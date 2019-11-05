@@ -1,0 +1,20 @@
+<form class="layui-form">
+    <div class="layui-form-item">
+        <label class="layui-form-label">权限名：</label>
+        <div class="layui-input-block">
+            <input type="text" name="permissionName" required  lay-verify="required" placeholder="请输入权限名" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">备注信息：</label>
+        <div class="layui-input-block">
+            <input type="text" name="permissionRemark" placeholder="请输入备注" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="addPermissionSubmit">立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+    </div>
+</form>

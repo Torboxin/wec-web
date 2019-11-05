@@ -1,0 +1,98 @@
+<form class="layui-form">
+    <div class="layui-form-item">
+        <label class="layui-form-label">名称：</label>
+        <div class="layui-input-block">
+            <input type="text" name="navName" required  lay-verify="required" placeholder="请输入导航项名称" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">链接：</label>
+        <div class="layui-input-block">
+            <input type="text" name="navUrl"  lay-verify="required" placeholder="请输入导航项链接" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">类型：</label>
+        <div class="layui-input-block">
+            <select name="navTypeCode" lay-search></select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <fieldset id="navIcoCode" class="layui-elem-field layui-field-title">
+                <legend>图标</legend>
+                <div class="layui-field-box layui-row layui-col-space5" style="max-height: 100px;overflow: auto;text-align: center;"></div>
+            </fieldset>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">上级菜单：</label>
+        <div class="layui-input-block">
+            <select name="navFatherId" lay-search></select>
+        </div>
+    </div>
+    <div class="layui-form-item layui-form-text">
+        <label class="layui-form-label">排序值：</label>
+        <div class="layui-input-block">
+            <input type="number" name="navOrderCode" placeholder="请输入排序值" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item layui-form-text">
+        <label class="layui-form-label">权限：</label>
+        <div class="layui-input-block">
+            <input type="text" name="navPermission" placeholder="请输入权限值" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="addNavSubmit">立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+    </div>
+    <script>
+        $.ajax({
+            datatype:'json',
+            url:"http://localhost:8080/wechat-model-controller/nav_admin/findAllMenuNavigationItem",
+            type:'post',
+            success:function(navList){
+                var html = '<option value="0">无</option>';
+                for(i in navList){
+                    html += '<option value="'+navList[i].id+'">'+navList[i].nav_name+'</option>'
+                }
+                $('select[name="navFatherId"]').html(html);
+                sessionStorage.setItem("selectNavMenuListHtml",html);
+                form.render();
+            }
+        });
+        $.ajax({
+            datatype:'json',
+            url:"http://localhost:8080/wechat-model-controller/comm/getAllIcon",
+            type:'post',
+            success:function(iconList){
+                var html = '';
+                for(i in iconList){
+                    html += '<div class="layui-col-md1"><i class="iconfont" style="cursor:pointer;font-size: 20px;" onclick="thisSelected(this)" data-val="'+iconList[i].ico_code.replace('#','+')+'">'+iconList[i].ico_code+'</i></div>'
+                }
+                $('#navIcoCode .layui-field-box').html(html);
+                form.render();
+            }
+        });
+        $.ajax({
+            datatype:'json',
+            url:"http://localhost:8080/wechat-model-controller/comm/getNavStateList",
+            type:'post',
+            success:function(navStateList){
+                var html = '';
+                for(i in navStateList){
+                    html += '<option value="'+navStateList[i].id+'">'+navStateList[i].state_msg+'</option>'
+                }
+                $('select[name="navTypeCode"]').html(html);
+                form.render();
+            }
+        });
+        function thisSelected(i){
+            $('.iconfont-selected').removeClass('iconfont-selected');
+            i.classList.add('iconfont-selected');
+        }
+    </script>
+</form>

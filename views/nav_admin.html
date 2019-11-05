@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <div class="layui-row">
+        <button type="button" class="layui-btn layui-btn-normal layui-btn-sm" onclick="addNav()"><i class="iconfont">&#xe782;</i>添加导航项</button>
+        <button type="button" class="layui-btn layui-btn-danger layui-btn-sm" onclick="delNav(this)"><i class="iconfont">&#xe642;</i>删除导航项</button>
+    </div>
+    <div class="layui-row layui-col-space10">
+        <div class="layui-col-md9 layui-col-sm12">
+            <table lay-filter="navigationAdminTable" id="navigationAdminTable"></table>
+        </div>
+        <div id="navTree" class="layui-col-md3 layui-hide-sm layui-show-md-block" style="margin: 15px 0;border: 1px solid #cbcbcb;height: 700px;max-height: 700px;overflow: auto;"></div>
+    </div>
+
+    <script>
+        $(function () {
+            loadNavigationAdminTable();
+        })
+
+        function loadNavigationAdminTable(){
+            $.ajax({
+                datatype:'json',
+                url:"http://localhost:8080/wechat-model-controller/comm/getNavStateRecord",
+                type:'post',
+                success:function(navStateList){
+                    table.render({
+                        elem: '#navigationAdminTable'
+                        ,method:'post'
+                        ,url: 'http://localhost:8080/wechat-model-controller/nav_admin/findAllNavigationTable'
+                        ,page: true
+                        ,height: 700
+                        ,limit:20
+                        ,cols: [[
+                            {width:80,type:"checkbox"}
+                            ,{field: 'id', title: 'ID', width:80, sort: true,hide: true}
+                            ,{field: 'nav_name', title: '名称', width:140}
+                            ,{field: 'nav_url', title: '链接', width:200}
+                            ,{field: 'nav_father_name', title: '上级菜单', width:140}
+                            ,{field: 'nav_type_code', title: '类型', width:60, templet:function (o) {
+                                    return navStateList[o.nav_type_code];
+                                }}
+                            ,{field: 'nav_ico_code', title: '图标', width:60, templet:function (o) {
+                                    return '<i class="iconfont" style="font-size: 22px;">'+o.nav_ico_code+'</i>';
+                                }}
+                            ,{field: 'nav_order_code', title: '排序', width:90}
+                            ,{field: 'nav_permission', title: '权限', width:200}
+                        ]]
+                    });
+                }
+            });
+            loadNavTree();
+        }
+
+        // 加载导航树
+        function loadNavTree(){
+            $.ajax({
+                datatype:'json',
+                url:"http://localhost:8080/wechat-model-controller/comm/getAllNavigation",
+                type:'get',
+                crossDomain: true,
+                success:function(obj){
+                    // 将后端传递的数据转换为指定格式的数据
+                    var mList = structureNav([],obj);
+                    // 遍历转换后的导航数据转换为layui tree组件所需要的格式 并渲染tree
+                    tree.render({
+                        elem:'#navTree',
+                        data:navDataAnalysisLayuiTreeData(mList),
+                        id:'navTree',
+                        showLine:true
+                    });
+                }
+            });
+        }
+
+        /**
+         * 将给定数据转换为layui tree组件所需要的格式
+         * @param mList 指定格式数据数组
+         * @returns {Array} layui tree组件data属性的格式值
+         */
+        function navDataAnalysisLayuiTreeData(mList){
+            var data = [];
+            for(i in mList){
+                if(mList[i].typeCode == 2 || mList[i].dl.length == 0){
+                    data.push({title:mList[i].title,id:mList[i].id});
+                }else{
+                    data.push({title:mList[i].title,id:mList[i].id,children:navDataAnalysisLayuiTreeData(mList[i].dl),spread:true});
+                }
+            }
+            return data;
+        }
+
+        function addNav(){
+            $.ajax({
+                datatype:'html',
+                url:"/add_nav",
+                type:'get',
+                success:function(obj){
+                    layer.open({
+                        title: '添加导航项',
+                        anim: mathLayuiAnim(),
+                        skin: 'layerzk-normal',
+                        area:'600px',
+                        btn: false,
+                        shadeClose: true,
+                        content: obj,
+                    });
+                }
+            });
+        }
+
+        form.on('submit(addNavSubmit)', function(data){
+            data.field.navIcoCode = $('#navIcoCode .iconfont-selected')[0].dataset.val.replace('+','#');
+            $.ajax({
+                datatype:'json',
+                url:"http://localhost:8080/wechat-model-controller/nav_admin/addNav",
+                data:data.field,
+                type:'post',
+                success:function(obj){
+                    if(obj.code == 1)
+                        layerzk.open(windowObj,{bakcgroundColor:rgba16(),msg:obj.message,icoCode:'&#xe688;'},3000);
+                    else
+                        layerzk.open(windowObj,{bakcgroundColor:'#f44336d4',msg:obj.message,icoCode:'&#xe688;'},3000);
+                    clickLayuiTableBtn('navigationAdminTable');
+                    loadNavTree();
+                    initNav();
+                }
+            });
+            return false;
+        });
+
+        function delNav(i){
+            var checkStatus = table.checkStatus('navigationAdminTable');
+            if(checkStatus.data.length <= 0){
+                layer.tips('未勾选数据！', i, {
+                    tips: [1, '#3595CC'],
+                    time: 4000
+                });
+            }else{
+                layer.open({
+                    title: '<i class="iconfont" style="color:#F44336">&#xe67e;</i>删除导航项',
+                    anim: mathLayuiAnim(),
+                    btn: ['确认'],
+                    yes: function(index, layero){
+                        var param = '';
+                        checkStatus.data.forEach(function (val) {
+                            param += 'id='+val.id+'&';
+                        });
+                        $.ajax({
+                            datatype:'json',
+                            url:"http://localhost:8080/wechat-model-controller/nav_admin/delNav",
+                            data: param,
+                            type:'post',
+                            success:function(obj){
+                                if(obj.code == 1)
+                                    layerzk.open(windowObj,{bakcgroundColor:'#009688',msg:obj.message,icoCode:'&#xe605;'},3000);
+                                else
+                                    layerzk.open(windowObj,{bakcgroundColor:'#f44336d4',msg:obj.message,icoCode:'&#xe67e;'},3000);
+                                layer.close(index);
+                                clickLayuiTableBtn('navigationAdminTable');
+                                loadNavTree();
+                                initNav();
+                            }
+                        });
+                    },
+                    success: function(layero, index){
+                        layero[0].children[1].style.textAlign = 'center';
+                    },
+                    shadeClose: true,
+                    content: '是否确认删除选中导航项？'
+                });
+            }
+        }
+    </script>
+</body>
+</html>

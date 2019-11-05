@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:v-on="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>管理控制台</title>
+    <link rel="shortcut icon" href="static/image/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="static/layui/css/layui.css">
+    <link rel="stylesheet" href="static/css/animate.min.css">
+    <link rel="stylesheet" href="static/css/layui-customize.css">
+    <style>
+        body #mainLeftNav i{
+            margin-right: 5px;
+            font-size: 16px;
+        }
+        .header-nav{
+            background-clip: padding-box,border-box;
+            background-origin: padding-box,border-box;
+            background-image: linear-gradient(135deg,#000,#000),linear-gradient(135deg,#009688,#8fff8b,#00BCD4);
+            border-bottom: 3px transparent solid;
+        }
+        .layui-tab-title li:nth-child(1) i {
+            display: none;
+        }
+        .web-index .layui-card-header{
+            text-indent: 5px;
+        }
+        .web-index .iconfont{
+            font-size: 26px;
+            float: left;
+        }
+        .web-index-statistics-item{
+            font-size: 28px;
+            display: block;
+            height: 50px;
+            line-height: 50px;
+            text-align: center;
+            cursor: pointer;
+        }
+        body .layui-table [data-field=role_name] .layui-table-cell {
+            overflow: visible;
+        }
+        body .layui-table .layui-form .layui-input{
+            height: 25px;
+        }
+        body .layui-table .layui-form .layui-anim{
+            top: 30px;
+        }
+        .iconfont-selected{
+            color: #4CAF50;
+        }
+        .layui-nav{
+            cursor: pointer;
+        }
+
+        @font-face {
+            font-family: 'iconfont';  /* project id 1376042 */
+            src: url('//at.alicdn.com/t/font_1376042_9y05xjqenks.eot');
+            src: url('//at.alicdn.com/t/font_1376042_9y05xjqenks.eot?#iefix') format('embedded-opentype'),
+            url('//at.alicdn.com/t/font_1376042_9y05xjqenks.woff2') format('woff2'),
+            url('//at.alicdn.com/t/font_1376042_9y05xjqenks.woff') format('woff'),
+            url('//at.alicdn.com/t/font_1376042_9y05xjqenks.ttf') format('truetype'),
+            url('//at.alicdn.com/t/font_1376042_9y05xjqenks.svg#iconfont') format('svg');
+        }
+
+        .iconfont{
+            font-family:"iconfont" !important;
+            font-size:16px;font-style:normal;
+            -webkit-font-smoothing: antialiased;
+            -webkit-text-stroke-width: 0.2px;
+            -moz-osx-font-smoothing: grayscale;
+            margin-right: 3px;
+        }
+        body .layui-layer-dialog .layui-layer-content{
+            overflow: visible;
+        }
+    </style>
+</head>
+<body class="layui-layout-body">
+<div class="layui-layout layui-layout-admin">
+    <div class="layui-header header-nav">
+        <div class="layui-logo layui-hide-sm layui-hide-xs layui-show-md-block">管理中心</div>
+        <!-- 头部区域（可配合layui已有的水平导航） -->
+        <ul class="layui-nav layui-layout-left layui-hide-sm layui-hide-xs layui-show-md-block">
+            <li class="layui-nav-item">
+                <i id="menuHideCss" class="layui-icon" style="font-size: 20px;cursor: pointer;" v-on:click="menuHide">&#xe668;</i>
+                <i id="menuShowCss" class="layui-icon" style="font-size: 20px;cursor: pointer;display: none;" v-on:click="menuShow">&#xe66b;</i>
+            </li>
+        </ul>
+        <ul class="layui-nav layui-layout-left layui-show-sm-block layui-hide-md" style="left: unset;">
+            <li class="layui-nav-item">
+                <i i class="iconfont" style="font-size: 20px;cursor: pointer;" onclick="showNav()">&#xe63b;</i>
+            </li>
+        </ul>
+        <ul class="layui-nav layui-layout-right">
+            <li class="layui-nav-item"><a href="/" onclick="userLoginOut()">退出</a></li>
+        </ul>
+    </div>
+
+    <div id="contentWindow" style="height: 94vh;position:relative;">
+        <div id="mainLeftMenu" class="layui-side layui-bg-black layui-hide-sm layui-hide-xs layui-show-md-block" style="float: left;height: 100%;top: unset;position:unset;width: 200px;">
+            <div id="abc" class="layui-side-scroll" style="width: 100%;">
+                <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+                <ul id="mainLeftNav" class="layui-nav layui-nav-tree"  lay-filter="menuLeftNav" lay-shrink="all" style="width: 100%;"></ul>
+            </div>
+        </div>
+        <div id="mainContent" class="layui-body" style="position:unset;height: 100%;">
+            <!-- 内容主体区域 -->
+            <div style="height: 100%;">
+                <div class="layui-tab layui-tab-card" lay-filter="menuTab" lay-allowClose="true" style="margin: 0;height: 100%;border: none;">
+                    <ul class="layui-tab-title">
+                        <li class="layui-this"><i class="iconfont" style="display: inline-block;">&#xe603;</i>首页</li>
+                    </ul>
+                    <div class="layui-tab-content" style="margin-bottom: 30px;">
+                        <div class="layui-tab-item layui-show">
+                            <div id="htmlContent" class="animated fadeInUp">
+                                <div class="layui-row layui-col-space10 web-index">
+                                    <div class="layui-col-md2 layui-col-sm6 layui-col-xs12">
+                                        <div class="layui-card">
+                                            <div class="layui-card-header"><i class="iconfont">&#xe650;</i>微信账号存活率</div>
+                                            <div class="layui-card-body">
+                                                <span id="weChatSuccess" class="web-index-statistics-item item-opt"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="layui-col-md2 layui-col-sm6 layui-col-xs12">
+                                        <div class="layui-card">
+                                            <div class="layui-card-header"><i class="iconfont">&#xe64d;</i>业务执行成功率</div>
+                                            <div class="layui-card-body">
+                                                <span id="businessSuccess" class="web-index-statistics-item item-opt"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="layui-col-md2 layui-col-sm6 layui-col-xs12">
+                                        <div class="layui-card">
+                                            <div class="layui-card-header"><i class="iconfont">&#xe64a;</i>添加好友成功率</div>
+                                            <div class="layui-card-body">
+                                                <span id="addFriendSuccess" class="web-index-statistics-item item-opt"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="layui-col-md2 layui-col-sm6 layui-col-xs12">
+                                        <div class="layui-card">
+                                            <div class="layui-card-header"><i class="iconfont">&#xe649;</i>新增微信账号数量</div>
+                                            <div class="layui-card-body">
+                                                <span id="newWeChatAccountCount" class="web-index-statistics-item item-opt-two"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="layui-col-md2 layui-col-sm6 layui-col-xs12">
+                                        <div class="layui-card">
+                                            <div class="layui-card-header"><i class="iconfont">&#xe654;</i>设备信息总数</div>
+                                            <div class="layui-card-body">
+                                                <span id="hanrdBaseCount" class="web-index-statistics-item item-opt-two"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="layui-col-md2 layui-col-sm6 layui-col-xs12">
+                                        <div class="layui-card">
+                                            <div class="layui-card-header"><i class="iconfont">&#xe65c;</i>当前系统时间</div>
+                                            <div class="layui-card-body">
+                                                <span id="systemTime" class="web-index-statistics-item" style="font-size: 18px;"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="layui-row">
+                                    <div class="layui-carousel" id="test1" lay-filter="test1">
+                                        <div carousel-item>
+                                            <div>
+                                                <div id="accountProbability" style="width: 100%;height: 100%;" ></div>
+                                            </div>
+                                            <div>
+                                                <div id="sk2"></div>
+                                            </div>
+                                            <div>
+                                                <div id="sk3"></div>
+                                            </div>
+                                            <div>
+                                                <div id="sk4"></div>
+                                            </div>
+                                            <div>
+                                                <div id="sk5"></div>
+                                            </div>
+                                            <div>
+                                                <div id="sk6"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="button" class="layui-btn layui-btn-primary" onclick="info()">一个标准的按钮</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+<script type="text/javascript" src="static/layui/layui.all.js"></script>
+<script type="text/javascript" src="static/js/jquery-3.3.1.min.js"></script>
+<script type="text/javascript" src="static/js/vue.js"></script>
+<script type="text/javascript" src="static/js/layerzk.js"></script>
+<script type="text/javascript" src="static/js/countUp.min.js"></script>
+<script type="text/javascript" src="static/js/echarts.min.js"></script>
+<script type="text/javascript">
+    // 自定义弹出层样式
+    layer.config({
+        extend: 'myskin/style.css'
+    });
+    // 设置ajax全局参数
+    $.ajaxSetup({
+        headers:{"Authorization":isNull(localStorage.wechatToken)},
+        crossDomain: true,
+        statusCode: {
+            404: function(){
+                clearInit();
+            },
+            500: function(){
+                clearInit();
+            }
+        }
+    });
+    var carousel = layui.carousel;
+    var windowObj = layerzk.init($('#mainContent'),'rb');
+    var menuList = [];
+    var msgList = ["我是一个保安，上班只为下班！","我是一个保安，每天打卡上班！","我是一个保安，坐等团本炸穿！","我是一个保安，***********！","我是一个info信息，弹出后五秒钟我会自动关闭哦，或者你点击我一下我也会带你去具体信息的详细页面查看"];
+    var icoCodeList = ['&#xe77d;','&#xe63b;','&#xe603;','&#xe60a;','&#xe605;','&#xe660;','&#xe65f;','&#xe65e;','&#xe65d;','&#xe65c;','&#xe65c;','&#xe65b;','&#xe65a;','&#xe659;','&#xe658;','&#xe657;','&#xe656;','&#xe655;','&#xe654;','&#xe653;','&#xe652;','&#xe651;','&#xe650;','&#xe64f;','&#xe64e;','&#xe64d;','&#xe64c;','&#xe64b;','&#xe64a;','&#xe649;']
+    var myChart = null;
+    var socket = null;
+    var html404 = null;
+    var menuTabCutReLoad = null;
+    var table = layui.table.set({headers:{"Authorization":isNull(localStorage.wechatToken)}});
+    var form = layui.form;
+    var transfer = layui.transfer;
+    var element = layui.element;
+    var tree = layui.tree;
+    var laydate = layui.laydate;
+    var upLoad = layui.upload;
+
+    $(function () {
+        if(!localStorage.wechatToken)
+            window.location = "/";
+        // 初始化websocket
+        initWebSocket();
+        // 初始化导航
+        initNav();
+        $.ajax({
+            datatype:'html',
+            url:"/404",
+            type:'get',
+            success:function(obj){
+                html404 = obj;
+            }
+        });
+        // 监听页面大小变化
+        $(window).resize(function() {
+            $('#contentWindow').css({
+                height:($(window).height()-$('.layui-header').height())+'px'
+            });
+            if(myChart){
+                myChart.resize({width:'auto',height:'auto'});
+            }
+        })
+        // 监听导航项被单击
+        element.on('nav(menuLeftNav)', function(elem){
+            if(elem[0].dataset.type == 2){
+                var layId = "tab-"+elem[0].dataset.id;
+                var contentHtml = "";
+                // 请求html页面并插入当前要切换的Tab选项卡中
+                $.ajax({
+                    datatype:'html',
+                    url:"/"+elem[0].dataset.src,
+                    type:'get',
+                    statusCode: {
+                        404: function(){
+                            console.warn("未获取到资源！");
+                            contentHtml = html404;
+                        },
+                        500: function(){
+                            console.warn("获取资源失败！");
+                            contentHtml = html404;
+                        }
+                    },
+                    async: false,
+                    success:function(obj){
+                        contentHtml = obj;
+                    }
+                });
+                if($('li[lay-id="'+layId+'"]').length <= 0){
+                    element.tabAdd('menuTab', {
+                        title: elem[0].innerHTML,
+                        content: '<div class="animated fadeInUp">'+ contentHtml +'</div>', //支持传入html
+                        id: layId
+                    });
+                }
+                element.tabChange('menuTab', layId);
+            }
+        });
+        // 监听选项卡单击事件
+        element.on('tab(menuTab)', function(data){
+            var id = $(this).attr('lay-id').split('-')[1];
+            $('#mainLeftNav .layui-this').removeClass('layui-this');
+            $('a[data-id="'+id+'"]')[0].parentElement.classList.add('layui-this');
+            if(menuTabCutReLoad){
+                if(data.index == 0){
+                    return;
+                }
+                $('.layui-show .animated').load($('a[data-id="'+id+'"]')[0].dataset.src);
+            }
+        });
+        //建造实例
+        carousel.render({
+            elem: '#test1'
+            ,height: '600px'
+            ,width: '100%' //设置容器宽度
+            ,arrow: 'hover' //始终显示箭头
+            ,anim: 'fade' //切换动画方式
+            ,interval: 5000
+        });
+        // 监听切换事件
+        carousel.on('change(test1)', function(obj){
+
+        });
+        loadIndexStatisticsItems();
+        myChart = echarts.init(document.getElementById('accountProbability'),{width:'auto',height:'auto'});
+        var option = {
+            tooltip : {
+                trigger: 'axis',
+                axisPointer : {            // 坐标轴指示器，坐标轴触发有效
+                    type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+                }
+            },
+            legend: {
+                data:['']
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            xAxis : [
+                {
+                    type : 'category',
+                    data : ['周一','周二','周三','周四','周五','周六','周日']
+                }
+            ],
+            yAxis : [
+                {
+                    type : 'value'
+                }
+            ],
+            series : [
+                {
+                    name:'直接访问',
+                    type:'bar',
+                    data:[320, 332, 301, 334, 390, 330, 320]
+                },
+                {
+                    name:'邮件营销',
+                    type:'bar',
+                    stack: '广告',
+                    data:[120, 132, 101, 134, 90, 230, 210]
+                },
+                {
+                    name:'联盟广告',
+                    type:'bar',
+                    stack: '广告',
+                    data:[220, 182, 191, 234, 290, 330, 310]
+                },
+                {
+                    name:'视频广告',
+                    type:'bar',
+                    stack: '广告',
+                    data:[150, 232, 201, 154, 190, 330, 410]
+                },
+                {
+                    name:'搜索引擎',
+                    type:'bar',
+                    data:[862, 1018, 964, 1026, 1679, 1600, 1570],
+                    markLine : {
+                        lineStyle: {
+                            normal: {
+                                type: 'dashed'
+                            }
+                        },
+                        data : [
+                            [{type : 'min'}, {type : 'max'}]
+                        ]
+                    }
+                },
+                {
+                    name:'百度',
+                    type:'bar',
+                    barWidth : 5,
+                    stack: '搜索引擎',
+                    data:[620, 732, 701, 734, 1090, 1130, 1120]
+                },
+                {
+                    name:'谷歌',
+                    type:'bar',
+                    stack: '搜索引擎',
+                    data:[120, 132, 101, 134, 290, 230, 220]
+                },
+                {
+                    name:'必应',
+                    type:'bar',
+                    stack: '搜索引擎',
+                    data:[60, 72, 71, 74, 190, 130, 110]
+                },
+                {
+                    name:'其他',
+                    type:'bar',
+                    stack: '搜索引擎',
+                    data:[62, 82, 91, 84, 109, 110, 120]
+                }
+            ]
+        };
+        myChart.setOption(option);
+    })
+    // 模拟点击layui table下方确定按钮进行异步请求
+    function clickLayuiTableBtn(id){
+        $('div[lay-id="' + id + '"] .layui-laypage-btn').click()
+    }
+    // 判断字符串是否为空
+    function isNull(str){
+        if(str == null || str == undefined || str.trim() === "" || str.trim().length === 0){
+            return "";
+        }
+        return str;
+    }
+    // 初始化导航栏
+    function initNav(){
+        $.ajax({
+            datatype:'json',
+            url:"http://localhost:8080/wechat-model-controller/comm/getNavigation",
+            type:'get',
+            success:function(obj){
+                if(obj.code == 1){
+                    // 将后端传递的数据转换为指定格式的数据
+                    menuList = structureNav([],obj.obj);
+                    // 将预备的导航栏数据加工并生成html代码插入其中
+                    $('#mainLeftNav').html(createrMenu(menuList));
+                    // 渲染导航
+                    layui.element.render();
+                }
+            }
+        });
+    }
+    // 获取指定配置项的值
+    function getConfigItemValue(key){
+        var value = null;
+        $.ajax({
+            datatype:'json',
+            url:"http://localhost:8080/wechat-model-controller/comm/getProjectConfigItemValue",
+            data:{"key":key},
+            type:'post',
+            async: false,
+            success:function(obj){
+                if(obj.code == 1){
+                    value = obj.obj;
+                }else{
+                    layer.msg(obj.message);
+                    value =  "";
+                }
+            }
+        });
+        return value;
+    }
+    // 开启websocket连接
+    function initWebSocket(){
+        var webSocketUrl = getConfigItemValue("ws_server");
+        var url = webSocketUrl+"?Authorization="+localStorage.wechatToken;
+        socket = new WebSocket(url);
+        // 监听连接
+        socket.onopen = function (e) {
+            console.log("%c服务端连接成功！","color: #009688;font-size:22px;");
+        }
+        // 监听关闭
+        socket.onclose = function (e) {
+            console.log("%c连接已断开！","color: red;font-size: 14px;");
+        }
+        // 监听接收
+        socket.onmessage = function (e) {
+            // 接收服务端传递的json字符串并转为json对象
+            var data = JSON.parse(e.data);
+            // 检查类型码
+            switch (data.code) {
+                case 0:
+                    layerzk.open(windowObj,{bakcgroundColor:'#009688',msg:data.message,icoCode:data.obj});
+                    break;
+                case 1:
+                    // 推送服务器系统时间
+                    if($('#systemTime')){
+                        $('#systemTime').text(data.obj);
+                    }
+                    break;
+            }
+        }
+        // 监听异常
+        socket.onerror = function (e) {
+            console.error("连接意外关闭，异常原因："+e);
+        }
+    }
+    // 清理并初始化
+    function clearInit(){
+        localStorage.clear();
+        window.location = "/";
+    }
+    // 登出当前登录账号
+    function userLoginOut(){
+        $.ajax({
+            datatype:'json',
+            url:"http://localhost:8080/wechat-model-controller/login/userLoginOut",
+            type:'post',
+            success:function(obj){
+                layer.msg(obj);
+            }
+        });
+        clearInit();
+    }
+    // 关闭所有选项卡
+    function closeAllTab(){
+        var tab = $('.layui-tab-title')[0];
+        var i = tab.children.length-1;
+        for(i;i>0;i--){
+            tab.removeChild(tab.children[i]);
+        }
+        element.tabChange('menuTab', 'tab-8');
+    }
+    // 加载首页统计项
+    function loadIndexStatisticsItems(){
+        const opt = {
+            suffix: ' %',
+            decimalPlaces: 2,
+            duration: 2
+        };
+        const opt2 = {
+            suffix: ' 条',
+            duration: 2
+        }
+        var optArr = $('.layui-card .item-opt');
+        var optTwoArr = $('.layui-card .item-opt-two');
+        for(i in optArr){
+            new CountUp(optArr[i], Math.random()*100, opt).start();
+            optArr[i].onclick = function () {
+                new CountUp(this.id, Math.random()*100, opt).start();
+            }
+        }
+        for(i in optTwoArr){
+            new CountUp(optTwoArr[i], parseInt(Math.random()*3000)+3000, opt2).start();
+            optTwoArr[i].onclick = function () {
+                new CountUp(this.id, parseInt(Math.random()*3000)+3000, opt2).start();
+            }
+        }
+    }
+    // 分辨率较小时的导航栏显示
+    function showNav(){
+        $('#mainLeftMenu')[0].classList.remove('layui-hide-sm','layui-hide-xs');
+        layer.open({
+            type: 1,
+            anim: mathLayuiAnim(),
+            area: ['200px',window.innerHeight+'px'],
+            offset: ['0','0'],
+            shade: [0.5,'#000'],
+            resize: false,
+            shadeClose: true,
+            closeBtn: false,
+            title: false, //不显示标题
+            isOutAnim: true,
+            content: $('#mainLeftMenu'), //捕获的元素，注意：最好该指定的元素要存放在body最外层，否则可能被其它的相对元素所影响
+            end : function(){
+                $('#mainLeftMenu')[0].classList.add('layui-hide-sm','layui-hide-xs');
+            }
+        });
+    }
+    // 给某个消息窗口增加数据
+    function info(){
+        layerzk.open(windowObj,{bakcgroundColor:rgba16(),msg:msgList[parseInt(Math.random()*msgList.length)],icoCode:icoCodeList[parseInt(Math.random()*icoCodeList.length)]},3000);
+    }
+    // 随机layui动画
+    function mathLayuiAnim(){
+        return parseInt(Math.random()*7);
+    }
+    /**
+     * 随机十六进制颜色(含透明度)
+     */
+    function rgba16(){//十六进制颜色随机
+        var r = Math.floor(Math.random()*256);
+        var g = Math.floor(Math.random()*256);
+        var b = Math.floor(Math.random()*256);
+        var a = Math.floor(Math.random()*256);
+        var color = '#'+r.toString(16)+g.toString(16)+b.toString(16)+a.toString(16);
+        return color;
+    }
+    /**
+     * 随机十六进制颜色(不含透明度)
+     */
+    function rgb16(){//十六进制颜色随机
+        var r = Math.floor(Math.random()*256);
+        var g = Math.floor(Math.random()*256);
+        var b = Math.floor(Math.random()*256);
+        var color = '#'+r.toString(16)+g.toString(16)+b.toString(16);
+        return color;
+    }
+    /**
+     * 构造页面导航
+     */
+    function structureNav(menu,navigation){
+        var o = 0;
+        while(navigation.length > 0){
+            var nav = navigation.pop();
+            if(menu.length <= 0 || nav.nav_father_id == null){
+                if(menu.length > 0){
+                    for(i in menu){
+                        if(menu[i].orderCode <= nav.nav_order_code){
+                            menu.splice(i,0,{typeCode:nav.nav_type_code,title:nav.nav_name,icoCode:nav.nav_ico_code,href:nav.nav_url,dl:[],id:nav.id,orderCode:nav.nav_order_code});
+                            if(nav.nav_url === '#'){
+                                if($('li[lay-id="tab-8"]').length <= 0){
+                                    $('.layui-tab-title .layui-this').attr('lay-id','tab-'+nav.id);
+                                }
+                            }
+                            break;
+                        }
+                    }
+                }else{
+                    menu.push({typeCode:nav.nav_type_code,title:nav.nav_name,icoCode:nav.nav_ico_code,href:nav.nav_url,dl:[],id:nav.id,orderCode:nav.nav_order_code});
+                }
+            }else {
+                menu = findNavItemInsertPosition(nav,menu);
+            }
+        }
+        return menu;
+    }
+
+    /**
+     * 递归遍历导航树寻找参数导航项的正确位置并插入
+     * @param nav 待插入的导航项
+     */
+    function findNavItemInsertPosition(nav,me){
+        for(i in me){
+            if(me[i].id == nav.nav_father_id){
+                if(me[i].dl.length > 0){
+                    for(j in me[i].dl){
+                        if(me[i].dl[j].orderCode <= nav.nav_order_code){
+                            me[i].dl.splice(j,0,{typeCode:nav.nav_type_code,title:nav.nav_name,icoCode:nav.nav_ico_code,href:nav.nav_url,dl:[],id:nav.id,orderCode:nav.nav_order_code});
+                            break;
+                        }
+                    }
+                }else{
+                    me[i].dl.push({typeCode:nav.nav_type_code,title:nav.nav_name,icoCode:nav.nav_ico_code,href:nav.nav_url,dl:[],id:nav.id,orderCode:nav.nav_order_code});
+                }
+                break;
+            }else{
+                if(me[i].dl.length > 0){
+                    me[i].dl = findNavItemInsertPosition(nav,me[i].dl);
+                }
+            }
+        }
+        return me;
+    }
+
+    /**
+     * 请求服务端查看是否拥有某项权限信息
+     */
+    function isPermitted(info) {
+        $.ajax({
+            datatype:'html',
+            url:"http://localhost:8080/wechat-model-controller/isPermitted",
+            data:'p='+info,
+            type:'post',
+            crossDomain: true,
+            success:function(obj){
+                console.log(obj);
+            }
+        });
+    }
+    /**
+     * 隐藏左侧导航栏
+     * @type {Vue}
+     */
+    var menuHideCss = new Vue({
+        el: '#menuHideCss',
+        methods: {
+            menuHide: function(e){
+                $('#mainLeftMenu').css({
+                    width:0
+                });
+                $('#menuHideCss').css({
+                    display:'none'
+                });
+                $('#menuShowCss').css({
+                    display:'block'
+                });
+                if(myChart){
+                    myChart.resize({width:'auto',height:'auto'});
+                }
+            }
+        }
+    })
+    /**
+     * 显示左侧导航栏
+     * @type {Vue}
+     */
+    var menuShowCss = new Vue({
+        el: '#menuShowCss',
+        methods: {
+            menuShow: function(e){
+                $('#mainLeftMenu').css({
+                    width:"200px"
+                });
+                $('#menuShowCss').css({
+                    display:'none'
+                });
+                $('#menuHideCss').css({
+                    display:'block'
+                });
+                if(myChart){
+                    myChart.resize({width:'auto',height:'auto'});
+                }
+            }
+        }
+    })
+
+    /**
+     * 创建左侧导航栏菜单项
+     * @param menuList
+     * @returns {string}
+     */
+    function createrMenu(menuList){
+        var menuHtml = '';
+        for(i in menuList){
+            if(menuList[i].typeCode == 1){
+                if(menuList[i].dl.length <= 0){
+                    continue;
+                }else{
+                    var t = menuList[i];
+                    var html = createrMultiLevelMenu(t.dl,0);
+                    if(html){
+                        menuHtml += '<li class="layui-nav-item"><a class=""><i class="iconfont">'+t.icoCode+'</i>'+t.title+'</a><dl class="layui-nav-child" style="background-color: rgba(0,0,0,1)!important;">'+ html +'</dl></li>';
+                    }
+                }
+            }else if(menuList[i].typeCode == 2){
+                if(menuList[i].href === '#'){
+                    menuHtml += '<li class="layui-nav-item layui-nav-itemed layui-this"><a data-src="'+menuList[i].href+'" data-type="' + menuList[i].typeCode + '" data-id="' + menuList[i].id + '" onclick="return false;"><i class="iconfont">'+menuList[i].icoCode+'</i>'+menuList[i].title+'</a></li>';
+                }else{
+                    menuHtml += '<li class="layui-nav-item layui-nav-itemed"><a data-src="'+menuList[i].href+'" data-type="' + menuList[i].typeCode + '" data-id="' + menuList[i].id + '" onclick="return false;"><i class="iconfont">'+menuList[i].icoCode+'</i>'+menuList[i].title+'</a></li>';
+                }
+            }
+        }
+        return menuHtml;
+    }
+
+    /**
+     * 创建左侧导航栏菜单项中的多级菜单项
+     * @param menuList
+     * @param index
+     * @returns {string}
+     */
+    function createrMultiLevelMenu(menuList,index){
+        var menuHtml = '';
+        // 菜单层级数
+        index++;
+        var tIndex = index;
+        for(i in menuList) {
+
+            if(menuList[i].typeCode == 1){
+                if(menuList[i].dl.length <= 0){
+                    return "";
+                }else{
+                    var t = menuList[i];
+                    var html = createrMultiLevelMenu(t.dl,index);
+                    if(html){
+                        menuHtml += '<dd style="text-indent: ' + tIndex + 'em"> <a data-src="'+t.href+'" data-type="' + t.typeCode + '" data-id="' + t.id + '" onclick="return false;"><i class="iconfont">' + t.icoCode + '</i>' + t.title + '</a><dl class="layui-nav-child">' + html + '</dl></dd>';
+                    }
+                }
+            }else if (menuList[i].typeCode == 2){
+                menuHtml += '<dd style="text-indent: ' + tIndex + 'em"><a data-src="'+menuList[i].href+'" data-type="' + menuList[i].typeCode + '" data-id="' + menuList[i].id + '" onclick="return false;"><i class="iconfont">' + menuList[i].icoCode + '</i>' + menuList[i].title + '</a></dd>';
+            }
+        }
+        return menuHtml;
+    }
+
+    /**
+     * 组合两个json对象为一个对象
+     * @param target
+     * @param source
+     * @returns {*}
+     */
+    function mergeJson(target, source) {
+        for (var obj in source) {
+            target[obj] = source[obj];
+        }
+        return target;
+    }
+</script>
+</body>
+</html>

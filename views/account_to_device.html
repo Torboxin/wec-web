@@ -1,0 +1,29 @@
+<form class="layui-form" >
+    <div class="layui-form-item">
+        <label class="layui-form-label">设备：</label>
+        <div class="layui-input-block">
+            <select name="updToDevice" lay-search></select>
+        </div>
+    </div>
+    <script>
+        $.ajax({
+            datatype:'json',
+            url:"http://localhost:8080/wechat-model-controller/comm/getAllDeviceNumData",
+            type:'post',
+            success:function(deviceList){
+                var options = '';
+                for(i in deviceList){
+                    options += '<option value="'+deviceList[i].id+'">'+deviceList[i].device_num +" ["+deviceList[i].remark+']</option>'
+                }
+                $('select[name="updToDevice"]').html(options);
+                form.render();
+            }
+        });
+    </script>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="updAccountToDevice">立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+    </div>
+</form>

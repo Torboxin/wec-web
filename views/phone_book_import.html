@@ -1,0 +1,83 @@
+<form class="layui-form" lay-filter="importPhoneBookCond">
+    <div class="layui-form-item">
+        <label class="layui-form-label">导入类别：</label>
+        <div class="layui-input-block">
+            <input type="radio" name="importPhoneBookType" lay-filter="importPhoneBookType" value="1" title="单批次导入" checked>
+            <input type="radio" name="importPhoneBookType" lay-filter="importPhoneBookType" value="2" title="多批次导入">
+        </div>
+    </div>
+    <div id="multiBatchPhoneBook" style="display: none;">
+        <div class="layui-form-item">
+            <label class="layui-form-label">批次数量：</label>
+            <div class="layui-input-block">
+                <input type="number" name="batchNum" placeholder="请输入每个批次导入的数量" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">批次备注：</label>
+        <div class="layui-input-block">
+            <input type="text" name="batchRemark" placeholder="请输入批次备注信息" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="resolverImportPhoneBook">立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+    </div>
+</form>
+<script>
+    form.on('radio(importPhoneBookType)', function(data){
+        if(data.value == 2){
+            $('#multiBatchPhoneBook').css({display:"block"});
+        }else{
+            $('#multiBatchPhoneBook').css({display:"none"});
+        }
+    });
+    form.on('submit(resolverImportPhoneBook)', function(data){
+        layer.load(2, {shade: [0.4,'#6b6b6c']});
+        data.field.filePath = $('#selectPhoneBookFileTitle')[0].dataset.path;
+        $.ajax({
+            datatype:'json',
+            url:"http://localhost:8080/wechat-model-controller/phone_book_admin/importPhoneBook",
+            data:data.field,
+            type:'post',
+            success:function(obj){
+                if(obj.code == 1){
+                    layer.open({
+                        title:'导入电话本反馈信息',
+                        area:['400px','450px'],
+                        content:"<table class=\"layui-table\">" +
+                                "  <thead>" +
+                                "    <tr>" +
+                                "      <th>手机号</th>" +
+                                "      <th>失败原因</th>" +
+                                "    </tr> " +
+                                "  </thead>" +
+                                "  <tbody>" +
+                                    obj.message +
+                                "  </tbody>" +
+                                "</table>",
+                        success:function(layero, index){
+                            layero[0].children[1].style.overflow = "auto";
+                        }
+                    });
+                    $('#selectPhoneBookFileTitle').text("选择文件");
+                    $('#selectPhoneBookFileTitle')[0].dataset.path = "";
+                    $('#resolverImportPhoneBookFile')[0].classList.add("layui-btn-disabled");
+                    $('#resolverImportPhoneBookFile')[0].setAttribute("disabled","");
+                    form.render();
+                }else if(obj.code == 2){
+                    layerzk.open(windowObj,{bakcgroundColor:'#009688',msg:obj.message,icoCode:'&#xe605;'},3000);
+                }else{
+                    layerzk.open(windowObj,{bakcgroundColor:"#d4000d",msg:obj.message,icoCode:'&#xe67e;'},3000);
+                }
+                clickLayuiTableBtn('phoneBookBatchAdminTable');
+                layer.closeAll('loading');
+            }
+        });
+        return false;
+    });
+    form.render();
+</script>

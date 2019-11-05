@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+    <div class="layui-row layui-col-space5">
+        <form class="layui-form layui-row layui-col-space3" lay-filter="phoneBookBatchScreeCond" style="max-height: 200px;overflow: visible;">
+            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+                <input class="layui-input" type="text" name="batchNumber" placeholder="批次号匹配" autocomplete="off">
+            </div>
+            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+                <select name="batchState">
+                    <option value="">批次状态</option>
+                    <option value="0">可用</option>
+                    <option value="1">不可用</option>
+                </select>
+            </div>
+        </form>
+    </div>
+    <div class="layui-row">
+        <div class="layui-btn-group" style="line-height: 35px;">
+            <button type="button" class="layui-btn layui-btn-normal layui-btn-sm" onclick="loadPhoneBookBatchAdminTable()"><i class="iconfont">&#xe6f7;</i>查询</button>
+            <button type="button" class="layui-btn layui-btn-primary layui-btn-sm" id="selectPhoneBookFile"><i class="iconfont">&#xe6dd;</i><span id="selectPhoneBookFileTitle">选择文件</span></button>
+            <button type="button" class="layui-btn layui-btn-normal layui-btn-sm layui-btn-disabled" onclick="importPhoneBook()" disabled id="resolverImportPhoneBookFile"><i class="iconfont">&#xe6dd;</i>解析导入文件</button>
+            <button type="button" class="layui-btn layui-btn-danger layui-btn-sm" onclick="delPhoneBook(this)"><i class="iconfont">&#xe642;</i>删除</button>
+        </div>
+    </div>
+    <div class="layui-row layui-col-space5">
+        <div class="layui-col-md7">
+            <table lay-filter="phoneBookBatchAdminTable" id="phoneBookBatchAdminTable"></table>
+        </div>
+        <div class="layui-col-md5">
+            <table lay-filter="phoneBookAdminTable" id="phoneBookAdminTable"></table>
+        </div>
+    </div>
+    <script type="text/html" id="phoneBookBatchAdminTableEventButton">
+        <a class="layui-btn layui-btn-xs" lay-event="batchInfo"><i class="iconfont">&#xe6c3;</i>批次详情</a>
+    </script>
+    <script>
+        var phoneBookUpLoad = null;
+        $(function () {
+            phoneBookUpLoad = upLoad.render({
+                elem:'#selectPhoneBookFile',
+                url:'http://localhost:8080/wechat-model-controller/comm/upLoadFile',
+                headers:{"Authorization":isNull(localStorage.wechatToken)},
+                acceptMime:'text/plain',
+                exts:'txt',
+                before:function(obj){
+                    layer.load(); //开启loading
+                },
+                done: function(res, index, upload){
+                    if(res.code == 0){
+                        $('#selectPhoneBookFileTitle').text("待解析："+res.message);
+                        $('#selectPhoneBookFileTitle')[0].dataset.path = res.obj;
+                        $('#resolverImportPhoneBookFile')[0].classList.remove("layui-btn-disabled");
+                        $('#resolverImportPhoneBookFile')[0].removeAttribute("disabled");
+                        form.render();
+                    }
+                    layer.closeAll('loading'); //关闭loading
+                },
+                error: function(index, upload){
+                    layer.closeAll('loading'); //关闭loading
+                }
+            });
+            loadPhoneBookBatchAdminTable();
+            form.render();
+        })
+
+        function loadPhoneBookBatchAdminTable(){
+            var param = form.val('phoneBookBatchScreeCond');
+            table.render({
+                elem: '#phoneBookBatchAdminTable'
+                ,height: 700
+                ,where: param
+                ,method:'post'
+                ,url: 'http://localhost:8080/wechat-model-controller/phone_book_admin/findAllPhoneBookBatch'
+                ,page: true
+                ,limit:20
+                ,cols: [[
+                    {width:80,type:"checkbox"}
+                    ,{field: 'id', title: 'ID', width:80, sort: true,hide: true}
+                    ,{field: 'btach_serial_number', title: '批次号', width:140}
+                    ,{title: '总 / 可用 / 不可用', width:160, templet:function (o) {
+                            return o.batch_count_num + " / " + o.btach_is_get_num + " / " + o.batch_not_get_num;
+                        }}
+                    ,{field: 'state', title: '数据状态', width:90, templet:function (o) {
+                            return o.state == 0 ? "<span style='color: #4caf50;'>可用</span>" : "<span style='color: red;'>不可用</span>";
+                        }}
+                    ,{field: 'username', title: '所属用户', width:100}
+                    ,{field: 'batch_create_time', title: '创建时间', width:160, sort: true}
+                    ,{field: 'batch_use_time', title: '最后调用时间', width:160, sort: true}
+                    ,{field: 'batch_remark', title: '备注', width:80}
+                    ,{toolbar: '#phoneBookBatchAdminTableEventButton', width:110}
+                ]]
+            });
+
+            table.on('tool(phoneBookBatchAdminTable)', function (obj) {
+                var data = obj.data;
+                var layEvent = obj.event;
+                var tr = obj.tr;
+
+                if(layEvent === 'batchInfo'){
+                    loadPhoneBookAdminTable(tr[0].children[1].children[0].innerText);
+                }
+            })
+        }
+
+        function loadPhoneBookAdminTable(id){
+            table.render({
+                elem: '#phoneBookAdminTable'
+                ,height: 700
+                ,where:{batchId:id}
+                ,method:'post'
+                ,url: 'http://localhost:8080/wechat-model-controller/phone_book_admin/findAllPhoneBookData'
+                ,page: true
+                ,limit:20
+                ,cols: [[
+                    // {width:80,type:"checkbox"}
+                    ,{field: 'id', title: 'ID', width:80, sort: true,hide: true}
+                    ,{field: 'phone_num', title: '手机号', width:120}
+                    ,{field: 'state', title: '数据状态', width:90, templet:function (o) {
+                            return o.state == 0 ? "<span style='color: #4caf50;'>可用</span>" : "<span style='color: red;'>不可用</span>";
+                        }}
+                    ,{field: 'btach_serial_number', title: '导入批次', width:140, sort:true}
+                    ,{field: 'create_time', title: '导入时间', width:160, sort:true}
+                    ,{field: 'remark', title: '备注', width:80}
+                ]]
+            });
+        }
+
+        function importPhoneBook(){
+            $.ajax({
+                datatype:'html',
+                url:"/phone_book_import",
+                type:'get',
+                async: false,
+                success:function(obj){
+                    layer.open({
+                        title: '解析电话本文件配置项',
+                        anim: mathLayuiAnim(),
+                        skin: 'layerzk-normal',
+                        area:'600px',
+                        btn: false,
+                        shadeClose: true,
+                        content: obj,
+                    });
+                }
+            });
+        }
+
+        function delPhoneBook(i){
+            var checkStatus = table.checkStatus('phoneBookBatchAdminTable');
+            if(checkStatus.data.length <= 0){
+                layer.tips('未勾选数据！', i, {
+                    tips: [1, '#3595CC'],
+                    time: 4000
+                });
+            }else{
+                layer.open({
+                    title: '<i class="iconfont">&#xe67e;</i>删除电话本数据',
+                    anim: mathLayuiAnim(),
+                    btn: ['确认'],
+                    skin:'layerzk-danger',
+                    yes: function(index, layero){
+                        var param = '';
+                        checkStatus.data.forEach(function (val) {
+                            param += 'id='+val.id+'&';
+                        });
+                        $.ajax({
+                            datatype:'json',
+                            url:"http://localhost:8080/wechat-model-controller/phone_book_admin/delPhoneBookData",
+                            data: param,
+                            type:'post',
+                            success:function(obj){
+                                if(obj.code == 1)
+                                    layerzk.open(windowObj,{bakcgroundColor:'#009688',msg:obj.message,icoCode:'&#xe605;'},3000);
+                                else
+                                    layerzk.open(windowObj,{bakcgroundColor:'#f44336d4',msg:obj.message,icoCode:'&#xe67e;'},3000);
+                                layer.close(index);
+                                clickLayuiTableBtn('phoneBookBatchAdminTable');
+                            }
+                        });
+                    },
+                    success: function(layero, index){
+                        layero[0].children[1].style.textAlign = 'center';
+                    },
+                    shadeClose: true,
+                    content: '是否确认删除选中电话本批次以及批次下数据信息？'
+                });
+            }
+        }
+    </script>
+</body>
+</html>

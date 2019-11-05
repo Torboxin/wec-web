@@ -1,0 +1,29 @@
+<form class="layui-form" >
+    <div class="layui-form-item">
+        <label class="layui-form-label">角色：</label>
+        <div class="layui-input-block">
+            <select name="updToUser" lay-search></select>
+        </div>
+    </div>
+    <script>
+        $.ajax({
+            datatype:'json',
+            url:"http://localhost:8080/wechat-model-controller/user_admin/findAllUser",
+            type:'post',
+            success:function(userList){
+                var options = '';
+                for(i in userList){
+                    options += '<option value="'+userList[i].id+'">'+userList[i].username+'</option>'
+                }
+                $('select[name="updToUser"]').html(options);
+                form.render();
+            }
+        });
+    </script>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="updAccountToUser">立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+    </div>
+</form>

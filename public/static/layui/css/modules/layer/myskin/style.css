@@ -1,0 +1,3 @@
+body .layerzk-black .layui-layer-title{background-color: #000;color:#fff;}
+body .layerzk-normal .layui-layer-title{background-color: #00BCD4;color:#fff;}
+body .layerzk-danger .layui-layer-title{background-color: #ff0000a1;color:#fff;}

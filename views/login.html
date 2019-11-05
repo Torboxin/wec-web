@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<script type="text/javascript" src="static/layui/layui.all.js"></script>
+<script type="text/javascript" src="static/js/jquery-3.3.1.min.js"></script>
+<link rel="stylesheet" href="static/layui/css/layui.css" media="all" />
+<title>登录入口</title>
+</head>
+<body style="background-color: #F2F2F2">
+
+
+	<form class="layui-form">
+		<div style="height: 200px;"></div>
+		<div style="margin-left: auto; margin-right: auto; width: 350px;">
+			<div class="layui-card">
+				<div class="layui-card-header">登录</div>
+				<div class="layui-card-body">
+					<table style="width: 100%;">
+
+						<tr>
+							<td style="width: 60px;">账号</td>
+							<td>
+								<div class="col-md-12" style="margin: 4px">
+									<input type="text" class="layui-input" style="width: 100%;"
+										lay-verify="required" placeholder="" lay-verType="tips"
+										name="username" />
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<td style="width: 60px;">密码</td>
+							<td>
+								<div class="col-md-12" style="margin: 4px">
+									<input type="password" class="layui-input" style="width: 100%;"
+										lay-verify="required" lay-verType="tips" name="pwd" />
+								</div>
+							</td>
+						</tr>
+<!--						<tr>
+							<td style="width: 60px;">验证码</td>
+							<td>
+								<div class="col-md-12" style="margin: 4px">
+									<input type="text" class="layui-input" style="width: 100%;"
+										lay-verify="required" placeholder="" lay-verType="tips"
+										name="vcode" />
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<td style="width: 60px;"></td>
+							<td>
+								<div class="col-md-12" style="margin: 4px">
+									<img id="imgid" src="http://localhost:8080/wechat-model-controller/login/verifycode" style="cursor:pointer" onclick="changevcode()" >
+								</div>
+							</td>
+						</tr>-->
+
+						<tr>
+							<td style="width: 60px;"></td>
+							<td>
+	
+								<div style="float: right; text-align: right; margin: 8px;">
+
+									<button id="btnreg" lay-submit lay-filter="save"
+										class="layui-btn">登录</button>
+								</div>
+							</td>
+						</tr>
+					</table>
+				</div>
+			</div>
+		</div>
+	</form>
+<script type="text/javascript" src="static/js/login.js"></script>
+</body>
+</html>

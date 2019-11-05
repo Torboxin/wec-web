@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <div class="layui-row layui-col-space20">
+        <div class="layui-col-md12">
+            <blockquote class="layui-elem-quote" style="margin-bottom: 0">项目配置参数</blockquote>
+            <blockquote class="layui-elem-quote layui-quote-nm" style="padding: 0;max-height: 700px;overflow: auto;">
+                <table class="layui-table" style="margin: 0;">
+                    <thead>
+                    <tr>
+                        <th style="display: none;">ID</th>
+                        <th>变量名</th>
+                        <th>变量值</th>
+                        <th>描述信息</th>
+                    </tr>
+                    </thead>
+                    <tbody id="projectConfigTable"></tbody>
+                </table>
+            </blockquote>
+        </div>
+    </div>
+    <script>
+        $.ajax({
+            datatype:'json',
+            url:"http://localhost:8080/wechat-model-controller/sys_param_admin/findAllProjectConfigData",
+            type:'post',
+            success:function(obj){
+                var configHtml = '';
+                for(i in obj){
+                    configHtml += '  <tr>' +
+                                '      <td style="display: none;">'+obj[i].id+'</td>' +
+                                '      <td>'+obj[i].setting_item_key+'</td>' +
+                                '      <td><input class="layui-input" value="'+obj[i].setting_item_value+'" type="text" onfocus="updProjectConfigItemData(this)" data-name="settingItemValue"></td>' +
+                                '      <td>'+obj[i].setting_item_name+'</td>' +
+                                '    </tr>';
+                }
+                $('#projectConfigTable').html(configHtml);
+            }
+        });
+
+        /**
+         * 修改项目配置项数据 获取焦点函数
+         */
+        function updProjectConfigItemData(i){
+            var oldValue = i.value;
+            i.onblur = function(){
+                var newVlue = this.value;
+                if(oldValue != newVlue){
+                    var param = this.dataset.name+'='+newVlue+'&id='+this.parentElement.parentElement.children[0].innerText;
+                    $.ajax({
+                        datatype:'json',
+                        url:"http://localhost:8080/wechat-model-controller/sys_param_admin/updProjectConfigData",
+                        data:param,
+                        type:'post',
+                        success:function(obj){
+                            if(obj.code == 1)
+                                layerzk.open(windowObj,{bakcgroundColor:'#009688',msg:obj.message,icoCode:'&#xe605;'},3000);
+                            else
+                                layerzk.open(windowObj,{bakcgroundColor:'#f44336d4',msg:obj.message,icoCode:'&#xe67e;'},3000);
+                        }
+                    });
+                }
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+<form class="layui-form">
+    <div class="layui-form-item">
+        <label class="layui-form-label" style="padding-left: 0;text-align: unset;color: #1E9FFF;width: auto;">请输入对话内容，上下句之间以分号分隔</label>
+        <div class="layui-input-block" style="margin-left: 0;">
+            <textarea name="content" required lay-verify="required" autofocus="autofocus" cols="100" rows="20" placeholder="请输入对话内容，上下句之间以分号分隔" class="layui-textarea" ></textarea>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="addDialogueContentSubmit">立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+    </div>
+</form>

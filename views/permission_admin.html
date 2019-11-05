@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <div class="layui-row">
+        <button type="button" class="layui-btn layui-btn-normal layui-btn-sm" onclick="addPermission()"><i class="iconfont">&#xe782;</i>添加权限</button>
+        <button type="button" class="layui-btn layui-btn-danger layui-btn-sm" onclick="delPermission(this)"><i class="iconfont">&#xe642;</i>删除权限</button>
+    </div>
+    <table lay-filter="permissionAdminTable" id="permissionAdminTable"></table>
+    <script>
+        $(function () {
+            loadPermissionAdminTable();
+        })
+
+        function loadPermissionAdminTable() {
+            table.render({
+                elem: '#permissionAdminTable'
+                ,height: 700
+                ,method:'post'
+                ,url: 'http://localhost:8080/wechat-model-controller/permission_admin/findAllPermissionTable'
+                ,page: true
+                ,limit:20
+                ,cols: [[
+                    {width:80,type:"checkbox"}
+                    ,{field: 'id', title: 'ID', width:80, sort: true,hide: true}
+                    ,{field: 'permission_name', title: '权限名', width:180}
+                    ,{field: 'permission_remark', title: '备注', width:160}
+                    ,{field: 'create_time', title: '添加时间', width:160}
+                ]]
+            });
+        }
+
+        function addPermission(){
+            $.ajax({
+                datatype:'html',
+                url:"/add_permission",
+                type:'get',
+                success:function(obj){
+                    layer.open({
+                        title: '添加权限',
+                        anim: mathLayuiAnim(),
+                        skin: 'layerzk-normal',
+                        area:'600px',
+                        btn: false,
+                        shadeClose: true,
+                        content: obj,
+                    });
+                }
+            });
+        }
+
+        form.on('submit(addPermissionSubmit)', function(data){
+            $.ajax({
+                datatype:'json',
+                url:"http://localhost:8080/wechat-model-controller/permission_admin/addPermissionData",
+                data:data.field,
+                type:'post',
+                success:function(obj){
+                    if(obj.code == 1)
+                        layerzk.open(windowObj,{bakcgroundColor:rgba16(),msg:obj.message,icoCode:'&#xe688;'},3000);
+                    clickLayuiTableBtn('permissionAdminTable');
+                }
+            });
+            return false;
+        });
+
+        function delPermission(i){
+            var checkStatus = table.checkStatus('permissionAdminTable');
+            if(checkStatus.data.length <= 0){
+                layer.tips('未勾选数据！', i, {
+                    tips: [1, '#3595CC'],
+                    time: 4000
+                });
+            }else{
+                layer.open({
+                    title: '<i class="iconfont" style="color:#F44336">&#xe67e;</i>删除权限',
+                    anim: mathLayuiAnim(),
+                    btn: ['确认'],
+                    yes: function(index, layero){
+                        var param = '';
+                        checkStatus.data.forEach(function (val) {
+                            param += 'id='+val.id+'&';
+                        });
+                        $.ajax({
+                            datatype:'json',
+                            url:"http://localhost:8080/wechat-model-controller/permission_admin/delPermissionData",
+                            data: param,
+                            type:'post',
+                            success:function(obj){
+                                if(obj.code == 1)
+                                    layerzk.open(windowObj,{bakcgroundColor:'#009688',msg:obj.message,icoCode:'&#xe605;'},3000);
+                                else
+                                    layerzk.open(windowObj,{bakcgroundColor:'#f44336d4',msg:obj.message,icoCode:'&#xe67e;'},3000);
+                                layer.close(index);
+                                clickLayuiTableBtn('permissionAdminTable');
+                            }
+                        });
+                    },
+                    success: function(layero, index){
+                        layero[0].children[1].style.textAlign = 'center';
+                    },
+                    shadeClose: true,
+                    content: '是否确认删除选中权限？'
+                });
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,120 @@
+<form class="layui-form" lay-filter="importWechatAccountCond">
+    <div class="layui-form-item">
+        <label class="layui-form-label">来源：</label>
+        <div class="layui-input-block">
+            <select name="deviceNumId" lay-search></select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">来源：</label>
+        <div class="layui-input-block">
+            <input type="text" name="from" placeholder="请输入数据来源" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">备注：</label>
+        <div class="layui-input-block">
+            <input type="text" name="remark" placeholder="请输入备注信息" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button type="button" class="layui-btn layui-btn-primary layui-btn-sm" id="selectWechatAccountFile"><i class="iconfont">&#xe6dd;</i><span id="selectWechatAccountFileTitle">选择文件</span></button>
+            <button class="layui-btn layui-btn-sm" lay-submit lay-filter="resolverImportWechatAccount">立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary layui-btn-sm">重置</button>
+        </div>
+    </div>
+</form>
+<script>
+    var wechatAccountUpLoad;
+    $(function(){
+        $.ajax({
+            datatype:'json',
+            url:"http://localhost:8080/wechat-model-controller/comm/getAllDeviceNumData",
+            type:'post',
+            success:function(deviceNumList){
+                var options = '';
+                for(i in deviceNumList){
+                    options += '<option value="'+deviceNumList[i].id+'">'+deviceNumList[i].device_num+' ['+deviceNumList[i].remark+']</option>'
+                }
+                $('select[name="deviceNumId"]').html(options);
+                form.render();
+            }
+        });
+        wechatAccountUpLoad = upLoad.render({
+            elem:'#selectWechatAccountFile',
+            url:'http://localhost:8080/wechat-model-controller/comm/upLoadFile',
+            headers:{"Authorization":isNull(localStorage.wechatToken)},
+            acceptMime:'text/plain',
+            exts:'txt',
+            before:function(obj){
+                layer.load(); //开启loading
+            },
+            done: function(res, index, upload){
+                if(res.code == 0){
+                    $('#selectWechatAccountFileTitle').text("已上传："+res.message);
+                    $('#selectWechatAccountFileTitle')[0].dataset.path = res.obj;
+                    form.render();
+                }
+                layer.closeAll('loading'); //关闭loading
+            },
+            error: function(index, upload){
+                layer.closeAll('loading'); //关闭loading
+            }
+        });
+    })
+
+    form.on('submit(resolverImportWechatAccount)', function(data){
+        data.field.filePath = $('#selectWechatAccountFileTitle')[0].dataset.path;
+        if(!data.field.filePath){
+            layer.tips('错误，请确认已成功上传文件！', data.elem, {
+                tips: [1, '#d4000d'],
+                time: 4000
+            });
+            return false;
+        }
+        if(!data.field.deviceNumId || data.field.deviceNumId <= 0){
+            layer.tips('错误，存在无效值！', data.elem, {
+                tips: [1, '#d4000d'],
+                time: 4000
+            });
+            return false;
+        }
+        layer.load(); //开启loading
+        $.ajax({
+            datatype:'json',
+            url:"http://localhost:8080/wechat-model-controller/wechat_account_admin/importWechatAccount",
+            data:data.field,
+            type:'post',
+            success:function(obj){
+                if(obj.code == 1){
+                    layer.open({
+                        title:'导入微信号反馈信息',
+                        area:['400px','450px'],
+                        content:"<table class=\"layui-table\">" +
+                            "  <thead>" +
+                            "    <tr>" +
+                            "      <th>微信号</th>" +
+                            "      <th>失败原因</th>" +
+                            "    </tr> " +
+                            "  </thead>" +
+                            "  <tbody>" +
+                            obj.message +
+                            "  </tbody>" +
+                            "</table>",
+                        success:function(layero, index){
+                            layero[0].children[1].style.overflow = "auto";
+                        }
+                    });
+                }else{
+                    layerzk.open(windowObj,{bakcgroundColor:"#d4000d",msg:obj.message,icoCode:'&#xe67e;'},3000);
+                }
+                $('#selectWechatAccountFileTitle').text("选择文件");
+                $('#selectWechatAccountFileTitle')[0].dataset.path = "";
+                layer.closeAll('loading'); //关闭loading
+                form.render();
+            }
+        });
+        return false;
+    });
+</script>

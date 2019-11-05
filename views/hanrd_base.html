@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <div class="layui-row">
+        <button type="button" class="layui-btn layui-btn-normal layui-btn-sm" onclick="addBaseData()"><i class="iconfont">&#xe782;</i>添加设备信息</button>
+        <button type="button" class="layui-btn layui-btn-danger layui-btn-sm" onclick="delBaseData(this)"><i class="iconfont">&#xe642;</i>删除设备信息</button>
+    </div>
+    <div class="layui-row">
+        <div class="layui-col-md12">
+            <table lay-filter="hanrdBaseAdminTable" id="hanrdBaseAdminTable"></table>
+        </div>
+    </div>
+
+    <script>
+        $(function () {
+            loadHanrdBaseAdminTable();
+        })
+
+        function loadHanrdBaseAdminTable(){
+            table.render({
+                elem: '#hanrdBaseAdminTable'
+                ,method:'post'
+                ,url: 'http://localhost:8080/wechat-model-controller/base_admin/findAllBaseData'
+                ,page: true
+                ,height: 700
+                ,limit:20
+                ,cols: [[
+                    {width:80,type:"checkbox"}
+                    ,{field: 'ID', title: 'ID', width:80, sort: true,hide: true}
+                    ,{field: 'IsStop', title: '开关', width:110, templet:function (o) {
+                            return o.IsStop == 0 ? '<input type="checkbox" name="hanrdBaseAdminDisabledOnOff" lay-filter="hanrdBaseAdminDisabledOnOff" lay-skin="switch" data-id="'+o.ID+'" lay-text="已启用|未启用" checked>':'<input type="checkbox" name="hanrdBaseAdminDisabledOnOff" lay-filter="hanrdBaseAdminDisabledOnOff" lay-skin="switch" data-id="'+o.ID+'" lay-text="已启用|未启用">';
+                        }}
+                    ,{field: 'Sys_Bootloadre', title: 'Sys_Bootloadre', width:140}
+                    ,{field: 'Sys_Brand', title: 'Sys_Brand', width:140}
+                    ,{field: 'Sys_CPU_ABI', title: 'Sys_CPU_ABI', width:140}
+                    ,{field: 'Sys_CPU_ABI2', title: 'Sys_CPU_ABI2', width:140}
+                    ,{field: 'Sys_DensityDpi', title: 'Sys_DensityDpi', width:140}
+                    ,{field: 'Sys_Device', title: 'Sys_Device', width:140}
+                    ,{field: 'Sys_Display', title: 'Sys_Display', width:140}
+                    ,{field: 'Sys_Fingerprint', title: 'Sys_Fingerprint', width:140}
+                    ,{field: 'Sys_HeightPixels', title: 'Sys_HeightPixels', width:140}
+                    ,{field: 'Sys_Model', title: 'Sys_Model', width:140}
+                    ,{field: 'Sys_Manufacturer', title: 'Sys_Manufacturer', width:140}
+                    ,{field: 'Sys_RadioVer', title: 'Sys_RadioVer', width:140}
+                    ,{field: 'Sys_Serial', title: 'Sys_Serial', width:140}
+                    ,{field: 'Sys_Ver_Increase', title: 'Sys_Ver_Increase', width:140}
+                    ,{field: 'Sys_Ver_Release', title: 'Sys_Ver_Release', width:140}
+                    ,{field: 'Sys_Ver_SdkInt', title: 'Sys_Ver_SdkInt', width:140}
+                    ,{field: 'Sys_WidthPixels', title: 'Sys_WidthPixels', width:140}
+                    ,{field: 'CPU_architecture', title: 'CPU_architecture', width:140}
+                    ,{field: 'Cpu_CPUCores', title: 'Cpu_CPUCores', width:140}
+                    ,{field: 'Cpu_Hardware', title: 'Cpu_Hardware', width:140}
+                    ,{field: 'Sys_Board', title: 'Sys_Board', width:140}
+                    ,{field: 'Cpu_Features', title: 'Cpu_Features', width:140}
+                    ,{field: 'Cpu_ModelName', title: 'Cpu_ModelName', width:140}
+                    ,{field: 'Cpu_Vevision', title: 'Cpu_Vevision', width:140}
+                    ,{field: 'Cpu_Serial', title: 'Cpu_Serial', width:140}
+                    ,{field: 'Sys_IMEI', title: 'Sys_IMEI', width:140}
+                    ,{field: 'Sys_Hardware', title: 'Sys_Hardware', width:140}
+                    ,{field: 'Sys_Product', title: 'Sys_Product', width:140}
+                    ,{field: 'Cpu_Format', title: 'Cpu_Format', width:140}
+                    ,{field: 'Sys_AndroidID', title: 'Sys_AndroidID', width:140}
+                ]]
+            });
+        }
+
+        // 监听设备信息启停开关
+        form.on('switch(hanrdBaseAdminDisabledOnOff)', function(data){
+            $.ajax({
+                datatype:'json',
+                    url:"http://localhost:8080/wechat-model-controller/base_admin/updateHanrdBaseDisabledOnOff",
+                data:'id='+data.elem.dataset.id+'&switchVal='+(data.elem.checked?0:1),
+                type:'post',
+                success:function(obj){
+                    if(obj.code == 1)
+                        layer.msg(obj.message);
+                }
+            });
+        });
+
+        /**
+         * 添加设备信息函数
+         */
+        function addBaseData(){
+
+        }
+
+        /**
+         * 删除设备信息函数
+         * @param i 当前Dom对象
+         */
+        function delBaseData(i){
+
+        }
+    </script>
+</body>
+</html>

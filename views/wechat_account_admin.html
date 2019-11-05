@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <div class="layui-row layui-col-space5">
+        <form class="layui-form layui-row layui-col-space3" lay-filter="wechatAccountAdminScreeCond" style="max-height: 200px;overflow: visible;">
+            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+                <input class="layui-input" type="text" name="wechatid" placeholder="微信号匹配" autocomplete="off">
+            </div>
+            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+                <input class="layui-input"type="text" name="account" placeholder="微信账号匹配" autocomplete="off">
+            </div>
+            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+                <input class="layui-input" type="text" name="phone" placeholder="手机号匹配" autocomplete="off">
+            </div>
+            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+                <input class="layui-input"  type="text" id="wechatAccountAdminDieTime" name="dieTime" placeholder="号码死亡时间" autocomplete="off">
+            </div>
+            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+                <input class="layui-input"  type="text" name="from" placeholder="数据来源" autocomplete="off">
+            </div>
+            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+                <input class="layui-input"  type="text" name="deviceNum" placeholder="设备编号" autocomplete="off">
+            </div>
+            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+                <input class="layui-input"  type="text" name="proxyIp" placeholder="代理IP地址匹配" autocomplete="off">
+            </div>
+            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+                <select name="proxyRegion" id="proxyRegion"></select>
+            </div>
+            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+                <select name="toUser">
+                    <option value="">是否分配用户</option>
+                    <option value="1">已分配</option>
+                    <option value="0">未分配</option>
+                </select>
+            </div>
+            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+                <select name="isProxy">
+                    <option value="">是否分配代理</option>
+                    <option value="1">已分配</option>
+                    <option value="0">未分配</option>
+                </select>
+            </div>
+            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+                <select name="accountState">
+                    <option value="">号码状态</option>
+                    <option value="1">登录成功</option>
+                    <option value="2">登录失败</option>
+                    <option value="3">登录超时</option>
+                </select>
+            </div>
+            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+                <select name="isLogin">
+                    <option value="">是否开启登录</option>
+                    <option value="1">已开启</option>
+                    <option value="0">未开启</option>
+                </select>
+            </div>
+            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+                <select name="proxyState">
+                    <option value="">代理有效状态</option>
+                    <option value="0">生效中</option>
+                    <option value="1">已失效</option>
+                </select>
+            </div>
+            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+                <select name="loginState">
+                    <option value="">登录状态</option>
+                    <option value="2">已登录</option>
+                    <option value="0">未登录</option>
+                </select>
+            </div>
+            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+                <select name="updPwdState">
+                    <option value="">改密状态</option>
+                    <option value="1">已修改</option>
+                    <option value="0">未修改</option>
+                </select>
+            </div>
+            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+                <select name="updHeadImgState">
+                    <option value="">头像状态</option>
+                    <option value="1">已修改</option>
+                    <option value="0">未修改</option>
+                </select>
+            </div>
+            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+                <select name="isExistsFriend">
+                    <option value="">有无好友</option>
+                    <option value="1">有</option>
+                    <option value="0">无</option>
+                </select>
+            </div>
+        </form>
+        <div class="layui-row">
+            <div class="layui-btn-group" style="line-height: 35px;">
+                <button type="button" class="layui-btn layui-btn-normal layui-btn-sm" onclick="loadWechatAccountAdminTable()"><i class="iconfont">&#xe6f7;</i>查询</button>
+                <button type="button" class="layui-btn layui-btn-sm"><i class="iconfont">&#xe620;</i>登录</button>
+                <button type="button" class="layui-btn layui-btn-sm layui-btn-danger"><i class="iconfont">&#xe6fa;</i>注销</button>
+                <button type="button" class="layui-btn layui-btn-normal layui-btn-sm" onclick="importWechatAccount()" id="importWechatAccountFile"><i class="iconfont">&#xe6a9;</i>导入微信账号</button>
+                <button type="button" class="layui-btn layui-btn-sm" onclick="updToUser(this)"><i class="iconfont">&#xe8cf;</i>分配用户</button>
+                <button type="button" class="layui-btn layui-btn-sm" onclick="updToDevice(this)"><i class="iconfont">&#xe8cf;</i>分配设备</button>
+                <button type="button" class="layui-btn layui-btn-sm" onclick="updAccountPwd()"><i class="iconfont">&#xe8cf;</i>修改密码</button>
+                <button type="button" class="layui-btn layui-btn-sm" onclick="updAccountNickname()"><i class="iconfont">&#xe8cf;</i>修改昵称</button>
+                <button type="button" class="layui-btn layui-btn-primary layui-btn-sm" onclick="openLogin(this)"><i class="iconfont">&#xeb17;</i>开启登录</button>
+                <button type="button" class="layui-btn layui-btn-warm layui-btn-sm" onclick="closeLogin(this)"><i class="iconfont">&#xe6fa;</i>关闭登录</button>
+                <button type="button" class="layui-btn layui-btn-primary layui-btn-sm" onclick="updAccountSync(this)"><i class="iconfont">&#xe647;</i>同步账号</button>
+                <button type="button" class="layui-btn layui-btn-primary layui-btn-sm" onclick="proxyRepair(this)"><i class="iconfont">&#xe647;</i>代理修复</button>
+            </div>
+        </div>
+        <div class="layui-row">
+            <table lay-filter="wechatAccountAdminTable" id="wechatAccountAdminTable"></table>
+        </div>
+    </div>
+    <script>
+        $(function () {
+            laydate.render({
+                elem: '#wechatAccountAdminDieTime'
+            });
+            $.ajax({
+                datatype:'json',
+                url:"http://localhost:8080/wechat-model-controller/comm/getAllProvinceData",
+                type:'post',
+                async: false,
+                success:function(obj){
+                    var html = '<option value="">代理归属地</option>';
+                    for(i in obj){
+                        html += '<option value="'+obj[i].provincename+'">'+obj[i].provincename+'</option>'
+                    }
+                    $('#proxyRegion').html(html);
+                }
+            });
+            loadWechatAccountAdminTable();
+            form.render();
+        })
+
+        // 导入微信号
+        function importWechatAccount(){
+            $.ajax({
+                datatype:'html',
+                url:"/import_wechat_account",
+                type:'get',
+                success:function(obj){
+                    layer.open({
+                        title: '导入微信号',
+                        anim: mathLayuiAnim(),
+                        skin: 'layerzk-normal',
+                        area:'600px',
+                        btn: false,
+                        shadeClose: true,
+                        content: obj,
+                    });
+                }
+            });
+        }
+
+        function loadWechatAccountAdminTable(){
+            var param = form.val("wechatAccountAdminScreeCond");
+            table.render({
+                elem: '#wechatAccountAdminTable'
+                ,height: 700
+                ,method:'post'
+                ,where: param
+                ,url: 'http://localhost:8080/wechat-model-controller/wechat_account_admin/findAllAccount'
+                ,page: true
+                ,limit:20
+                ,cols: [[
+                    {width:40,type:"checkbox"}
+                    ,{field: 'aid', title: 'AID', width:80,hide: true}
+                    ,{field: 'pid', title: 'PID', width:80,hide: true}
+                    ,{field: 'uid', title: 'UID', width:80,hide: true}
+                    ,{field: 'wechat_id', title: '微信号', width:120}
+                    ,{field: 'wechat_account', title: '微信账号', width:120}
+                    ,{field: 'wechat_phone', title: '微信手机号', width:120}
+                    ,{field: 'wechat_nickname', title: '昵称', width:120}
+                    ,{field: 'wechat_set_headimg', title: '修改头像', width:90, templet:function (o) {
+                            return o.wechat_set_headimg == 1 ? "<span style='color: #4caf50;'>已修改</span>" : "<span style='color: red;'>未修改</span>";
+                        }}
+                    ,{field: 'username', title: '所属用户', width:90}
+                    ,{field: 'is_search', title: '被搜索', width:100, templet:function (o) {
+                            return o.is_search==1?'<input type="checkbox" name="wechatAccountItem" lay-filter="wechatAccountItem" lay-skin="switch" data-id="'+o.aid+'" data-key="isSearch" lay-text="可以|不可以" checked>':'<input type="checkbox" name="wechatAccountItem" lay-filter="wechatAccountItem" lay-skin="switch" data-id="'+o.aid+'" data-key="isSearch" lay-text="可以|不可以">';
+                        }}
+                    ,{field: 'add_frined', title: '加好友', width:100, templet:function (o) {
+                            return o.add_frined==1?'<input type="checkbox" name="wechatAccountItem" lay-filter="wechatAccountItem" lay-skin="switch" data-id="'+o.aid+'" data-key="addFrined" lay-text="可以|不可以" checked>':'<input type="checkbox" name="wechatAccountItem" lay-filter="wechatAccountItem" lay-skin="switch" data-id="'+o.aid+'" data-key="addFrined" lay-text="可以|不可以">';
+                        }}
+                    ,{field: 'is_group', title: '被拉群', width:100, templet:function (o) {
+                            return o.is_group==1?'<input type="checkbox" name="wechatAccountItem" lay-filter="wechatAccountItem" lay-skin="switch" data-id="'+o.aid+'" data-key="isGroup" lay-text="可以|不可以" checked>':'<input type="checkbox" name="wechatAccountItem" lay-filter="wechatAccountItem" lay-skin="switch" data-id="'+o.aid+'" data-key="isGroup" lay-text="可以|不可以">';
+                        }}
+                    ,{field: 'is_send_friend_circle', title: '发朋友圈', width:100, templet:function (o) {
+                            return o.is_send_friend_circle==1?'<input type="checkbox" name="wechatAccountItem" lay-filter="wechatAccountItem" lay-skin="switch" data-id="'+o.aid+'" data-key="isSendFriendCircle" lay-text="可以|不可以" checked>':'<input type="checkbox" name="wechatAccountItem" lay-filter="wechatAccountItem" lay-skin="switch" data-id="'+o.aid+'" data-key="isSendFriendCircle" lay-text="可以|不可以">';
+                        }}
+                    ,{field: 'is_dialogue', title: '对话', width:100, templet:function (o) {
+                            return o.is_dialogue==1?'<input type="checkbox" name="wechatAccountItem" lay-filter="wechatAccountItem" lay-skin="switch" data-id="'+o.aid+'" data-key="isDialogue" lay-text="可以|不可以" checked>':'<input type="checkbox" name="wechatAccountItem" lay-filter="wechatAccountItem" lay-skin="switch" data-id="'+o.aid+'" data-key="isDialogue" lay-text="可以|不可以">';
+                        }}
+                    ,{field: 'proxy_sync', title: '代理同步', width:110, templet:function (o) {
+                            return o.proxy_sync==1?'<input type="checkbox" name="wechatAccountItem" lay-filter="wechatAccountItem" lay-skin="switch" data-id="'+o.aid+'" data-key="proxySync" lay-text="已同步|未同步" checked>':'<input type="checkbox" name="wechatAccountItem" lay-filter="wechatAccountItem" lay-skin="switch" data-id="'+o.aid+'" data-key="proxySync" lay-text="已同步|未同步">';
+                        }}
+                    ,{field: 'synchronize_state', title: '同步状态', width:110, templet:function (o) {
+                            return o.synchronize_state==1?'<input type="checkbox" name="wechatAccountItem" lay-filter="wechatAccountItem" lay-skin="switch" data-id="'+o.aid+'" data-key="synchronizeState" lay-text="已同步|未同步" checked>':'<input type="checkbox" name="wechatAccountItem" lay-filter="wechatAccountItem" lay-skin="switch" data-id="'+o.aid+'" data-key="synchronizeState" lay-text="已同步|未同步">';
+                        }}
+                    ,{field: 'is_login', title: '登录权限', width:90, templet:function (o) {
+                            return o.is_login == 1 ? "<span style='color: #4caf50;'>开启</span>" : "<span style='color: red;'>关闭</span>";
+                        }}
+                    ,{field: 'wechat_set_pwd', title: '改密状态', width:90, templet:function (o) {
+                            return o.wechat_set_pwd == 1 ? "<span style='color: #4caf50;'>已修改</span>" : "<span style='color: red;'>未修改</span>";
+                        }}
+                    ,{field: 'login_time', title: '登录时间', width:180}
+                    ,{field: 'login_state', title: '登录状态', width:100, templet:function (o) {
+                            var val = "";
+                            switch (o.login_state) {
+                                case 1:
+                                    val = "<span style='color: #03a9f4;'>登录中</span>";
+                                    break;
+                                case 2:
+                                    val = "<span style='color: #4caf50;'>已登录</span>";
+                                    break;
+                                default:
+                                    val = "<span style='color: red;'>未登录</span>";
+                                    break;
+                            }
+                            return val;
+                        }}
+                    ,{field: 'data_type_code', title: '数据类型', width:100, templet:function (o) {
+                            var val = "";
+                            switch (o.data_type_code) {
+                                case 2:
+                                    val = "批量导入";
+                                    break;
+                                case 3:
+                                    val = "手动添加";
+                                    break;
+                                case 4:
+                                    val = "接口上报";
+                                    break;
+                                default:
+                                    val = "系统生成";
+                                    break;
+                            }
+                            return val;
+                        }}
+                    ,{field: 'proxy', title: '代理', width:80, templet:function (o) {
+                            return o.proxy_ip+":"+o.proxy_port+"-"+o.proxy_username+"-"+o.proxy_pwd+"-"+o.proxy_province_id+"-"+o.proxy_city;
+                        }}
+                    ,{field: 'proxy_lose_efficacy_time', title: '代理过期时间', width:180}
+                    ,{field: 'account_state_id', title: '账号状态', width:100 ,templet:function (o) {
+                            var val = "";
+                            switch (o.account_state_id) {
+                                case 1:
+                                    val = "<span style='color: #03a9f4;'>登录成功</span>";
+                                    break;
+                                case 2:
+                                    val = "<span style='color: red;'>登录失败</span>";
+                                    break;
+                                case 3:
+                                    val = "<span style='color: #ff9800;'>登录超时</span>";
+                                    break;
+                                default:
+                                    val = "无";
+                                    break;
+                            }
+                            return val;
+                        }}
+                    ,{field: 'account_die_time', title: '账号死亡时间', width:180, templet:function (o) {
+                            if(o.account_die_time){
+                                return o.account_die_time;
+                            }else{
+                                return "未死亡";
+                            }
+                        }}
+                    ,{field: 'data_remark', title: '数据备注', width:100}
+                    ,{field: 'not_sys_friend_num', title: '非系统好友', width:120}
+                    ,{field: 'sys_friend_num', title: '系统好友', width:100}
+                    ,{field: 'device_num', title: '设备编号', width:100}
+                ]]
+            });
+        }
+        // 监听开关修改动作
+        form.on('switch(wechatAccountItem)', function(data){
+            var param = {
+                value:data.elem.checked ? 1 : 0,
+                key:data.othis[0].parentNode.children[0].dataset.key,
+                id:data.othis[0].parentNode.children[0].dataset.id
+            };
+            $.ajax({
+                datatype:'json',
+                url:"http://localhost:8080/wechat-model-controller/wechat_account_admin/updAccountConfigItem",
+                data:param,
+                type:'post',
+                success:function(obj){
+                    if(obj.code == 1)
+                        layerzk.open(windowObj,{bakcgroundColor:"#009688",msg:obj.message,icoCode:'&#xe605;'}, 3000);
+                }
+            });
+        });
+
+        // 查询条件分配用户
+        function updToUser(i){
+            $.ajax({
+                datatype:'html',
+                url:"/account_to_user",
+                type:'get',
+                success:function(obj){
+                    layer.open({
+                        title: '分配用户',
+                        anim: mathLayuiAnim(),
+                        skin: 'layerzk-normal',
+                        area:'600px',
+                        btn: false,
+                        shadeClose: true,
+                        content: obj,
+                        success:function(layero, index){
+                            // 监听分配用户提交
+                            form.on('submit(updAccountToUser)', function(data){
+                                var param = form.val("wechatAccountAdminScreeCond");
+                                param.key = "toUser";
+                                param.value = data.field.updToUser;
+                                $.ajax({
+                                    datatype:'json',
+                                    url:"http://localhost:8080/wechat-model-controller/wechat_account_admin/updAccountConfigItems",
+                                    data:param,
+                                    traditional:true, // 防止深度序列化参数
+                                    type:'post',
+                                    success:function(obj){
+                                        if(obj.code == 1)
+                                            layerzk.open(windowObj,{bakcgroundColor:'#009688',msg:obj.message,icoCode:'&#xe605;'}, 3000);
+                                        clickLayuiTableBtn('wechatAccountAdminTable');
+                                        layer.close(index);
+                                    }
+                                });
+                                return false;
+                            });
+                        }
+                    });
+                }
+            });
+        }
+
+        // 查询条件分配设备
+        function updToDevice(i){
+            $.ajax({
+                datatype:'html',
+                url:"/account_to_device",
+                type:'get',
+                success:function(obj){
+                    layer.open({
+                        title: '分配设备',
+                        anim: mathLayuiAnim(),
+                        skin: 'layerzk-normal',
+                        area:'600px',
+                        btn: false,
+                        shadeClose: true,
+                        content: obj,
+                        success:function(layero, index){
+                            // 监听分配设备提交
+                            form.on('submit(updAccountToDevice)', function(data){
+                                var param = form.val("wechatAccountAdminScreeCond");
+                                param.key = "toDevice";
+                                param.value = data.field.updToDevice;
+                                $.ajax({
+                                    datatype:'json',
+                                    url:"http://localhost:8080/wechat-model-controller/wechat_account_admin/updAccountConfigItems",
+                                    data:param,
+                                    traditional:true, // 防止深度序列化参数
+                                    type:'post',
+                                    success:function(obj){
+                                        if(obj.code == 1)
+                                            layerzk.open(windowObj,{bakcgroundColor:'#009688',msg:obj.message,icoCode:'&#xe605;'}, 3000);
+                                        clickLayuiTableBtn('wechatAccountAdminTable');
+                                        layer.close(index);
+                                    }
+                                });
+                                return false;
+                            });
+                        }
+                    });
+                }
+            });
+        }
+
+        // 查询条件修改账号同步状态
+        function updAccountSync(i){
+            layer.open({
+                title: '修改账号同步状态',
+                anim: mathLayuiAnim(),
+                skin: 'layerzk-normal',
+                area:'600px',
+                btn: ["确认"],
+                shadeClose: true,
+                content: "是否确认将当前条件下查询出的账号同步状态修改为[未同步]状态？",
+                success: function(layero, index){
+                    layero[0].children[1].style.textAlign = 'center';
+                },
+                yes:function(index, layero){
+                    var param = form.val("wechatAccountAdminScreeCond");
+                    param.key = "accountSync";
+                    param.value = 0;
+                    $.ajax({
+                        datatype:'json',
+                        url:"http://localhost:8080/wechat-model-controller/wechat_account_admin/updAccountConfigItems",
+                        data:param,
+                        traditional:true, // 防止深度序列化参数
+                        type:'post',
+                        success:function(obj){
+                            if(obj.code == 1)
+                                layerzk.open(windowObj,{bakcgroundColor:'#009688',msg:obj.message,icoCode:'&#xe605;'}, 3000);
+                            clickLayuiTableBtn('wechatAccountAdminTable');
+                            layer.close(index);
+                        }
+                    });
+                }
+            });
+        }
+
+        // 查询条件关闭登录权限
+        function closeLogin(i){
+            layer.open({
+                title: '关闭登录权限',
+                anim: mathLayuiAnim(),
+                skin: 'layerzk-normal',
+                area:'600px',
+                btn: ["确认"],
+                shadeClose: true,
+                content: "是否确认将当前条件下查询出的账号的登录权限关闭？",
+                success: function(layero, index){
+                    layero[0].children[1].style.textAlign = 'center';
+                },
+                yes:function(index, layero){
+                    var param = form.val("wechatAccountAdminScreeCond");
+                    param.key = "isLogin";
+                    param.value = 0;
+                    $.ajax({
+                        datatype:'json',
+                        url:"http://localhost:8080/wechat-model-controller/wechat_account_admin/updAccountConfigItems",
+                        data:param,
+                        traditional:true, // 防止深度序列化参数
+                        type:'post',
+                        success:function(obj){
+                            if(obj.code == 1)
+                                layerzk.open(windowObj,{bakcgroundColor:'#009688',msg:obj.message,icoCode:'&#xe605;'}, 3000);
+                            clickLayuiTableBtn('wechatAccountAdminTable');
+                            layer.close(index);
+                        }
+                    });
+                }
+            });
+        }
+
+        // 查询条件开启登录权限
+        function openLogin(i){
+            layer.open({
+                title: '开启登录权限',
+                anim: mathLayuiAnim(),
+                skin: 'layerzk-normal',
+                area:'600px',
+                btn: ["确认"],
+                shadeClose: true,
+                content: "是否确认将当前条件下查询出的账号登录权限开启？",
+                success: function(layero, index){
+                    layero[0].children[1].style.textAlign = 'center';
+                },
+                yes:function(index, layero){
+                    var param = form.val("wechatAccountAdminScreeCond");
+                    param.key = "isLogin";
+                    param.value = 1;
+                    $.ajax({
+                        datatype:'json',
+                        url:"http://localhost:8080/wechat-model-controller/wechat_account_admin/updAccountConfigItems",
+                        data:param,
+                        traditional:true, // 防止深度序列化参数
+                        type:'post',
+                        success:function(obj){
+                            if(obj.code == 1)
+                                layerzk.open(windowObj,{bakcgroundColor:'#009688',msg:obj.message,icoCode:'&#xe605;'}, 3000);
+                            clickLayuiTableBtn('wechatAccountAdminTable');
+                            layer.close(index);
+                        }
+                    });
+                }
+            });
+        }
+
+        // 查询条件修复代理
+        function proxyRepair(i){
+            $.ajax({
+                datatype:'html',
+                url:"/proxy_repair",
+                type:'get',
+                success:function(o){
+                    layer.open({
+                        title: '修复代理',
+                        anim: mathLayuiAnim(),
+                        skin: 'layerzk-normal',
+                        area:'600px',
+                        btn: ["确认"],
+                        shadeClose: true,
+                        content: "<div style='text-align: center;'>是否确认将当前条件下查询出的失效代理全部修复？</div>"+o,
+                        yes:function(index, layero){
+                            // 开启加载层
+                            layer.load();
+                            var param = mergeJson(form.val("proxyRepairCond"),form.val("wechatAccountAdminScreeCond"));
+                            $.ajax({
+                                datatype:'json',
+                                url:"http://localhost:8080/wechat-model-controller/wechat_account_admin/proxyRepair",
+                                data:param,
+                                traditional:true, // 防止深度序列化参数
+                                type:'post',
+                                success:function(obj){
+                                    if(obj.code == 1){
+                                        if(obj.message){
+                                            layer.open({
+                                                title:'代理修复反馈',
+                                                area:['400px','450px'],
+                                                content:"<table class=\"layui-table\">" +
+                                                    "  <thead>" +
+                                                    "    <tr>" +
+                                                    "      <th>账号</th>" +
+                                                    "      <th>失败原因</th>" +
+                                                    "    </tr> " +
+                                                    "  </thead>" +
+                                                    "  <tbody>" +
+                                                    obj.message +
+                                                    "  </tbody>" +
+                                                    "</table>",
+                                                success:function(layero, index){
+                                                    layero[0].children[1].style.overflow = "auto";
+                                                }
+                                            });
+                                        }else{
+                                            layerzk.open(windowObj,{bakcgroundColor:'#009688',msg:"修改成功！",icoCode:'&#xe605;'}, 3000);
+                                        }
+                                    }else{
+                                        layerzk.open(windowObj,{bakcgroundColor:'#d4000d',msg:obj.message,icoCode:'&#xe67e;'}, 3000);
+                                    }
+                                    clickLayuiTableBtn('wechatAccountAdminTable');
+                                    layer.closeAll('loading');
+                                    layer.close(index);
+                                },
+                                error:function(xhr,state,errorThrown){
+                                    layer.closeAll('loading');
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+        }
+
+        // 修改微信号密码
+        function updAccountPwd(){
+            var checkStatus = table.checkStatus('wechatAccountAdminTable');
+            if(checkStatus.data.length <= 0){
+                layer.open({
+                    title: '<i class="iconfont">&#xe8cf;</i>修改密码',
+                    anim: mathLayuiAnim(),
+                    btn: ['确认'],
+                    skin:'layerzk-danger',
+                    yes: function(index, layero){
+                        $.ajax({
+                            datatype:'json',
+                            url:"http://localhost:8080/wechat-model-controller/wechat_account_admin/updAccountPwdByNot",
+                            type:'post',
+                            success:function(obj){
+                                if(obj.code == 1)
+                                    layerzk.open(windowObj,{bakcgroundColor:'#009688',msg:obj.message,icoCode:'&#xe605;'},3000);
+                                else
+                                    layerzk.open(windowObj,{bakcgroundColor:'#f44336d4',msg:obj.message,icoCode:'&#xe67e;'},5000);
+                                layer.close(index);
+                                clickLayuiTableBtn('wechatAccountAdminTable');
+                            }
+                        });
+                    },
+                    success: function(layero, index){
+                        layero[0].children[1].style.textAlign = 'center';
+                    },
+                    shadeClose: true,
+                    content: '是否确认将未修改密码的用户全部修改密码？'
+                });
+            }else{
+                layer.open({
+                    title: '<i class="iconfont">&#xe8cf;</i>修改密码',
+                    anim: mathLayuiAnim(),
+                    btn: ['确认'],
+                    yes: function(index, layero){
+                        var param = {id:[]};
+                        checkStatus.data.forEach(function (val) {
+                            param.id.push(val.aid);
+                        });
+                        $.ajax({
+                            datatype:'json',
+                            url:"http://localhost:8080/wechat-model-controller/wechat_account_admin/updAccountPwd",
+                            data:param,
+                            traditional:true, // 防止深度序列化参数
+                            type:'post',
+                            success:function(obj){
+                                if(obj.code == 1)
+                                    layerzk.open(windowObj,{bakcgroundColor:'#009688',msg:obj.message,icoCode:'&#xe605;'},3000);
+                                else
+                                    layerzk.open(windowObj,{bakcgroundColor:'#f44336d4',msg:obj.message,icoCode:'&#xe67e;'},5000);
+                                layer.close(index);
+                                clickLayuiTableBtn('wechatAccountAdminTable');
+                            }
+                        });
+                    },
+                    success: function(layero, index){
+                        layero[0].children[1].style.textAlign = 'center';
+                    },
+                    shadeClose: true,
+                    content: '是否确认修改选中用户密码？'
+                });
+            }
+        }
+
+        // 修改昵称
+        function updAccountNickname(){
+            var checkStatus = table.checkStatus('wechatAccountAdminTable');
+            if(checkStatus.data.length <= 0){
+                layer.open({
+                    title: '<i class="iconfont">&#xe8cf;</i>修改昵称',
+                    anim: mathLayuiAnim(),
+                    btn: ['确认'],
+                    skin:'layerzk-danger',
+                    yes: function(index, layero){
+                        $.ajax({
+                            datatype:'json',
+                            url:"http://localhost:8080/wechat-model-controller/wechat_account_admin/updAllAccountNickname",
+                            type:'post',
+                            success:function(obj){
+                                if(obj.code == 1)
+                                    layerzk.open(windowObj,{bakcgroundColor:'#009688',msg:obj.message,icoCode:'&#xe605;'},3000);
+                                else
+                                    layerzk.open(windowObj,{bakcgroundColor:'#f44336d4',msg:obj.message,icoCode:'&#xe67e;'},5000);
+                                layer.close(index);
+                                clickLayuiTableBtn('wechatAccountAdminTable');
+                            }
+                        });
+                    },
+                    success: function(layero, index){
+                        layero[0].children[1].style.textAlign = 'center';
+                    },
+                    shadeClose: true,
+                    content: '是否确认修改全部用户的昵称？'
+                });
+            }else{
+                layer.open({
+                    title: '<i class="iconfont">&#xe8cf;</i>修改昵称',
+                    anim: mathLayuiAnim(),
+                    btn: ['确认'],
+                    yes: function(index, layero){
+                        var param = {id:[]};
+                        checkStatus.data.forEach(function (val) {
+                            param.id.push(val.aid);
+                        });
+                        $.ajax({
+                            datatype:'json',
+                            url:"http://localhost:8080/wechat-model-controller/wechat_account_admin/updAccountNickname",
+                            data:param,
+                            traditional:true, // 防止深度序列化参数
+                            type:'post',
+                            success:function(obj){
+                                if(obj.code == 1)
+                                    layerzk.open(windowObj,{bakcgroundColor:'#009688',msg:obj.message,icoCode:'&#xe605;'},3000);
+                                else
+                                    layerzk.open(windowObj,{bakcgroundColor:'#f44336d4',msg:obj.message,icoCode:'&#xe67e;'},5000);
+                                layer.close(index);
+                                clickLayuiTableBtn('wechatAccountAdminTable');
+                            }
+                        });
+                    },
+                    success: function(layero, index){
+                        layero[0].children[1].style.textAlign = 'center';
+                    },
+                    shadeClose: true,
+                    content: '是否确认修改选中用户的昵称？'
+                });
+            }
+        }
+
+    </script>
+</body>
+</html>

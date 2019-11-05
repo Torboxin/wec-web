@@ -1,0 +1,83 @@
+<form class="layui-form" lay-filter="importGreetingCond">
+    <div class="layui-form-item">
+        <label class="layui-form-label">导入类别：</label>
+        <div class="layui-input-block">
+            <input type="radio" name="importGreetingType" lay-filter="importGreetingType" value="1" title="单批次导入" checked>
+            <input type="radio" name="importGreetingType" lay-filter="importGreetingType" value="2" title="多批次导入">
+        </div>
+    </div>
+    <div id="multiBatchGreeting" style="display: none;">
+        <div class="layui-form-item">
+            <label class="layui-form-label">批次数量：</label>
+            <div class="layui-input-block">
+                <input type="number" name="batchNum" placeholder="请输入每个批次导入的数量" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">批次备注：</label>
+        <div class="layui-input-block">
+            <input type="text" name="batchRemark" placeholder="请输入批次备注信息" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="resolverImportGreeting">立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+    </div>
+</form>
+<script>
+    form.on('radio(importGreetingType)', function(data){
+        if(data.value == 2){
+            $('#multiBatchGreeting').css({display:"block"});
+        }else{
+            $('#multiBatchGreeting').css({display:"none"});
+        }
+    });
+    form.on('submit(resolverImportGreeting)', function(data){
+        layer.load(2, {shade: [0.4,'#6b6b6c']});
+        data.field.filePath = $('#selectGreetingFileTitle')[0].dataset.path;
+        $.ajax({
+            datatype:'json',
+            url:"http://localhost:8080/wechat-model-controller/greeting_admin/importGreeting",
+            data:data.field,
+            type:'post',
+            success:function(obj){
+                if(obj.code == 1){
+                    layer.open({
+                        title:'导入问候语反馈信息',
+                        area:['400px','450px'],
+                        content:"<table class=\"layui-table\">" +
+                            "  <thead>" +
+                            "    <tr>" +
+                            "      <th>问候语</th>" +
+                            "      <th>失败原因</th>" +
+                            "    </tr> " +
+                            "  </thead>" +
+                            "  <tbody>" +
+                            obj.message +
+                            "  </tbody>" +
+                            "</table>",
+                        success:function(layero, index){
+                            layero[0].children[1].style.overflow = "auto";
+                        }
+                    });
+                    $('#selectGreetingFileTitle').text("选择文件");
+                    $('#selectGreetingFileTitle')[0].dataset.path = "";
+                    $('#resolverImportGreetingFile')[0].classList.add("layui-btn-disabled");
+                    $('#resolverImportGreetingFile')[0].setAttribute("disabled","");
+                    form.render();
+                }else if(obj.code == 2){
+                    layerzk.open(windowObj,{bakcgroundColor:'#009688',msg:obj.message,icoCode:'&#xe605;'},3000);
+                }else{
+                    layerzk.open(windowObj,{bakcgroundColor:"#d4000d",msg:obj.message,icoCode:'&#xe67e;'},3000);
+                }
+                clickLayuiTableBtn('greetingBatchAdminTable');
+                layer.closeAll('loading');
+            }
+        });
+        return false;
+    });
+    form.render();
+</script>

@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <div class="layui-row">
+        <button type="button" class="layui-btn layui-btn-normal layui-btn-sm" onclick="addRole()"><i class="iconfont">&#xe782;</i>添加角色</button>
+        <button type="button" class="layui-btn layui-btn-danger layui-btn-sm" onclick="delRole(this)"><i class="iconfont">&#xe642;</i>删除角色</button>
+    </div>
+    <div class="layui-row layui-col-space20">
+        <div class="layui-col-md6 layui-col-sm12">
+            <table lay-filter="roleAdminTable" id="roleAdminTable"></table>
+        </div>
+        <div class="layui-col-md6 layui-hide-sm layui-show-md-block" style="margin: 10px 0;">
+            <div id="rolePermissionConfig" class="animated fadeInRight" style="display: none;"></div>
+        </div>
+    </div>
+    <script type="text/html" id="roleAdminTableEventButton">
+        <a class="layui-btn layui-btn-xs" lay-event="permissionInfo"><i class="iconfont">&#xe61d;</i>权限信息</a>
+    </script>
+    <script>
+        $(function () {
+            loadRoleAdminTable();
+        })
+
+        function loadRoleAdminTable(){
+            table.render({
+                elem: '#roleAdminTable'
+                ,method:'post'
+                ,url: 'http://localhost:8080/wechat-model-controller/role_admin/findAllRoleTable'
+                ,page: true
+                ,height: 700
+                ,limit:20
+                ,cols: [[
+                    {width:80,type:"checkbox"}
+                    ,{field: 'id', title: 'ID', width:80, sort: true,hide: true}
+                    ,{field: 'role_name', title: '角色名', width:120}
+                    ,{field: 'create_time', title: '添加时间', width:160}
+                    ,{toolbar: '#roleAdminTableEventButton', width:110}
+                ]]
+            });
+
+            table.on('tool(roleAdminTable)', function (obj) {
+                var data = obj.data;
+                var layEvent = obj.event;
+                var tr = obj.tr;
+
+                if(layEvent === 'permissionInfo'){
+                    $.ajax({
+                        datatype:'json',
+                        url:"http://localhost:8080/wechat-model-controller/role_admin/findRolePermissionData",
+                        data:"id="+tr[0].children[1].firstChild.innerText,
+                        type:'post',
+                        success:function(obj){
+                            var initRightDataArr = [];
+                            var initLeftDataArr = [];
+                            for(i in obj.json.allPermission){
+                                initLeftDataArr.push({value:obj.json.allPermission[i].columns.id,title:obj.json.allPermission[i].columns.permission_name,disabled:false,checked:false,rid:parseInt(tr[0].children[1].firstChild.innerText)});
+                                for(j in obj.json.rolePermission) {
+                                    if (obj.json.allPermission[i].columns.id == obj.json.rolePermission[j].permissionId) {
+                                        initRightDataArr.push(obj.json.allPermission[i].columns.id);
+                                        break;
+                                    }
+                                }
+                            }
+                            transfer.render({
+                                title: ['['+tr[0].children[2].firstChild.innerText+']未拥有权限','['+tr[0].children[2].firstChild.innerText+']已拥有权限'],
+                                elem:'#rolePermissionConfig',
+                                height: 700,
+                                data:initLeftDataArr,
+                                value: initRightDataArr,
+                                showSearch: true,
+                                onchange: function(data, index){
+                                    var param = "";
+                                    for(i in data){
+                                        param += "ids="+data[i].value+","+data[i].rid+"&";
+                                    }
+                                    var url = index == 0 ? 'addRolePermission' : 'delRolePermission';
+                                    $.ajax({
+                                        datatype:'json',
+                                        url:"http://localhost:8080/wechat-model-controller/role_admin/"+url,
+                                        data:param,
+                                        type:'post',
+                                        success:function(obj){
+                                            if(obj.code == 1)
+                                                layerzk.open(windowObj,{bakcgroundColor:rgba16(),msg:obj.message,icoCode:'&#xe688;'},2500);
+                                            else
+                                                layerzk.open(windowObj,{bakcgroundColor:'#f44336d4',msg:obj.message,icoCode:'&#xe67e;'},2500);
+                                            transfer.reload('rolePermissionConfigTransfer');
+                                            rolePermissionRenderTransfer();
+                                        }
+                                    });
+                                },
+                                id:'rolePermissionConfigTransfer',
+                                text: {
+                                    none: '无数据',
+                                    searchNone: '无匹配数据'
+                                }
+                            });
+                            rolePermissionRenderTransfer();
+                            if(obj.code == 1)
+                                $('#rolePermissionConfig').css('display','block');
+                        }
+                    });
+                }
+            })
+        }
+
+        function rolePermissionRenderTransfer(){
+            $('#rolePermissionConfig .layui-transfer-box').css('width','40%');
+            $('#rolePermissionConfig .layui-transfer-active').css({'width':'10%','text-align':'-webkit-center'});
+        }
+
+        function addRole(){
+            $.ajax({
+                datatype:'html',
+                url:"/add_role",
+                type:'get',
+                success:function(obj){
+                    layer.open({
+                        title: '添加角色',
+                        anim: mathLayuiAnim(),
+                        skin: 'layerzk-normal',
+                        area:'600px',
+                        btn: false,
+                        shadeClose: true,
+                        content: obj,
+                    });
+                }
+            });
+        }
+
+        form.on('submit(addRoleSubmit)', function(data){
+            $.ajax({
+                datatype:'json',
+                url:"http://localhost:8080/wechat-model-controller/role_admin/addRole",
+                data:data.field,
+                type:'post',
+                success:function(obj){
+                    if(obj.code == 1)
+                        layerzk.open(windowObj,{bakcgroundColor:'#009688',msg:obj.message,icoCode:'&#xe605;'},3000);
+                    clickLayuiTableBtn('roleAdminTable');
+                }
+            });
+            return false;
+        });
+
+        function delRole(i){
+            var checkStatus = table.checkStatus('roleAdminTable');
+            if(checkStatus.data.length <= 0){
+                layer.tips('未勾选数据！', i, {
+                    tips: [1, '#3595CC'],
+                    time: 4000
+                });
+            }else{
+                layer.open({
+                    title: '<i class="iconfont" style="color:#F44336">&#xe67e;</i>删除角色',
+                    anim: mathLayuiAnim(),
+                    btn: ['确认'],
+                    yes: function(index, layero){
+                        var param = '';
+                        checkStatus.data.forEach(function (val) {
+                            param += 'id='+val.id+'&';
+                        });
+                        $.ajax({
+                            datatype:'json',
+                            url:"http://localhost:8080/wechat-model-controller/role_admin/delRole",
+                            data: param,
+                            type:'post',
+                            success:function(obj){
+                                if(obj.code == 1)
+                                    layerzk.open(windowObj,{bakcgroundColor:'#009688',msg:obj.message,icoCode:'&#xe605;'},3000);
+                                else
+                                    layerzk.open(windowObj,{bakcgroundColor:'#f44336d4',msg:obj.message,icoCode:'&#xe67e;'},3000);
+                                layer.close(index);
+                                clickLayuiTableBtn('roleAdminTable');
+                            }
+                        });
+                    },
+                    success: function(layero, index){
+                        layero[0].children[1].style.textAlign = 'center';
+                    },
+                    shadeClose: true,
+                    content: '是否确认删除选中角色？'
+                });
+            }
+        }
+    </script>
+</body>
+</html>
