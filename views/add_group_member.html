@@ -1,0 +1,92 @@
+<form class="layui-form" lay-filter="addGroupMemberCond">
+    <div class="layui-form-item">
+        <label class="layui-form-label" style="text-align: left;padding: 9px 0;width: auto;">群组：</label>
+        <div class="layui-input-block" style="margin-left: 50px;">
+            <select name="addMemberGroupSelect" lay-filter="addMemberGroupSelect" lay-search></select>
+        </div>
+    </div>
+    <table id="mayAddGroupMemberAccountTable" lay-filter="mayAddGroupMemberAccountTable"></table>
+    <div class="layui-form-item">
+        <div class="layui-input-block" style="margin-left: 0;text-align: right;">
+            <button class="layui-btn layui-btn-sm" lay-submit lay-filter="addGroupMemberSubmit">立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary layui-btn-sm">重置</button>
+        </div>
+    </div>
+</form>
+<script>
+    var checkStatus = table.checkStatus('wechatAccountAdminTable');
+
+    $(function(){
+        var param = {accountId:checkStatus.data[0].aid}
+        $.ajax({
+            datatype:'json',
+            url:"http://localhost:8080/wechat-model-controller/comm/wechatAccountIdFindGroup",
+            type:'post',
+            data:param,
+            success:function(groupList){
+                var options = '<option value="">请选择...</option>';
+                for(i in groupList){
+                    options += '<option value="'+groupList[i].id+'">'+groupList[i].group_name+' ['+groupList[i].group_key+']</option>'
+                }
+                $('select[name="addMemberGroupSelect"]').html(options);
+                form.render();
+            }
+        });
+        loadMayAddGroupMemberAccountTable({accountId:0,groupId:0});
+    })
+
+    // 监听群组选择
+    form.on('select(addMemberGroupSelect)', function(data){
+        loadMayAddGroupMemberAccountTable({accountId:checkStatus.data[0].aid,groupId:data.value});
+    });
+
+    function loadMayAddGroupMemberAccountTable(param){
+        table.render({
+            elem: '#mayAddGroupMemberAccountTable'
+            ,height: 350
+            ,method:'post'
+            ,where: param
+            ,url: 'http://localhost:8080/wechat-model-controller/comm/getMayInAssignGroupAccountData'
+            ,cols: [[
+                {width:40,type:"checkbox"}
+                ,{field: 'id', title: 'id', width:80,hide: true}
+                ,{title: '用户微信', width:210, templet:function(o){
+                        return o.wechat_nickname+"["+o.wechat_account+"]";
+                    }}
+            ]]
+        });
+    }
+
+    // 监听添加群成员提交
+    form.on('submit(addGroupMemberSubmit)', function(data){
+        var addGroupMemberCheckStatus = table.checkStatus('mayAddGroupMemberAccountTable');
+        if(addGroupMemberCheckStatus.data.length <= 0){
+            layer.tips('请选择被拉入群组的账号！', data.elem, {
+                tips: [1, '#f44336d4'],
+                time: 4000
+            });
+        }else{
+            var param = {friendAccountIds:[],accountId:checkStatus.data[0].aid};
+            for(i in addGroupMemberCheckStatus.data){
+                param.friendAccountIds.push(addGroupMemberCheckStatus.data[i].id);
+            }
+            param = mergeJson(param,data.field);
+            layer.load(2); // 开启loading
+            $.ajax({
+                datatype:'json',
+                url:"http://localhost:8080/wechat-model-controller/wechat_account_admin/wechatAccountAddGroupMember",
+                data:param,
+                traditional:true, // 防止深度序列化参数
+                type:'post',
+                success:function(obj){
+                    if(obj.code == 1)
+                        layerzk.open(windowObj,{bakcgroundColor:'#009688',msg:obj.message,icoCode:'&#xe605;'},3000);
+                    else
+                        layerzk.open(windowObj,{bakcgroundColor:'#f44336d4',msg:obj.message,icoCode:'&#xe67e;'},5000);
+                    layer.closeAll(); //关闭所有弹出层
+                }
+            });
+        }
+        return false;
+    });
+</script>

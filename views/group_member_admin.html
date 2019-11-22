@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <div class="layui-row layui-col-space5">
+        <form class="layui-form layui-row layui-col-space3" lay-filter="groupMemberAdminScreeCond" style="max-height: 200px;overflow: visible;">
+            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+                <input class="layui-input"type="text" name="account" placeholder="微信号匹配" autocomplete="off">
+            </div>
+            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+                <input class="layui-input"type="text" name="groupName" placeholder="群组名匹配" autocomplete="off">
+            </div>
+            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+                <input class="layui-input" type="text" name="groupNumber" placeholder="群组编号匹配" autocomplete="off">
+            </div>
+            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+                <input class="layui-input"  type="text" id="groupMemberAdminAddTime" name="groupMemberAdminAddTime" placeholder="入群时间" autocomplete="off">
+            </div>
+            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+                <select name="accountType">
+                    <option value="">号码类型</option>
+                    <option value="1">系统号</option>
+                    <option value="2">非系统号</option>
+                </select>
+            </div>
+            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+                <select name="isQuit">
+                    <option value="">退群状态</option>
+                    <option value="1">已退群</option>
+                    <option value="0">未退群</option>
+                </select>
+            </div>
+        </form>
+        <div class="layui-row">
+            <div class="layui-btn-group" style="line-height: 35px;">
+                <button type="button" class="layui-btn layui-btn-normal layui-btn-sm" onclick="loadGroupMemberAdminTable()"><i class="iconfont">&#xe6f7;</i>查询</button>
+                <button type="button" class="layui-btn layui-btn-primary layui-btn-sm" onclick="sendGroupMessage()"><i class="iconfont">&#xe747;</i>发送群消息</button>
+                <button type="button" class="layui-btn layui-btn-sm layui-btn-danger" onclick="quitGroup()"><i class="iconfont">&#xe740;</i>退出群组</button>
+            </div>
+        </div>
+        <div class="layui-row">
+            <table lay-filter="groupMemberAdminTable" id="groupMemberAdminTable"></table>
+        </div>
+    </div>
+</body>
+<script>
+    $(function () {
+        laydate.render({
+            elem: '#groupMemberAdminAddTime',
+            max: 0,
+            value: new Date(),
+            isInitValue: true
+        });
+        loadGroupMemberAdminTable();
+        form.render();
+    })
+
+    function loadGroupMemberAdminTable(){
+        var param = form.val("groupMemberAdminScreeCond");
+        table.render({
+            elem: '#groupMemberAdminTable'
+            ,height: 700
+            ,method:'post'
+            ,where: param
+            ,url: 'http://localhost:8080/wechat-model-controller/wechat_group_member_admin/findAllGroupMember'
+            ,page: true
+            ,limit:20
+            ,cols: [[
+                {width:40,type:"checkbox"}
+                ,{field: 'gmid', title: 'id', width:80,hide: true}
+                ,{field: 'wgid', title: 'id', width:80,hide: true}
+                ,{field: 'aid', title: 'id', width:80,hide: true}
+                ,{field: 'group_name', title: '群组名称', width:100}
+                ,{field: 'group_key', title: '群组编号', width:140}
+                ,{field: 'wechat_account', title: '用户微信', width:140}
+                ,{field: 'wechat_nickname', title: '微信昵称', width:100}
+                ,{field: 'add_group_time', title: '入群时间', width:160}
+                ,{field: 'is_quit', title: '是否退群', width:100, templet:function(o){
+                        return o.is_quit == 0 ? "未退群" : "已退群";
+                    }}
+                ,{field: 'quit_time', title: '退群时间', width:160, templet:function(o){
+                        return o.quit_time ? o.quit_time : "无数据";
+                    }}
+            ]]
+        });
+    }
+
+    // 发送群消息
+    function sendGroupMessage(){
+        $.ajax({
+            datatype:'html',
+            url:"/send_group_message",
+            type:'get',
+            async: false,
+            success:function(obj){
+                var checkStatus = table.checkStatus('groupMemberAdminTable');
+                if(checkStatus.data.length <= 0){
+                    layer.open({
+                        title: '发送群消息',
+                        anim: mathLayuiAnim(),
+                        skin: 'layerzk-normal',
+                        btn: ["确认"],
+                        shadeClose: true,
+                        content: '是否确定将消息发送给查询条件下所有系统微信的对应群组？'+obj,
+                        success:function(layero, index){
+                            layero[0].children[1].style.textAlign = 'center';
+                        },
+                        yes:function(index, layero){
+                            var sendGroupMessageForm = form.val("sendGroupMessageForm");
+                            if(!sendGroupMessageForm.msg.trim()){
+                                layerzk.open(windowObj,{bakcgroundColor:'#f44336d4',msg:"消息内容不可为空！",icoCode:'&#xe67e;'},5000);
+                                return;
+                            }
+                            var layerId = layer.msg('消息任务添加中...', {icon: 16, shade: 0.4,time:false});
+                            var param = mergeJson(sendGroupMessageForm,form.val("groupMemberAdminScreeCond"));
+                            $.ajax({
+                                datatype:'json',
+                                url:"http://localhost:8080/wechat-model-controller/wechat_account_admin/condSendGroupMessage",
+                                data:param,
+                                traditional:true, // 防止深度序列化参数
+                                type:'post',
+                                success:function(obj){
+                                    if(obj.code == 1)
+                                        layerzk.open(windowObj,{bakcgroundColor:'#009688',msg:obj.message,icoCode:'&#xe605;'},3000);
+                                    else
+                                        layerzk.open(windowObj,{bakcgroundColor:'#f44336d4',msg:obj.message,icoCode:'&#xe67e;'},5000);
+                                    layer.close(index);
+                                    layer.close(layerId);
+                                }
+                            });
+                        }
+                    });
+                }else{
+                    layer.open({
+                        title: '<i class="iconfont">&#xe747;</i>发送群消息',
+                        anim: mathLayuiAnim(),
+                        btn: ['确认'],
+                        yes: function(index, layero){
+                            var sendGroupMessageForm = form.val("sendGroupMessageForm");
+                            if(!sendGroupMessageForm.msg.trim()){
+                                layerzk.open(windowObj,{bakcgroundColor:'#f44336d4',msg:"消息内容不可为空！",icoCode:'&#xe67e;'},5000);
+                                return;
+                            }
+                            var data = {ids:[]};
+                            checkStatus.data.forEach(function (val) {
+                                data.ids.push(val.gmid);
+                            });
+                            var param = mergeJson(sendGroupMessageForm,data);
+                            layer.load(2); // 开启loading
+                            $.ajax({
+                                datatype:'json',
+                                url:"http://localhost:8080/wechat-model-controller/wechat_account_admin/sendGroupMessage",
+                                data:param,
+                                traditional:true, // 防止深度序列化参数
+                                type:'post',
+                                success:function(obj){
+                                    if(obj.code == 1)
+                                        layerzk.open(windowObj,{bakcgroundColor:'#009688',msg:obj.message,icoCode:'&#xe605;'},3000);
+                                    else
+                                        layerzk.open(windowObj,{bakcgroundColor:'#f44336d4',msg:obj.message,icoCode:'&#xe67e;'},5000);
+                                    layer.close(index);
+                                    layer.closeAll('loading'); //关闭loading
+                                }
+                            });
+                        },
+                        success: function(layero, index){
+                            layero[0].children[1].style.textAlign = 'center';
+                        },
+                        shadeClose: true,
+                        content: '是否将消息由选中微信号发送到相应群组？'+obj
+                    });
+                }
+            }
+        });
+    }
+
+    // 退出群组
+    function quitGroup(){
+        var checkStatus = table.checkStatus('groupMemberAdminTable');
+        if(checkStatus.data.length <= 0){
+            layer.open({
+                title: '退出群组',
+                anim: mathLayuiAnim(),
+                skin: 'layerzk-normal',
+                btn: ["确认"],
+                shadeClose: true,
+                content: '是否确定将当前查询条件下所有系统数据退出群组？',
+                success:function(layero, index){
+                    layero[0].children[1].style.textAlign = 'center';
+                },
+                yes:function(index, layero){
+                    var param = form.val("groupMemberAdminScreeCond");
+                    var layerId = layer.msg('退群任务添加中...', {icon: 16, shade: 0.4,time:false});
+                    $.ajax({
+                        datatype:'json',
+                        url:"http://localhost:8080/wechat-model-controller/wechat_account_admin/condWechatAccountQuitGroup",
+                        data:param,
+                        traditional:true, // 防止深度序列化参数
+                        type:'post',
+                        success:function(obj){
+                            if(obj.code == 1)
+                                layerzk.open(windowObj,{bakcgroundColor:'#009688',msg:obj.message,icoCode:'&#xe605;'},3000);
+                            else
+                                layerzk.open(windowObj,{bakcgroundColor:'#f44336d4',msg:obj.message,icoCode:'&#xe67e;'},5000);
+                            layer.close(index);
+                            layer.close(layerId);
+                        }
+                    });
+                }
+            });
+        }else{
+            layer.open({
+                title: '<i class="iconfont">&#xe740;</i>退出群组',
+                anim: mathLayuiAnim(),
+                btn: ["确认"],
+                yes: function(index, layero){
+                    var param = {ids:[]};
+                    checkStatus.data.forEach(function (val) {
+                        param.ids.push(val.gmid);
+                    });
+                    layer.load(2); // 开启loading
+                    $.ajax({
+                        datatype:'json',
+                        url:"http://localhost:8080/wechat-model-controller/wechat_account_admin/wechatAccountQuitGroup",
+                        data:param,
+                        traditional:true, // 防止深度序列化参数
+                        type:'post',
+                        success:function(obj){
+                            if(obj.code == 1)
+                                layerzk.open(windowObj,{bakcgroundColor:'#009688',msg:obj.message,icoCode:'&#xe605;'},3000);
+                            else
+                                layerzk.open(windowObj,{bakcgroundColor:'#f44336d4',msg:obj.message,icoCode:'&#xe67e;'},5000);
+                            layer.close(index);
+                            layer.closeAll('loading'); //关闭loading
+                        }
+                    });
+                },
+                success: function(layero, index){
+                    layero[0].children[1].style.textAlign = 'center';
+                },
+                shadeClose: true,
+                content: '是否将选中数据进行退出群组？'
+            });
+        }
+    }
+</script>
+</html>

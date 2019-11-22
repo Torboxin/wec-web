@@ -53,7 +53,7 @@
             done: function(res, index, upload){
                 if(res.code == 0){
                     $('#selectWechatAccountFileTitle').text("已上传："+res.message);
-                    $('#selectWechatAccountFileTitle')[0].dataset.path = res.obj;
+                    $('#selectWechatAccountFileTitle')[0].dataset.path = res.data;
                     form.render();
                 }
                 layer.closeAll('loading'); //关闭loading

@@ -1,0 +1,170 @@
+<form class="layui-form" lay-filter="addFriendCond">
+    <div class="layui-form-item">
+        <label class="layui-form-label">添加类别：</label>
+        <div class="layui-input-block">
+            <input type="radio" name="addFriendType" lay-filter="addFriendType" value="1" title="添加指定手机号" checked>
+            <input type="radio" name="addFriendType" lay-filter="addFriendType" value="2" title="添加指定电话本">
+        </div>
+    </div>
+    <div id="addFriendPhoneDiv">
+        <div class="layui-form-item">
+            <label class="layui-form-label">手机号：</label>
+            <div class="layui-input-block">
+                <input type="text" name="addFriendPhone" placeholder="请输入需要添加的手机号" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+    </div>
+    <div id="addFriendPhoneBookDiv" style="display: none;">
+        <div class="layui-form-item">
+            <label class="layui-form-label">电话本：</label>
+            <div class="layui-input-block">
+                <select name="phoneBookBatchSelect" lay-search></select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">添加数量：</label>
+            <div class="layui-input-block">
+                <input type="number" name="addFriendNumber" placeholder="请输入需要添加好友的数量" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">间隔时间：</label>
+                <div class="layui-input-inline" style="width: 100px;">
+                    <input type="number" name="intervalMin" placeholder="最小间隔" autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-form-mid">-</div>
+                <div class="layui-input-inline" style="width: 100px;">
+                    <input type="number" name="intervalMax" placeholder="最大间隔" autocomplete="off" class="layui-input">
+                </div>
+                <label class="layui-form-label" style="text-align: left;color: #9E9E9E;">单位：秒</label>
+            </div>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">问候语：</label>
+        <div class="layui-input-block">
+            <select name="greetingBatchSelect" lay-search lay-verify="required"></select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="addFriendSubmit">立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+    </div>
+</form>
+<script>
+    form.on('radio(addFriendType)', function(data){
+        if(data.value == 2){
+            $('#addFriendPhoneBookDiv').css({display:"block"});
+            $('#addFriendPhoneDiv').css({display:"none"});
+        }else{
+            $('#addFriendPhoneBookDiv').css({display:"none"});
+            $('#addFriendPhoneDiv').css({display:"block"});
+        }
+    });
+    form.on('submit(addFriendSubmit)', function(data){
+        var checkStatus = table.checkStatus('wechatAccountAdminTable');
+        var param = data.field;
+        var url;
+        if(checkStatus.data.length <= 0){
+            if(parseInt(data.field.intervalMax) <= parseInt(data.field.intervalMin)){
+                layer.tips('间隔时间最大值不可小于最小值！', data.elem, {
+                    tips: [1, '#3595CC'],
+                    time: 2000
+                });
+                return false;
+            }
+            if(data.field.addFriendType == 2 && !data.field.addFriendNumber){
+                layer.tips('添加数量不可为空！', data.elem, {
+                    tips: [1, '#3595CC'],
+                    time: 2000
+                });
+                return false;
+            }
+            param = mergeJson(param,form.val("wechatAccountAdminScreeCond"));
+            url = "wechatAccountAddFriendCond";
+        }else{
+            if(!data.field.addFriendPhone){
+                layer.tips('被添加手机号不可为空！！', data.elem, {
+                    tips: [1, '#3595CC'],
+                    time: 2000
+                });
+                return false;
+            }
+            var checkedData = {ids:[]};
+            checkStatus.data.forEach(function (val) {
+                checkedData.ids.push(val.aid);
+            });
+            param = mergeJson(data.field,checkedData);
+            url = "wechatAccountAddFriend";
+        }
+        layer.load(2, {shade: [0.4,'#6b6b6c']});
+        $.ajax({
+            datatype:'json',
+            url:"http://localhost:8080/wechat-model-controller/wechat_account_admin/"+url,
+            type:'post',
+            data:param,
+            traditional:true, // 防止深度序列化参数
+            success:function(obj){
+                if(obj.code == 1){
+                    layer.open({
+                        title:'添加好友任务反馈信息',
+                        area:['400px','450px'],
+                        content:"<table class=\"layui-table\">" +
+                            "  <thead>" +
+                            "    <tr>" +
+                            "      <th>微信号</th>" +
+                            "      <th>失败原因</th>" +
+                            "    </tr> " +
+                            "  </thead>" +
+                            "  <tbody>" +
+                            obj.message +
+                            "  </tbody>" +
+                            "</table>",
+                        success:function(layero, index){
+                            layero[0].children[1].style.overflow = "auto";
+                        }
+                    });
+                    form.render();
+                }else if(obj.code == 2){
+                    layerzk.open(windowObj,{bakcgroundColor:'#009688',msg:obj.message,icoCode:'&#xe605;'},3000);
+                }else{
+                    layerzk.open(windowObj,{bakcgroundColor:"#d4000d",msg:obj.message,icoCode:'&#xe67e;'},3000);
+                }
+                layer.closeAll('loading');
+            }
+        });
+        return false;
+    });
+    $(function(){
+        $.ajax({
+            datatype:'json',
+            url:"http://localhost:8080/wechat-model-controller/comm/getAllIsOpenPhoneBookBatchData",
+            type:'post',
+            success:function(phoneBookBatchList){
+                var options = '';
+                for(i in phoneBookBatchList){
+                    options += '<option value="'+phoneBookBatchList[i].id+'">'+phoneBookBatchList[i].batch_serial_number+' ['+phoneBookBatchList[i].batch_remark+']</option>'
+                }
+                $('select[name="phoneBookBatchSelect"]').html(options);
+                form.render();
+            }
+        });
+        $.ajax({
+            datatype:'json',
+            url:"http://localhost:8080/wechat-model-controller/comm/getAllIsOpenGreetingBatchData",
+            type:'post',
+            success:function(greetingBatchList){
+                var options = '';
+                for(i in greetingBatchList){
+                    options += '<option value="'+greetingBatchList[i].id+'">'+greetingBatchList[i].batch_serial_number+' ['+greetingBatchList[i].batch_remark+']</option>'
+                }
+                $('select[name="greetingBatchSelect"]').html(options);
+                form.render();
+            }
+        });
+    });
+    form.render();
+</script>

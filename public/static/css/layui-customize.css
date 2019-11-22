@@ -2,21 +2,25 @@
     position: absolute;
     bottom: 50px;
     right: 20px;
+    z-index:20191120
 }
 .layerzk-rt-window{
     position: absolute;
     top: 0;
     right: 20px;
+    z-index:20191120
 }
 .layerzk-lb-window{
     position: absolute;
     bottom: 50px;
     left: 20px;
+    z-index:20191120
 }
 .layerzk-lt-window{
     position: absolute;
     top: 0;
     left: 20px;
+    z-index:20191120
 }
 .layerzk-info{
     margin-bottom: 1rem;

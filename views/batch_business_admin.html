@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <div class="layui-row layui-col-space5">
+        <form class="layui-form layui-row layui-col-space3" lay-filter="batchBusinessAdminScreeCond" style="max-height: 200px;overflow: visible;">
+            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+                <input class="layui-input" type="text" name="batchBusinessAdminBatchNumber" placeholder="批次号匹配" autocomplete="off">
+            </div>
+            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+                <input class="layui-input" type="text" name="batchBusinessAdminAccount" placeholder="微信号匹配" autocomplete="off">
+            </div>
+            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+                <input class="layui-input" type="text" id="batchBusinessAdminCreateTime" name="batchBusinessAdminCreateTime" placeholder="创建时间" autocomplete="off">
+            </div>
+            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+                <input class="layui-input" type="text" id="batchBusinessAdminDealTime" name="batchBusinessAdminDealTime" placeholder="处理时间" autocomplete="off">
+            </div>
+            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+                <input class="layui-input" type="text" id="batchBusinessAdminAccomplishTime" name="batchBusinessAdminAccomplishTime" placeholder="完成时间" autocomplete="off">
+            </div>
+            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+                <select id="batchBusinessAdminTypeCode" name="batchBusinessAdminTypeCode"></select>
+            </div>
+            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+                <select name="batchBusinessAdminExecuteState">
+                    <option value="">执行状态</option>
+                    <option value="0">暂停</option>
+                    <option value="1">运行中</option>
+                    <option value="2">已完成</option>
+                    <option value="3">异常停止</option>
+                    <option value="4">手动停止</option>
+                </select>
+            </div>
+        </form>
+        <div class="layui-row">
+            <div class="layui-btn-group" style="line-height: 35px;">
+                <button type="button" class="layui-btn layui-btn-normal layui-btn-sm" onclick="loadBatchBusinessAdminTable()"><i class="iconfont">&#xe6f7;</i>查询</button>
+            </div>
+        </div>
+        <div class="layui-row">
+            <table lay-filter="batchBusinessAdminTable" id="batchBusinessAdminTable"></table>
+        </div>
+    </div>
+    <script>
+        $(function(){
+            laydate.render({
+                elem: '#batchBusinessAdminCreateTime'
+            });
+            laydate.render({
+                elem: '#batchBusinessAdminDealTime'
+            });
+            laydate.render({
+                elem: '#batchBusinessAdminAccomplishTime'
+            });
+            var businessTypeHtml = "<option value=''>业务类型</option>";
+            for(var i=1;i<typeName.length;i++){
+                businessTypeHtml += '<option value="'+i+'">'+typeName[i]+'</option>';
+            }
+            $('#batchBusinessAdminTypeCode').html(businessTypeHtml);
+            loadBatchBusinessAdminTable();
+            form.render();
+        })
+
+        function loadBatchBusinessAdminTable(){
+            var param = form.val('batchBusinessAdminScreeCond');
+            table.render({
+                elem: '#batchBusinessAdminTable'
+                ,height: 700
+                ,method:'post'
+                ,url: 'http://localhost:8080/wechat-model-controller/business_batch_admin/findAllBatchBusinessData'
+                ,where: param
+                ,page: true
+                ,limit:20
+                ,cols: [[
+                    {width:80,type:"checkbox"}
+                    ,{field: 'id', title: 'ID', width:80, sort: true,hide: true}
+                    ,{title: '业务类型', width:140, templet:function(o){
+                            return typeName[o.business_batch_type_code];
+                        }}
+                    ,{title: '执行任务微信', width:170, templet:function (o) {
+                            return o.wechat_nickname+"["+o.wechat_account+"]";
+                        }}
+                    ,{field: 'username', title: '所属用户', width:100}
+                    ,{field: 'business_count_num', title: '任务总数', width:100}
+                    ,{field: 'business_target_count_num', title: '目标数', width:100}
+                    ,{field: 'business__take_out_num', title: '取走数', width:100}
+                    ,{field: 'business_fail_num', title: '失败数', width:100}
+                    ,{field: 'business_success_num', title: '成功数', width:100}
+                    ,{field: 'batch_create_time', title: '创建时间', width:160}
+                    ,{field: 'batch_deal_time', title: '处理时间', width:160}
+                    ,{field: 'batch_accomplish_time', title: '完成时间', width:160}
+                    ,{field: 'batch_interval_min', title: '最小间隔', width:100, templet:function(o){
+                            return o.batch_interval_min+" 秒";
+                        }}
+                    ,{field: 'batch_interval_max', title: '最大间隔', width:100, templet:function(o){
+                            return o.batch_interval_max+" 秒";
+                        }}
+                    ,{field: 'batch_serial_number', title: '批次任务号', width:160}
+                    ,{title: '执行状态', width:100,templet:function(o){
+                            var val = "";
+                            switch (o.business_batch_state) {
+                                case 0:
+                                    val = "<span style='color: #000000;'>暂停</span>";
+                                    break;
+                                case 1:
+                                    val = "<span style='color: #03a9f4;'>运行中</span>";
+                                    break;
+                                case 2:
+                                    val = "<span style='color: #4caf50;'>已完成</span>";
+                                    break;
+                                case 3:
+                                    val = "<span style='color: red;'>异常停止</span>";
+                                    break;
+                                default:
+                                    val = "<span style='color: red;'>手动停止</span>";
+                                    break;
+                            }
+                            return val;
+                        }}
+                    ,{field: 'business_batch_remark', title: '备注', width:120}
+                ]]
+            });
+        }
+    </script>
+</body>
+</html>

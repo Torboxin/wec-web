@@ -4,6 +4,213 @@
     <meta charset="UTF-8">
 </head>
 <body>
-
+    <div class="layui-row layui-col-space5">
+        <form class="layui-form layui-row layui-col-space3" lay-filter="wechatFriendAdminScreeCond" style="max-height: 200px;overflow: visible;">
+            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+                <input class="layui-input"type="text" name="account" placeholder="微信账号匹配" autocomplete="off">
+            </div>
+            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+                <input class="layui-input" type="text" name="friendAccount" placeholder="好友微信账号匹配" autocomplete="off">
+            </div>
+            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+                <input class="layui-input"  type="text" id="wechatFriendAdminAddTime" name="addTime" placeholder="好友添加时间" autocomplete="off">
+            </div>
+            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+                <select name="loginState">
+                    <option value="">登录状态</option>
+                    <option value="2">已登录</option>
+                    <option value="0">未登录</option>
+                </select>
+            </div>
+            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+                <select name="delState">
+                    <option value="">删除状态</option>
+                    <option value="1">已删除</option>
+                    <option value="0">未删除</option>
+                </select>
+            </div>
+        </form>
+        <div class="layui-row">
+            <div class="layui-btn-group" style="line-height: 35px;">
+                <button type="button" class="layui-btn layui-btn-normal layui-btn-sm" onclick="loadWechatFriendAdminTable()"><i class="iconfont">&#xe6f7;</i>查询</button>
+                <button type="button" class="layui-btn layui-btn-sm layui-btn-danger" onclick="delFriend(this)"><i class="iconfont">&#xe6fa;</i>删除好友</button>
+                <button type="button" class="layui-btn layui-btn-primary layui-btn-sm" onclick="sendFriendMessage()"><i class="iconfont">&#xe6fd;</i>发送消息</button>
+            </div>
+        </div>
+        <div class="layui-row">
+            <table lay-filter="wechatFriendAdminTable" id="wechatFriendAdminTable"></table>
+        </div>
+    </div>
 </body>
+<script>
+    $(function () {
+        laydate.render({
+            elem: '#wechatFriendAdminAddTime'
+        });
+        loadWechatFriendAdminTable();
+        form.render();
+    })
+
+    function loadWechatFriendAdminTable(){
+        var param = form.val("wechatFriendAdminScreeCond");
+        table.render({
+            elem: '#wechatFriendAdminTable'
+            ,height: 700
+            ,method:'post'
+            ,where: param
+            ,url: 'http://localhost:8080/wechat-model-controller/wechat_friend_admin/findAllFriend'
+            ,page: true
+            ,limit:20
+            ,cols: [[
+                {width:40,type:"checkbox"}
+                ,{field: 'aid1', title: 'AID1', width:80,hide: true}
+                ,{field: 'aid2', title: 'AID2', width:80,hide: true}
+                ,{title: '用户微信', width:180, templet:function(o){
+                        return o.nickname+"["+o.account+"]";
+                    }}
+                ,{title: '好友微信', width:180, templet:function(o){
+                        return o.fnickname+"["+o.faccount+"]";
+                    }}
+                ,{title: '删除状态', width:100, templet:function(o){
+                        return o.del_state == 1 ? "<span style='color: red;'>已删除</span>" : "<span style='color: #03a9f4;'>未删除</span>";
+                    }}
+                ,{field: 'add_time', title: '数据添加时间', width:160}
+                ,{field: 'update_time', title: '数据修改时间', width:160}
+                ,{field: 'friend_remark', title: '备注', width:100}
+            ]]
+        });
+    }
+
+    // 选中删除好友
+    function delFriend(i){
+        var checkStatus = table.checkStatus('wechatFriendAdminTable');
+        if(checkStatus.data.length <= 0){
+            layer.tips('未勾选数据！', i, {
+                tips: [1, '#3595CC'],
+                time: 4000
+            });
+        }else{
+            layer.open({
+                title: '<i class="iconfont">&#xe6fa;</i>删除好友',
+                anim: mathLayuiAnim(),
+                btn: ['确认'],
+                yes: function(index, layero){
+                    var param = {t_f:[]};
+                    checkStatus.data.forEach(function (val) {
+                        if(val.del_state != 1){
+                            param.t_f.push(val.aid1+"|"+val.faccount);
+                        }
+                    });
+                    if(param.t_f.length <= 0){
+                        layerzk.open(windowObj,{bakcgroundColor:'#f44336d4',msg:"没有可删除数据！",icoCode:'&#xe67e;'},3000);
+                        return;
+                    }
+                    layer.load(2); // 开启loading
+                    $.ajax({
+                        datatype:'json',
+                        url:"http://localhost:8080/wechat-model-controller/wechat_friend_admin/delFriendData",
+                        data:param,
+                        traditional:true, // 防止深度序列化参数
+                        type:'post',
+                        success:function(obj){
+                            if(obj.code == 1)
+                                layerzk.open(windowObj,{bakcgroundColor:'#009688',msg:obj.message,icoCode:'&#xe605;'},3000);
+                            else
+                                layerzk.open(windowObj,{bakcgroundColor:'#f44336d4',msg:obj.message,icoCode:'&#xe67e;'},5000);
+                            layer.close(index);
+                            clickLayuiTableBtn('wechatFriendAdminTable');
+                            layer.closeAll('loading'); //关闭loading
+                        }
+                    });
+                },
+                success: function(layero, index){
+                    layero[0].children[1].style.textAlign = 'center';
+                },
+                shadeClose: true,
+                content: '是否确定删除选中的好友？'
+            });
+        }
+    }
+
+    // 查询条件发送消息
+    function sendFriendMessage(){
+        $.ajax({
+            datatype:'html',
+            url:"/send_friend_message",
+            type:'get',
+            async: false,
+            success:function(obj){
+                var checkStatus = table.checkStatus('wechatFriendAdminTable');
+                if(checkStatus.data.length <= 0){
+                    layer.open({
+                        title: '发送消息',
+                        anim: mathLayuiAnim(),
+                        skin: 'layerzk-normal',
+                        btn: ["确认"],
+                        shadeClose: true,
+                        content: '是否确定将消息发送给所有查询条件下的好友？'+obj,
+                        success:function(layero, index){
+                            layero[0].children[1].style.textAlign = 'center';
+                        },
+                        yes:function(index, layero){
+                            var layerId = layer.msg('消息任务添加中...', {icon: 16, shade: 0.4,time:false});
+                            var param = mergeJson(form.val("sendFriendMessageForm"),form.val("wechatFriendAdminScreeCond"));
+                            $.ajax({
+                                datatype:'json',
+                                url:"http://localhost:8080/wechat-model-controller/wechat_friend_admin/sendFriendMessage",
+                                data:param,
+                                traditional:true, // 防止深度序列化参数
+                                type:'post',
+                                success:function(obj){
+                                    if(obj.code == 1)
+                                        layerzk.open(windowObj,{bakcgroundColor:'#009688',msg:obj.message,icoCode:'&#xe605;'},3000);
+                                    else
+                                        layerzk.open(windowObj,{bakcgroundColor:'#f44336d4',msg:obj.message,icoCode:'&#xe67e;'},5000);
+                                    layer.close(index);
+                                    clickLayuiTableBtn('wechatFriendAdminTable');
+                                    layer.close(layerId);
+                                }
+                            });
+                        }
+                    });
+                }else{
+                    layer.open({
+                        title: '<i class="iconfont">&#xe6fd;</i>发送消息',
+                        anim: mathLayuiAnim(),
+                        btn: ['确认'],
+                        yes: function(index, layero){
+                            layer.load(2); // 开启loading
+                            var data = {t_f:[]};
+                            checkStatus.data.forEach(function (val) {
+                                data.t_f.push(val.aid1+"|"+val.faccount);
+                            });
+                            var param = mergeJson(form.val("sendFriendMessageForm"),data);
+                            $.ajax({
+                                datatype:'json',
+                                url:"http://localhost:8080/wechat-model-controller/wechat_friend_admin/sendFriendMessageParams",
+                                data:param,
+                                traditional:true, // 防止深度序列化参数
+                                type:'post',
+                                success:function(obj){
+                                    if(obj.code == 1)
+                                        layerzk.open(windowObj,{bakcgroundColor:'#009688',msg:obj.message,icoCode:'&#xe605;'},3000);
+                                    else
+                                        layerzk.open(windowObj,{bakcgroundColor:'#f44336d4',msg:obj.message,icoCode:'&#xe67e;'},5000);
+                                    layer.close(index);
+                                    clickLayuiTableBtn('wechatFriendAdminTable');
+                                    layer.closeAll('loading'); //关闭loading
+                                }
+                            });
+                        },
+                        success: function(layero, index){
+                            layero[0].children[1].style.textAlign = 'center';
+                        },
+                        shadeClose: true,
+                        content: '是否将消息发送给选中的好友？'+obj
+                    });
+                }
+            }
+        });
+    }
+</script>
 </html>

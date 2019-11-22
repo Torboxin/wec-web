@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <div class="layui-row layui-col-space5">
+        <form class="layui-form layui-row layui-col-space3" lay-filter="businessDataAdminScreeCond" style="max-height: 200px;overflow: visible;">
+            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+                <input class="layui-input" type="text" name="businessAdminAccount" placeholder="微信账号匹配" autocomplete="off">
+            </div>
+            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+                <input class="layui-input" type="text" name="businessAdminBatchNumber" placeholder="批次任务号匹配" autocomplete="off">
+            </div>
+            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+                <input class="layui-input" type="text" name="businessAdminTimingNumber" placeholder="定时任务号匹配" autocomplete="off">
+            </div>
+            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+                <input class="layui-input" type="text" id="businessAdminCreateTime" name="businessAdminCreateTime" placeholder="创建时间" autocomplete="off">
+            </div>
+            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+                <input class="layui-input" type="text" id="businessAdminGetTime" name="businessAdminGetTime" placeholder="取走时间" autocomplete="off">
+            </div>
+            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+                <input class="layui-input" type="text" id="businessAdminSuccessTime" name="businessAdminSuccessTime" placeholder="完成时间" autocomplete="off">
+            </div>
+            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+                <select id="businessAdminTypeCode" name="businessAdminTypeCode"></select>
+            </div>
+            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+                <select name="businessAdminExecuteState">
+                    <option value="">执行状态</option>
+                    <option value="0">未处理</option>
+                    <option value="1">处理中</option>
+                    <option value="2">处理成功</option>
+                    <option value="3">处理失败</option>
+                </select>
+            </div>
+            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+                <select name="businessAdminTaskType">
+                    <option value="">任务类型</option>
+                    <option value="0">普通任务</option>
+                    <option value="1">批量任务</option>
+                    <option value="2">定时任务</option>
+                </select>
+            </div>
+        </form>
+        <div class="layui-row">
+            <div class="layui-btn-group" style="line-height: 35px;">
+                <button type="button" class="layui-btn layui-btn-normal layui-btn-sm" onclick="loadBusinessDataAdminTable()"><i class="iconfont">&#xe6f7;</i>查询</button>
+                <button type="button" class="layui-btn layui-btn-sm layui-btn-danger" onclick="delBusinessData()"><i class="iconfont">&#xe6fa;</i>删除数据</button>
+            </div>
+        </div>
+        <div class="layui-row">
+            <table lay-filter="businessDataAdminTable" id="businessDataAdminTable"></table>
+        </div>
+    </div>
+    <script>
+        $(function () {
+            laydate.render({
+                elem: '#businessAdminCreateTime'
+            });
+            laydate.render({
+                elem: '#businessAdminGetTime'
+            });
+            laydate.render({
+                elem: '#businessAdminSuccessTime'
+            });
+            var businessTypeHtml = "<option value=''>业务类型</option>";
+            for(var i=1;i<typeName.length;i++){
+                businessTypeHtml += '<option value="'+i+'">'+typeName[i]+'</option>';
+            }
+            $('#businessAdminTypeCode').html(businessTypeHtml);
+            loadBusinessDataAdminTable();
+            form.render();
+        })
+
+        function loadBusinessDataAdminTable(){
+            var param = form.val('businessDataAdminScreeCond');
+            table.render({
+                elem: '#businessDataAdminTable'
+                ,height: 700
+                ,method:'post'
+                ,url: 'http://localhost:8080/wechat-model-controller/business_data_admin/findAllVxBusinessData'
+                ,where: param
+                ,page: true
+                ,limit:20
+                ,cols: [[
+                    {width:80,type:"checkbox"}
+                    ,{field: 'id', title: 'ID', width:80, sort: true,hide: true}
+                    ,{title: '业务类型', width:100, templet:function(o){
+                            return typeName[o.business_type_code];
+                        }}
+                    ,{title: '执行任务微信', width:170, templet:function (o) {
+                            return o.thisNickname+"["+o.thisWechatAccount+"]";
+                        }}
+                    ,{title: '好友微信', width:170, templet:function (o) {
+                            return o.friendNickname && o.friendWechatAccount ? o.friendNickname+"["+o.friendWechatAccount+"]" : o.friend_wechat_account ? o.friend_wechat_account : "无数据";
+                        }}
+                    ,{title: '群组信息', width:140,templet:function(o){
+                            return o.group_name && o.group_key ? o.group_name+"["+o.group_key+"]" : "无数据";
+                        }}
+                    ,{field: 'business_result_msg', title: '返回值信息', width:120}
+                    ,{title: '执行状态', width:100,templet:function(o){
+                            var val = "";
+                            switch (o.business_state) {
+                                case 0:
+                                    val = "<span style='color: #9e9e9e;'>未处理</span>";
+                                    break;
+                                case 1:
+                                    val = "<span style='color: #03a9f4;'>处理中</span>";
+                                    break;
+                                case 2:
+                                    val = "<span style='color: #4caf50;'>处理成功</span>";
+                                    break;
+                                default:
+                                    val = "<span style='color: red;'>处理失败</span>";
+                                    break;
+                            }
+                            return val;
+                        }}
+                    ,{field: 'send_msg', title: '消息内容', width:100}
+                    ,{field: 'business_create_time', title: '创建时间', width:160}
+                    ,{field: 'business_get_time', title: '取走时间', width:160}
+                    ,{field: 'busness_success_time', title: '完成时间', width:160}
+                    ,{field: 'username', title: '所属用户', width:100}
+                    ,{field: 'batch_serial_number', title: '批次任务号', width:160}
+                    ,{field: 'timing_serial_number', title: '定时任务号', width:160}
+                    ,{title: '任务类型', width:100,templet:function(o){
+                            var val = "";
+                            switch (o.task_type_code) {
+                                case 1:
+                                    val = "批量任务";
+                                    break;
+                                case 2:
+                                    val = "定时任务";
+                                    break;
+                                default:
+                                    val = "普通任务";
+                                    break;
+                            }
+                            return val;
+                        }}
+                    //,{toolbar: '#phoneBookBatchAdminTableEventButton', width:110}
+                ]]
+            });
+        }
+
+        // 查询条件删除业务数据
+        function delBusinessData(){
+            var checkStatus = table.checkStatus('businessDataAdminTable');
+            if(checkStatus.data.length > 0){
+                layer.open({
+                    title: '删除业务数据',
+                    anim: mathLayuiAnim(),
+                    skin: 'layerzk-normal',
+                    btn: ["确认"],
+                    shadeClose: true,
+                    content: "是否确认删除选中的业务数据信息？",
+                    success: function(layero, index){
+                        layero[0].children[1].style.textAlign = 'center';
+                    },
+                    yes:function(index, layero){
+                        layer.load(2, {shade: [0.4,'#6b6b6c']});
+                        var param = {ids:[]};
+                        for(i in checkStatus.data){
+                            param.ids.push(checkStatus.data[i].id);
+                        }
+                        $.ajax({
+                            datatype:'json',
+                            url:"http://localhost:8080/wechat-model-controller/business_data_admin/delSelectedBusinessData",
+                            data:param,
+                            traditional:true, // 防止深度序列化参数
+                            type:'post',
+                            success:function(obj){
+                                if(obj.code == 1)
+                                    layerzk.open(windowObj,{bakcgroundColor:'#009688',msg:obj.message,icoCode:'&#xe605;'}, 3000);
+                                clickLayuiTableBtn('businessDataAdminTable');
+                                layer.close(index);
+                                layer.closeAll('loading');
+                            },
+                            error:function(xhr,state,errorThrown){
+                                layer.closeAll('loading');
+                            }
+                        });
+                    }
+                });
+            }else{
+                layer.open({
+                    title: '删除业务数据',
+                    anim: mathLayuiAnim(),
+                    skin: 'layerzk-normal',
+                    btn: ["确认"],
+                    shadeClose: true,
+                    content: "是否确认将当前条件下查询出的业务数据全部删除？",
+                    success: function(layero, index){
+                        layero[0].children[1].style.textAlign = 'center';
+                    },
+                    yes:function(index, layero){
+                        layer.load(2, {shade: [0.4,'#6b6b6c']});
+                        var param = form.val('businessDataAdminScreeCond');
+                        $.ajax({
+                            datatype:'json',
+                            url:"http://localhost:8080/wechat-model-controller/business_data_admin/delBusinessDataByScreeCond",
+                            data:param,
+                            traditional:true, // 防止深度序列化参数
+                            type:'post',
+                            success:function(obj){
+                                if(obj.code == 1)
+                                    layerzk.open(windowObj,{bakcgroundColor:'#009688',msg:obj.message,icoCode:'&#xe605;'}, 3000);
+                                else
+                                    layerzk.open(windowObj,{bakcgroundColor:'#f44336d4',msg:obj.message,icoCode:'&#xe67e;'},5000);
+                                clickLayuiTableBtn('businessDataAdminTable');
+                                layer.close(index);
+                                layer.closeAll('loading');
+                            },
+                            error:function(xhr,state,errorThrown){
+                                layer.closeAll('loading');
+                            }
+                        });
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html>

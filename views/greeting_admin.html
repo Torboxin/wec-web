@@ -53,7 +53,7 @@
             done: function(res, index, upload){
                 if(res.code == 0){
                     $('#selectGreetingFileTitle').text("待解析："+res.message);
-                    $('#selectGreetingFileTitle')[0].dataset.path = res.obj;
+                    $('#selectGreetingFileTitle')[0].dataset.path = res.data;
                     $('#resolverImportGreetingFile')[0].classList.remove("layui-btn-disabled");
                     $('#resolverImportGreetingFile')[0].removeAttribute("disabled");
                     form.render();
@@ -81,9 +81,9 @@
             ,cols: [[
                 {width:80,type:"checkbox"}
                 ,{field: 'id', title: 'ID', width:80, sort: true,hide: true}
-                ,{field: 'btach_serial_number', title: '批次号', width:140}
+                ,{field: 'batch_serial_number', title: '批次号', width:140}
                 ,{title: '总 / 可用 / 不可用', width:160, templet:function (o) {
-                        return o.batch_count_num + " / " + o.btach_is_get_num + " / " + o.batch_not_get_num;
+                        return o.batch_count_num + " / " + o.batch_is_get_num + " / " + o.batch_not_get_num;
                     }}
                 ,{field: 'state', title: '数据状态', width:90, templet:function (o) {
                         return o.state == 0 ? "<span style='color: #4caf50;'>可用</span>" : "<span style='color: red;'>不可用</span>";
@@ -123,7 +123,7 @@
                 ,{field: 'state', title: '数据状态', width:90, templet:function (o) {
                         return o.state == 0 ? "<span style='color: #4caf50;'>可用</span>" : "<span style='color: red;'>不可用</span>";
                     }}
-                ,{field: 'btach_serial_number', title: '导入批次', width:140, sort:true}
+                ,{field: 'batch_serial_number', title: '导入批次', width:140, sort:true}
                 ,{field: 'create_time', title: '导入时间', width:160, sort:true}
                 ,{field: 'remark', title: '备注', width:80}
             ]]

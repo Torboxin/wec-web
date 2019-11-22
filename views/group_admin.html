@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <div class="layui-row layui-col-space5">
+        <form class="layui-form layui-row layui-col-space3" lay-filter="groupAdminScreeCond" style="max-height: 200px;overflow: visible;">
+            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+                <input class="layui-input"type="text" name="groupName" placeholder="群组名匹配" autocomplete="off">
+            </div>
+            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+                <input class="layui-input" type="text" name="groupNumber" placeholder="群组编号匹配" autocomplete="off">
+            </div>
+            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+                <input class="layui-input"  type="text" id="groupAdminAddTime" name="groupAddTime" placeholder="群组添加时间" autocomplete="off">
+            </div>
+            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+                <select name="inGroupType">
+                    <option value="">进群方式</option>
+                    <option value="1">扫码入群</option>
+                    <option value="2">新建群</option>
+                </select>
+            </div>
+        </form>
+        <div class="layui-row">
+            <div class="layui-btn-group" style="line-height: 35px;">
+                <button type="button" class="layui-btn layui-btn-normal layui-btn-sm" onclick="loadGroupAdminTable()"><i class="iconfont">&#xe6f7;</i>查询</button>
+            </div>
+        </div>
+        <div class="layui-row">
+            <table lay-filter="groupAdminTable" id="groupAdminTable"></table>
+        </div>
+    </div>
+</body>
+<script>
+    $(function () {
+        laydate.render({
+            elem: '#groupAdminAddTime'
+        });
+        loadGroupAdminTable();
+        form.render();
+    })
+
+    function loadGroupAdminTable() {
+        var param = form.val("groupAdminScreeCond");
+        table.render({
+            elem: '#groupAdminTable'
+            ,height: 700
+            ,method:'post'
+            ,where: param
+            ,url: 'http://localhost:8080/wechat-model-controller/wechat_group_admin/findAllGroup'
+            ,page: true
+            ,limit:20
+            ,cols: [[
+                {width:40,type:"checkbox"}
+                ,{field: 'id', title: 'id', width:80,hide: true}
+                ,{field: 'group_name', title: '群组名称', width:100}
+                ,{field: 'group_key', title: '群组编号', width:140}
+                ,{field: 'create_time', title: '创建时间', width:160}
+                ,{field: 'update_time', title: '修改时间', width:160}
+                ,{field: 'add_group_type_code', title: '入群方式', width:100, templet:function(o){
+                        return o.add_group_type_code == 1 ? "扫码入群" : "自建群";
+                    }}
+                ,{field: 'QRCode_url', title: '二维码值', width:140, templet:function(o){
+                        return o.QRCode_url ? o.QRCode_url : "无";
+                    }}
+                ,{field: 'init_num', title: '初始人数', width:100}
+                ,{field: 'add_num', title: '添加人数', width:100}
+                ,{field: 'end_num', title: '最终人数', width:100}
+                ,{field: 'username', title: '所属用户', width:120}
+            ]]
+        });
+    }
+</script>
+</html>

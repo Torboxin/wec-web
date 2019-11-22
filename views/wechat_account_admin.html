@@ -99,17 +99,22 @@
         <div class="layui-row">
             <div class="layui-btn-group" style="line-height: 35px;">
                 <button type="button" class="layui-btn layui-btn-normal layui-btn-sm" onclick="loadWechatAccountAdminTable()"><i class="iconfont">&#xe6f7;</i>查询</button>
-                <button type="button" class="layui-btn layui-btn-sm"><i class="iconfont">&#xe620;</i>登录</button>
-                <button type="button" class="layui-btn layui-btn-sm layui-btn-danger"><i class="iconfont">&#xe6fa;</i>注销</button>
+                <button type="button" class="layui-btn layui-btn-sm" onclick="accountLogin()"><i class="iconfont">&#xe620;</i>登录</button>
+                <button type="button" class="layui-btn layui-btn-sm layui-btn-danger" onclick="accountLogOut()"><i class="iconfont">&#xe736;</i>注销</button>
+                <button type="button" class="layui-btn layui-btn-sm" onclick="addFriend()"><i class="iconfont">&#xe70f;</i>添加好友</button>
+                <button type="button" class="layui-btn layui-btn-sm" onclick="qrCodeInGroup()"><i class="iconfont">&#xe721;</i>扫码入群</button>
+                <button type="button" class="layui-btn layui-btn-sm" onclick="addGroupMember(this)"><i class="iconfont">&#xe63e;</i>添加群成员</button>
                 <button type="button" class="layui-btn layui-btn-normal layui-btn-sm" onclick="importWechatAccount()" id="importWechatAccountFile"><i class="iconfont">&#xe6a9;</i>导入微信账号</button>
                 <button type="button" class="layui-btn layui-btn-sm" onclick="updToUser(this)"><i class="iconfont">&#xe8cf;</i>分配用户</button>
                 <button type="button" class="layui-btn layui-btn-sm" onclick="updToDevice(this)"><i class="iconfont">&#xe8cf;</i>分配设备</button>
                 <button type="button" class="layui-btn layui-btn-sm" onclick="updAccountPwd()"><i class="iconfont">&#xe8cf;</i>修改密码</button>
                 <button type="button" class="layui-btn layui-btn-sm" onclick="updAccountNickname()"><i class="iconfont">&#xe8cf;</i>修改昵称</button>
+                <button type="button" class="layui-btn layui-btn-sm" onclick="updAccountHeadImg()"><i class="iconfont">&#xe714;</i>修改头像</button>
                 <button type="button" class="layui-btn layui-btn-primary layui-btn-sm" onclick="openLogin(this)"><i class="iconfont">&#xeb17;</i>开启登录</button>
                 <button type="button" class="layui-btn layui-btn-warm layui-btn-sm" onclick="closeLogin(this)"><i class="iconfont">&#xe6fa;</i>关闭登录</button>
                 <button type="button" class="layui-btn layui-btn-primary layui-btn-sm" onclick="updAccountSync(this)"><i class="iconfont">&#xe647;</i>同步账号</button>
-                <button type="button" class="layui-btn layui-btn-primary layui-btn-sm" onclick="proxyRepair(this)"><i class="iconfont">&#xe647;</i>代理修复</button>
+                <button type="button" class="layui-btn layui-btn-primary layui-btn-sm" onclick="proxyRepair(this)"><i class="iconfont">&#xe842;</i>代理修复</button>
+                <button type="button" class="layui-btn layui-btn-primary layui-btn-sm" onclick="sendFriendCircle()"><i class="iconfont">&#xe619;</i>发送朋友圈</button>
             </div>
         </div>
         <div class="layui-row">
@@ -177,6 +182,7 @@
                     ,{field: 'wechat_account', title: '微信账号', width:120}
                     ,{field: 'wechat_phone', title: '微信手机号', width:120}
                     ,{field: 'wechat_nickname', title: '昵称', width:120}
+                    ,{field: 'wechat_headimg', title: '头像', width:120}
                     ,{field: 'wechat_set_headimg', title: '修改头像', width:90, templet:function (o) {
                             return o.wechat_set_headimg == 1 ? "<span style='color: #4caf50;'>已修改</span>" : "<span style='color: red;'>未修改</span>";
                         }}
@@ -243,7 +249,7 @@
                             return val;
                         }}
                     ,{field: 'proxy', title: '代理', width:80, templet:function (o) {
-                            return o.proxy_ip+":"+o.proxy_port+"-"+o.proxy_username+"-"+o.proxy_pwd+"-"+o.proxy_province_id+"-"+o.proxy_city;
+                            return o.proxy_ip ? o.proxy_ip+":"+o.proxy_port+"-"+o.proxy_username+"-"+o.proxy_pwd+"-"+o.proxy_province_id+"-"+o.proxy_city : "无数据";
                         }}
                     ,{field: 'proxy_lose_efficacy_time', title: '代理过期时间', width:180}
                     ,{field: 'account_state_id', title: '账号状态', width:100 ,templet:function (o) {
@@ -280,6 +286,7 @@
         }
         // 监听开关修改动作
         form.on('switch(wechatAccountItem)', function(data){
+            layer.load(0);
             var param = {
                 value:data.elem.checked ? 1 : 0,
                 key:data.othis[0].parentNode.children[0].dataset.key,
@@ -293,9 +300,480 @@
                 success:function(obj){
                     if(obj.code == 1)
                         layerzk.open(windowObj,{bakcgroundColor:"#009688",msg:obj.message,icoCode:'&#xe605;'}, 3000);
+                    layer.closeAll('loading');
                 }
             });
         });
+
+        // 添加群成员
+        function addGroupMember(i){
+            var checkStatus = table.checkStatus('wechatAccountAdminTable');
+            if(checkStatus.data.length <= 0){
+                layer.tips('未勾选数据！', i, {
+                    tips: [1, '#f44336d4'],
+                    time: 4000
+                });
+            }else if(checkStatus.data.length > 1){
+                layer.tips('只能选择一项数据！', i, {
+                    tips: [1, '#f44336d4'],
+                    time: 4000
+                });
+            }else{
+                $.ajax({
+                    datatype:'html',
+                    url:"/add_group_member",
+                    type:'get',
+                    success:function(obj){
+                        layer.open({
+                            title: '添加群成员',
+                            anim: mathLayuiAnim(),
+                            skin: 'layerzk-normal',
+                            btn: false,
+                            area:'300px',
+                            offset:'150px',
+                            resize:false,
+                            shadeClose: true,
+                            content: obj
+                        });
+                    }
+                });
+            }
+        }
+
+        // 扫码入群
+        function qrCodeInGroup(){
+            $.ajax({
+                datatype:'html',
+                url:"/qrcode_in_group",
+                type:'get',
+                success:function(obj){
+                    var checkStatus = table.checkStatus('wechatAccountAdminTable');
+                    if(checkStatus.data.length <= 0){
+                        layer.open({
+                            title: '扫码入群',
+                            anim: mathLayuiAnim(),
+                            skin: 'layerzk-normal',
+                            btn: ["确认"],
+                            area:'600px',
+                            shadeClose: true,
+                            content: '是否确定将当前查询条件下所有微信进行扫码入群？'+obj,
+                            success:function(layero, index){
+                                //layero[0].children[1].style.textAlign = 'center';
+                            },
+                            yes:function(index, layero){
+                                var param = mergeJson(form.val("wechatAccountAdminScreeCond"),form.val("qrCodeInGroupCond"));
+                                param.val = codeVal;
+                                if(codeVal.length <= 0){
+                                    layer.tips('请确认是否存在上传成功的二维码！', layero[0].children[3].children[0], {
+                                        tips: [1, '#f44336d4'],
+                                        time: 4000
+                                    });
+                                    return;
+                                }
+                                var min = parseInt(param.intervalMin);
+                                var max = parseInt(param.intervalMax);
+                                if(min <= 0 || max <= 0){
+                                    layer.tips('间隔时间值错误！', layero[0].children[3].children[0], {
+                                        tips: [1, '#f44336d4'],
+                                        time: 4000
+                                    });
+                                    return;
+                                }
+                                if(min >= max){
+                                    layer.tips('最大间隔时间不可小于或等于最小间隔时间！', layero[0].children[3].children[0], {
+                                        tips: [1, '#f44336d4'],
+                                        time: 4000
+                                    });
+                                    return;
+                                }
+                                var layerId = layer.msg('扫码入群任务添加中...', {icon: 16, shade: 0.4,time:false});
+                                $.ajax({
+                                    datatype:'json',
+                                    url:"http://localhost:8080/wechat-model-controller/wechat_account_admin/condWechatAccountQrCodeInGroup",
+                                    data:param,
+                                    traditional:true, // 防止深度序列化参数
+                                    type:'post',
+                                    success:function(obj){
+                                        if(obj.code == 1)
+                                            layerzk.open(windowObj,{bakcgroundColor:'#009688',msg:obj.message,icoCode:'&#xe605;'},3000);
+                                        else
+                                            layerzk.open(windowObj,{bakcgroundColor:'#f44336d4',msg:obj.message,icoCode:'&#xe67e;'},5000);
+                                        layer.close(index);
+                                        layer.close(layerId);
+                                    }
+                                });
+                            }
+                        });
+                    }else{
+                        layer.open({
+                            title: '<i class="iconfont">&#xe721;</i>扫码入群',
+                            anim: mathLayuiAnim(),
+                            btn: ["确认"],
+                            area:'600px',
+                            yes: function(index, layero){
+                                var param = mergeJson({ids:[]},form.val("qrCodeInGroupCond"));
+                                checkStatus.data.forEach(function (val) {
+                                    param.ids.push(val.aid);
+                                });
+                                param.val = codeVal;
+                                if(codeVal.length <= 0){
+                                    layer.tips('请确认是否存在上传成功的二维码！', layero[0].children[3].children[0], {
+                                        tips: [1, '#f44336d4'],
+                                        time: 4000
+                                    });
+                                    return;
+                                }
+                                var min = parseInt(param.intervalMin);
+                                var max = parseInt(param.intervalMax);
+                                if(min <= 0 || max <= 0){
+                                    layer.tips('间隔时间值错误！', layero[0].children[3].children[0], {
+                                        tips: [1, '#f44336d4'],
+                                        time: 4000
+                                    });
+                                    return;
+                                }
+                                if(min >= max){
+                                    layer.tips('最大间隔时间不可小于或等于最小间隔时间！', layero[0].children[3].children[0], {
+                                        tips: [1, '#f44336d4'],
+                                        time: 4000
+                                    });
+                                    return;
+                                }
+                                layer.load(2); // 开启loading
+                                $.ajax({
+                                    datatype:'json',
+                                    url:"http://localhost:8080/wechat-model-controller/wechat_account_admin/wechatAccountQrCodeInGroup",
+                                    data:param,
+                                    traditional:true, // 防止深度序列化参数
+                                    type:'post',
+                                    success:function(obj){
+                                        if(obj.code == 1)
+                                            layerzk.open(windowObj,{bakcgroundColor:'#009688',msg:obj.message,icoCode:'&#xe605;'},3000);
+                                        else
+                                            layerzk.open(windowObj,{bakcgroundColor:'#f44336d4',msg:obj.message,icoCode:'&#xe67e;'},5000);
+                                        layer.close(index);
+                                        layer.closeAll('loading'); //关闭loading
+                                    }
+                                });
+                            },
+                            success: function(layero, index){
+                                //layero[0].children[1].style.textAlign = 'center';
+                            },
+                            shadeClose: true,
+                            content: '是否将选中微信进行扫码入群？'+obj
+                        });
+                    }
+                }
+            });
+        }
+
+        // 发送朋友圈
+        function sendFriendCircle(){
+            $.ajax({
+                datatype:'html',
+                url:"/send_friend_circle",
+                type:'get',
+                success:function(obj){
+                    var checkStatus = table.checkStatus('wechatAccountAdminTable');
+                    if(checkStatus.data.length <= 0){
+                        layer.open({
+                            title: '发送朋友圈',
+                            anim: mathLayuiAnim(),
+                            skin: 'layerzk-normal',
+                            area:'600px',
+                            btn: false,
+                            shadeClose: true,
+                            content: "是否确定将当前条件下查询出的微信账号进行发送朋友圈？"+obj,
+                        });
+                    }else{
+                        layer.open({
+                            title: '发送朋友圈',
+                            anim: mathLayuiAnim(),
+                            skin: 'layerzk-normal',
+                            area:'600px',
+                            btn: false,
+                            shadeClose: true,
+                            content: "是否确定将选中微信账号进行发送朋友圈？"+obj,
+                        });
+                    }
+                }
+            });
+        }
+
+        // 监听发送朋友圈提交
+        form.on('submit(sendFriendCircleSubmit)', function(data){
+            var param;
+            var url;
+            var checkStatus = table.checkStatus('wechatAccountAdminTable');
+            if(checkStatus.data.length <= 0){
+                url = "sendFriendCircleSrceeCond";
+                param = mergeJson(form.val("wechatAccountAdminScreeCond"),data.field);
+            }else{
+                url = "sendFriendCircle";
+                var p = {ids:[]};
+                checkStatus.data.forEach(function (val) {
+                    p.ids.push(val.aid);
+                });
+                param = mergeJson(p,data.field);
+            }
+            layer.load(); //开启loading
+            $.ajax({
+                datatype:'json',
+                url:"http://localhost:8080/wechat-model-controller/wechat_account_admin/"+url,
+                data:param,
+                traditional:true, // 防止深度序列化参数
+                type:'post',
+                success:function(obj){
+                    if (obj.code == 1)
+                        layerzk.open(windowObj,{bakcgroundColor:'#009688',msg:obj.message,icoCode:'&#xe605;'},3000);
+                    else
+                        layerzk.open(windowObj,{bakcgroundColor:'#f44336d4',msg:obj.message,icoCode:'&#xe67e;'},5000);
+                    layer.closeAll(); //关闭所有弹出层
+                    form.render();
+                }
+            });
+            return false;
+        });
+
+        // 添加好友
+        function addFriend(){
+            $.ajax({
+                datatype:'html',
+                url:"/add_friend",
+                type:'get',
+                success:function(obj){
+                    layer.open({
+                        title: '添加好友',
+                        anim: mathLayuiAnim(),
+                        skin: 'layerzk-normal',
+                        area:'600px',
+                        btn: false,
+                        shadeClose: true,
+                        content: obj,
+                    });
+                }
+            });
+        }
+
+        // 微信号注销
+        function accountLogOut(){
+            var checkStatus = table.checkStatus('wechatAccountAdminTable');
+            if(checkStatus.data.length <= 0){
+                layer.open({
+                    title: '微信账号注销',
+                    anim: mathLayuiAnim(),
+                    skin: 'layerzk-normal',
+                    btn: ["确认"],
+                    shadeClose: true,
+                    content: '是否确定将当前查询条件下所有微信注销？',
+                    success:function(layero, index){
+                        layero[0].children[1].style.textAlign = 'center';
+                    },
+                    yes:function(index, layero){
+                        var layerId = layer.msg('微信账号注销中...', {icon: 16, shade: 0.4,time:false});
+                        var param = form.val("wechatAccountAdminScreeCond");
+                        $.ajax({
+                            datatype:'json',
+                            url:"http://localhost:8080/wechat-model-controller/wechat_account_admin/condLogOutWechatAccount",
+                            data:param,
+                            traditional:true, // 防止深度序列化参数
+                            type:'post',
+                            success:function(obj){
+                                if(obj.code == 1)
+                                    layer.open({
+                                        title:'微信账号注销反馈信息',
+                                        area:['400px','450px'],
+                                        content:"<table class=\"layui-table\">" +
+                                            "  <thead>" +
+                                            "    <tr>" +
+                                            "      <th>微信</th>" +
+                                            "      <th>失败原因</th>" +
+                                            "    </tr> " +
+                                            "  </thead>" +
+                                            "  <tbody>" +
+                                            obj.message +
+                                            "  </tbody>" +
+                                            "</table>",
+                                        success:function(layero, index){
+                                            layero[0].children[1].style.overflow = "auto";
+                                        }
+                                    });
+                                else if (obj.code == 2)
+                                    layerzk.open(windowObj,{bakcgroundColor:'#009688',msg:obj.message,icoCode:'&#xe605;'},3000);
+                                else
+                                    layerzk.open(windowObj,{bakcgroundColor:'#f44336d4',msg:obj.message,icoCode:'&#xe67e;'},5000);
+                                layer.close(index);
+                                clickLayuiTableBtn('wechatAccountAdminTable');
+                                layer.close(layerId);
+                            }
+                        });
+                    }
+                });
+            }else{
+                layer.open({
+                    title: '<i class="iconfont">&#xe736;</i>微信账号注销',
+                    anim: mathLayuiAnim(),
+                    btn: ['确认'],
+                    yes: function(index, layero){
+                        layer.load(2); // 开启loading
+                        var param = {ids:[]};
+                        checkStatus.data.forEach(function (val) {
+                            param.ids.push(val.aid);
+                        });
+                        $.ajax({
+                            datatype:'json',
+                            url:"http://localhost:8080/wechat-model-controller/wechat_account_admin/logOutWechatAccount",
+                            data:param,
+                            traditional:true, // 防止深度序列化参数
+                            type:'post',
+                            success:function(obj){
+                                if(obj.code == 1)
+                                    layer.open({
+                                        title:'微信账号注销反馈信息',
+                                        area:['400px','450px'],
+                                        content:"<table class=\"layui-table\">" +
+                                            "  <thead>" +
+                                            "    <tr>" +
+                                            "      <th>微信</th>" +
+                                            "      <th>失败原因</th>" +
+                                            "    </tr> " +
+                                            "  </thead>" +
+                                            "  <tbody>" +
+                                            obj.message +
+                                            "  </tbody>" +
+                                            "</table>",
+                                        success:function(layero, index){
+                                            layero[0].children[1].style.overflow = "auto";
+                                        }
+                                    });
+                                else if (obj.code == 2)
+                                    layerzk.open(windowObj,{bakcgroundColor:'#009688',msg:obj.message,icoCode:'&#xe605;'},3000);
+                                else
+                                    layerzk.open(windowObj,{bakcgroundColor:'#f44336d4',msg:obj.message,icoCode:'&#xe67e;'},5000);
+                                layer.close(index);
+                                clickLayuiTableBtn('wechatAccountAdminTable');
+                                layer.closeAll('loading'); //关闭loading
+                            }
+                        });
+                    },
+                    success: function(layero, index){
+                        layero[0].children[1].style.textAlign = 'center';
+                    },
+                    shadeClose: true,
+                    content: '是否注销选中微信？'
+                });
+            }
+        }
+
+        // 微信号登录
+        function accountLogin(){
+            var checkStatus = table.checkStatus('wechatAccountAdminTable');
+            if(checkStatus.data.length <= 0){
+                layer.open({
+                    title: '微信账号登录',
+                    anim: mathLayuiAnim(),
+                    skin: 'layerzk-normal',
+                    btn: ["确认"],
+                    shadeClose: true,
+                    content: '是否确定将当前查询条件下所有微信登录？',
+                    success:function(layero, index){
+                        layero[0].children[1].style.textAlign = 'center';
+                    },
+                    yes:function(index, layero){
+                        var layerId = layer.msg('微信账号登陆中...', {icon: 16, shade: 0.4,time:false});
+                        var param = form.val("wechatAccountAdminScreeCond");
+                        $.ajax({
+                            datatype:'json',
+                            url:"http://localhost:8080/wechat-model-controller/wechat_account_admin/condLoginWechatAccount",
+                            data:param,
+                            traditional:true, // 防止深度序列化参数
+                            type:'post',
+                            success:function(obj){
+                                if(obj.code == 1)
+                                    layer.open({
+                                        title:'微信账号登录反馈信息',
+                                        area:['400px','450px'],
+                                        content:"<table class=\"layui-table\">" +
+                                            "  <thead>" +
+                                            "    <tr>" +
+                                            "      <th>微信</th>" +
+                                            "      <th>失败原因</th>" +
+                                            "    </tr> " +
+                                            "  </thead>" +
+                                            "  <tbody>" +
+                                            obj.message +
+                                            "  </tbody>" +
+                                            "</table>",
+                                        success:function(layero, index){
+                                            layero[0].children[1].style.overflow = "auto";
+                                        }
+                                    });
+                                else if (obj.code == 2)
+                                    layerzk.open(windowObj,{bakcgroundColor:'#009688',msg:obj.message,icoCode:'&#xe605;'},3000);
+                                else
+                                    layerzk.open(windowObj,{bakcgroundColor:'#f44336d4',msg:obj.message,icoCode:'&#xe67e;'},5000);
+                                layer.close(index);
+                                clickLayuiTableBtn('wechatAccountAdminTable');
+                                layer.close(layerId);
+                            }
+                        });
+                    }
+                });
+            }else{
+                layer.open({
+                    title: '<i class="iconfont">&#xe620;</i>微信账号登录',
+                    anim: mathLayuiAnim(),
+                    btn: ['确认'],
+                    yes: function(index, layero){
+                        layer.load(2); // 开启loading
+                        var param = {ids:[]};
+                        checkStatus.data.forEach(function (val) {
+                            param.ids.push(val.aid);
+                        });
+                        $.ajax({
+                            datatype:'json',
+                            url:"http://localhost:8080/wechat-model-controller/wechat_account_admin/loginWechatAccount",
+                            data:param,
+                            traditional:true, // 防止深度序列化参数
+                            type:'post',
+                            success:function(obj){
+                                if(obj.code == 1)
+                                    layer.open({
+                                        title:'微信账号登录反馈信息',
+                                        area:['400px','450px'],
+                                        content:"<table class=\"layui-table\">" +
+                                            "  <thead>" +
+                                            "    <tr>" +
+                                            "      <th>微信</th>" +
+                                            "      <th>失败原因</th>" +
+                                            "    </tr> " +
+                                            "  </thead>" +
+                                            "  <tbody>" +
+                                            obj.message +
+                                            "  </tbody>" +
+                                            "</table>",
+                                        success:function(layero, index){
+                                            layero[0].children[1].style.overflow = "auto";
+                                        }
+                                    });
+                                else if (obj.code == 2)
+                                    layerzk.open(windowObj,{bakcgroundColor:'#009688',msg:obj.message,icoCode:'&#xe605;'},3000);
+                                else
+                                    layerzk.open(windowObj,{bakcgroundColor:'#f44336d4',msg:obj.message,icoCode:'&#xe67e;'},5000);
+                                layer.close(index);
+                                clickLayuiTableBtn('wechatAccountAdminTable');
+                                layer.closeAll('loading'); //关闭loading
+                            }
+                        });
+                    },
+                    success: function(layero, index){
+                        layero[0].children[1].style.textAlign = 'center';
+                    },
+                    shadeClose: true,
+                    content: '是否登录选中微信？'
+                });
+            }
+        }
 
         // 查询条件分配用户
         function updToUser(i){
@@ -315,6 +793,7 @@
                         success:function(layero, index){
                             // 监听分配用户提交
                             form.on('submit(updAccountToUser)', function(data){
+                                layer.load(2, {shade: [0.4,'#6b6b6c']});
                                 var param = form.val("wechatAccountAdminScreeCond");
                                 param.key = "toUser";
                                 param.value = data.field.updToUser;
@@ -329,6 +808,7 @@
                                             layerzk.open(windowObj,{bakcgroundColor:'#009688',msg:obj.message,icoCode:'&#xe605;'}, 3000);
                                         clickLayuiTableBtn('wechatAccountAdminTable');
                                         layer.close(index);
+                                        layer.closeAll('loading');
                                     }
                                 });
                                 return false;
@@ -357,6 +837,7 @@
                         success:function(layero, index){
                             // 监听分配设备提交
                             form.on('submit(updAccountToDevice)', function(data){
+                                layer.load(2, {shade: [0.4,'#6b6b6c']});
                                 var param = form.val("wechatAccountAdminScreeCond");
                                 param.key = "toDevice";
                                 param.value = data.field.updToDevice;
@@ -371,6 +852,7 @@
                                             layerzk.open(windowObj,{bakcgroundColor:'#009688',msg:obj.message,icoCode:'&#xe605;'}, 3000);
                                         clickLayuiTableBtn('wechatAccountAdminTable');
                                         layer.close(index);
+                                        layer.closeAll('loading');
                                     }
                                 });
                                 return false;
@@ -387,7 +869,6 @@
                 title: '修改账号同步状态',
                 anim: mathLayuiAnim(),
                 skin: 'layerzk-normal',
-                area:'600px',
                 btn: ["确认"],
                 shadeClose: true,
                 content: "是否确认将当前条件下查询出的账号同步状态修改为[未同步]状态？",
@@ -395,6 +876,7 @@
                     layero[0].children[1].style.textAlign = 'center';
                 },
                 yes:function(index, layero){
+                    layer.load(2, {shade: [0.4,'#6b6b6c']});
                     var param = form.val("wechatAccountAdminScreeCond");
                     param.key = "accountSync";
                     param.value = 0;
@@ -409,6 +891,7 @@
                                 layerzk.open(windowObj,{bakcgroundColor:'#009688',msg:obj.message,icoCode:'&#xe605;'}, 3000);
                             clickLayuiTableBtn('wechatAccountAdminTable');
                             layer.close(index);
+                            layer.closeAll('loading');
                         }
                     });
                 }
@@ -421,7 +904,6 @@
                 title: '关闭登录权限',
                 anim: mathLayuiAnim(),
                 skin: 'layerzk-normal',
-                area:'600px',
                 btn: ["确认"],
                 shadeClose: true,
                 content: "是否确认将当前条件下查询出的账号的登录权限关闭？",
@@ -429,6 +911,7 @@
                     layero[0].children[1].style.textAlign = 'center';
                 },
                 yes:function(index, layero){
+                    layer.load(2, {shade: [0.4,'#6b6b6c']});
                     var param = form.val("wechatAccountAdminScreeCond");
                     param.key = "isLogin";
                     param.value = 0;
@@ -443,6 +926,7 @@
                                 layerzk.open(windowObj,{bakcgroundColor:'#009688',msg:obj.message,icoCode:'&#xe605;'}, 3000);
                             clickLayuiTableBtn('wechatAccountAdminTable');
                             layer.close(index);
+                            layer.closeAll('loading');
                         }
                     });
                 }
@@ -455,7 +939,6 @@
                 title: '开启登录权限',
                 anim: mathLayuiAnim(),
                 skin: 'layerzk-normal',
-                area:'600px',
                 btn: ["确认"],
                 shadeClose: true,
                 content: "是否确认将当前条件下查询出的账号登录权限开启？",
@@ -463,6 +946,7 @@
                     layero[0].children[1].style.textAlign = 'center';
                 },
                 yes:function(index, layero){
+                    layer.load(2, {shade: [0.4,'#6b6b6c']});
                     var param = form.val("wechatAccountAdminScreeCond");
                     param.key = "isLogin";
                     param.value = 1;
@@ -477,6 +961,7 @@
                                 layerzk.open(windowObj,{bakcgroundColor:'#009688',msg:obj.message,icoCode:'&#xe605;'}, 3000);
                             clickLayuiTableBtn('wechatAccountAdminTable');
                             layer.close(index);
+                            layer.closeAll('loading');
                         }
                     });
                 }
@@ -559,6 +1044,7 @@
                     btn: ['确认'],
                     skin:'layerzk-danger',
                     yes: function(index, layero){
+                        layer.load(2, {shade: [0.4,'#6b6b6c']});
                         $.ajax({
                             datatype:'json',
                             url:"http://localhost:8080/wechat-model-controller/wechat_account_admin/updAccountPwdByNot",
@@ -570,6 +1056,7 @@
                                     layerzk.open(windowObj,{bakcgroundColor:'#f44336d4',msg:obj.message,icoCode:'&#xe67e;'},5000);
                                 layer.close(index);
                                 clickLayuiTableBtn('wechatAccountAdminTable');
+                                layer.closeAll('loading');
                             }
                         });
                     },
@@ -585,6 +1072,7 @@
                     anim: mathLayuiAnim(),
                     btn: ['确认'],
                     yes: function(index, layero){
+                        layer.load(2, {shade: [0.4,'#6b6b6c']});
                         var param = {id:[]};
                         checkStatus.data.forEach(function (val) {
                             param.id.push(val.aid);
@@ -602,6 +1090,7 @@
                                     layerzk.open(windowObj,{bakcgroundColor:'#f44336d4',msg:obj.message,icoCode:'&#xe67e;'},5000);
                                 layer.close(index);
                                 clickLayuiTableBtn('wechatAccountAdminTable');
+                                layer.closeAll('loading');
                             }
                         });
                     },
@@ -610,6 +1099,76 @@
                     },
                     shadeClose: true,
                     content: '是否确认修改选中用户密码？'
+                });
+            }
+        }
+
+        // 修改头像
+        function updAccountHeadImg(){
+            var checkStatus = table.checkStatus('wechatAccountAdminTable');
+            if(checkStatus.data.length <= 0){
+                layer.open({
+                    title: '<i class="iconfont">&#xe73b;</i>修改头像',
+                    anim: mathLayuiAnim(),
+                    btn: ['确认'],
+                    skin:'layerzk-danger',
+                    yes: function(index, layero){
+                        layer.load(2, {shade: [0.4,'#6b6b6c']});
+                        $.ajax({
+                            datatype:'json',
+                            url:"http://localhost:8080/wechat-model-controller/wechat_account_admin/updAllAccountHeadImg",
+                            data:form.val("wechatAccountAdminScreeCond"),
+                            type:'post',
+                            success:function(obj){
+                                if(obj.code == 1)
+                                    layerzk.open(windowObj,{bakcgroundColor:'#009688',msg:obj.message,icoCode:'&#xe605;'},3000);
+                                else
+                                    layerzk.open(windowObj,{bakcgroundColor:'#f44336d4',msg:obj.message,icoCode:'&#xe67e;'},5000);
+                                layer.close(index);
+                                clickLayuiTableBtn('wechatAccountAdminTable');
+                                layer.closeAll('loading');
+                            }
+                        });
+                    },
+                    success: function(layero, index){
+                        layero[0].children[1].style.textAlign = 'center';
+                    },
+                    shadeClose: true,
+                    content: '是否确认修改当前查询条件下所有用户的头像？'
+                });
+            }else{
+                layer.open({
+                    title: '<i class="iconfont">&#xe73b;</i>修改头像',
+                    anim: mathLayuiAnim(),
+                    btn: ['确认'],
+                    yes: function(index, layero){
+                        layer.load(2, {shade: [0.4,'#6b6b6c']});
+                        var param = {id:[]};
+                        checkStatus.data.forEach(function (val) {
+                            param.id.push(val.aid);
+                        });
+                        $.ajax({
+                            datatype:'json',
+                            url:"http://localhost:8080/wechat-model-controller/wechat_account_admin/updAccountHeadImg",
+                            data:param,
+                            traditional:true, // 防止深度序列化参数
+                            type:'post',
+                            success:function(obj){
+                                if(obj.code == 1)
+                                    layerzk.open(windowObj,{bakcgroundColor:'#009688',msg:obj.message,icoCode:'&#xe605;'},3000);
+                                else
+                                    layerzk.open(windowObj,{bakcgroundColor:'#f44336d4',msg:obj.message,icoCode:'&#xe67e;'},5000);
+                                layer.close(index);
+                                clickLayuiTableBtn('wechatAccountAdminTable');
+                                layer.closeAll('loading');
+                            }
+                        });
+                    },
+                    success: function(layero, index){
+                        layero[0].children[1].style.textAlign = 'center';
+                    },
+                    shadeClose: true,
+                    content: '是否确认修改选中用户的头像？'
                 });
             }
         }
@@ -624,6 +1183,7 @@
                     btn: ['确认'],
                     skin:'layerzk-danger',
                     yes: function(index, layero){
+                        layer.load(2, {shade: [0.4,'#6b6b6c']});
                         $.ajax({
                             datatype:'json',
                             url:"http://localhost:8080/wechat-model-controller/wechat_account_admin/updAllAccountNickname",
@@ -635,6 +1195,7 @@
                                     layerzk.open(windowObj,{bakcgroundColor:'#f44336d4',msg:obj.message,icoCode:'&#xe67e;'},5000);
                                 layer.close(index);
                                 clickLayuiTableBtn('wechatAccountAdminTable');
+                                layer.closeAll('loading');
                             }
                         });
                     },
@@ -650,6 +1211,7 @@
                     anim: mathLayuiAnim(),
                     btn: ['确认'],
                     yes: function(index, layero){
+                        layer.load(2, {shade: [0.4,'#6b6b6c']});
                         var param = {id:[]};
                         checkStatus.data.forEach(function (val) {
                             param.id.push(val.aid);
@@ -667,6 +1229,7 @@
                                     layerzk.open(windowObj,{bakcgroundColor:'#f44336d4',msg:obj.message,icoCode:'&#xe67e;'},5000);
                                 layer.close(index);
                                 clickLayuiTableBtn('wechatAccountAdminTable');
+                                layer.closeAll('loading');
                             }
                         });
                     },

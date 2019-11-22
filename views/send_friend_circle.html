@@ -1,0 +1,33 @@
+<form class="layui-form" lay-filter="sendFriendCircleScreeCond">
+    <div class="layui-form-item">
+        <label class="layui-form-label">发送内容：</label>
+        <div class="layui-input-block friend-circle-msg">
+            <textarea name="msg" required lay-verify="required" autofocus="autofocus" cols="100" rows="20" placeholder="请输朋友圈要发送的内容" class="layui-textarea" style="height: 100px;"></textarea>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button type="button" class="layui-btn layui-btn-primary layui-btn-sm" onclick="randMsg()">随机内容</button>
+            <button class="layui-btn-sm layui-btn" lay-submit lay-filter="sendFriendCircleSubmit">立即提交</button>
+            <button type="reset" class="layui-btn-sm layui-btn layui-btn-primary">重置</button>
+        </div>
+    </div>
+</form>
+<script>
+    $(function(){
+        form.render()
+    })
+
+    function randMsg(){
+        $.ajax({
+            datatype:'json',
+            url:"http://localhost:8080/wechat-model-controller/comm/randGetFriendCircleMsg",
+            type:'post',
+            success:function(o){
+                $('textarea[name="msg"]').val(o.msg.content);
+                form.render();
+            }
+        });
+    }
+
+</script>

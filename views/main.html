@@ -13,6 +13,9 @@
             margin-right: 5px;
             font-size: 16px;
         }
+        .friend-circle-msg .layui-anim {
+            max-width: 100%;
+        }
         .header-nav{
             background-clip: padding-box,border-box;
             background-origin: padding-box,border-box;
@@ -55,12 +58,12 @@
 
         @font-face {
             font-family: 'iconfont';  /* project id 1376042 */
-            src: url('//at.alicdn.com/t/font_1376042_9y05xjqenks.eot');
-            src: url('//at.alicdn.com/t/font_1376042_9y05xjqenks.eot?#iefix') format('embedded-opentype'),
-            url('//at.alicdn.com/t/font_1376042_9y05xjqenks.woff2') format('woff2'),
-            url('//at.alicdn.com/t/font_1376042_9y05xjqenks.woff') format('woff'),
-            url('//at.alicdn.com/t/font_1376042_9y05xjqenks.ttf') format('truetype'),
-            url('//at.alicdn.com/t/font_1376042_9y05xjqenks.svg#iconfont') format('svg');
+            src: url('//at.alicdn.com/t/font_1376042_2xp4okxlvct.eot');
+            src: url('//at.alicdn.com/t/font_1376042_2xp4okxlvct.eot?#iefix') format('embedded-opentype'),
+            url('//at.alicdn.com/t/font_1376042_2xp4okxlvct.woff2') format('woff2'),
+            url('//at.alicdn.com/t/font_1376042_2xp4okxlvct.woff') format('woff'),
+            url('//at.alicdn.com/t/font_1376042_2xp4okxlvct.ttf') format('truetype'),
+            url('//at.alicdn.com/t/font_1376042_2xp4okxlvct.svg#iconfont') format('svg');
         }
 
         .iconfont{
@@ -117,7 +120,7 @@
                                 <div class="layui-row layui-col-space10 web-index">
                                     <div class="layui-col-md2 layui-col-sm6 layui-col-xs12">
                                         <div class="layui-card">
-                                            <div class="layui-card-header"><i class="iconfont">&#xe650;</i>微信账号存活率</div>
+                                            <div class="layui-card-header"><i class="iconfont">&#xe650;</i>微信存活率</div>
                                             <div class="layui-card-body">
                                                 <span id="weChatSuccess" class="web-index-statistics-item item-opt"></span>
                                             </div>
@@ -125,7 +128,7 @@
                                     </div>
                                     <div class="layui-col-md2 layui-col-sm6 layui-col-xs12">
                                         <div class="layui-card">
-                                            <div class="layui-card-header"><i class="iconfont">&#xe64d;</i>业务执行成功率</div>
+                                            <div class="layui-card-header"><i class="iconfont">&#xe64d;</i>业务成功率</div>
                                             <div class="layui-card-body">
                                                 <span id="businessSuccess" class="web-index-statistics-item item-opt"></span>
                                             </div>
@@ -133,7 +136,7 @@
                                     </div>
                                     <div class="layui-col-md2 layui-col-sm6 layui-col-xs12">
                                         <div class="layui-card">
-                                            <div class="layui-card-header"><i class="iconfont">&#xe64a;</i>添加好友成功率</div>
+                                            <div class="layui-card-header"><i class="iconfont">&#xe64a;</i>加人成功率</div>
                                             <div class="layui-card-body">
                                                 <span id="addFriendSuccess" class="web-index-statistics-item item-opt"></span>
                                             </div>
@@ -141,7 +144,7 @@
                                     </div>
                                     <div class="layui-col-md2 layui-col-sm6 layui-col-xs12">
                                         <div class="layui-card">
-                                            <div class="layui-card-header"><i class="iconfont">&#xe649;</i>新增微信账号数量</div>
+                                            <div class="layui-card-header"><i class="iconfont">&#xe649;</i>新增微信数</div>
                                             <div class="layui-card-body">
                                                 <span id="newWeChatAccountCount" class="web-index-statistics-item item-opt-two"></span>
                                             </div>
@@ -157,7 +160,7 @@
                                     </div>
                                     <div class="layui-col-md2 layui-col-sm6 layui-col-xs12">
                                         <div class="layui-card">
-                                            <div class="layui-card-header"><i class="iconfont">&#xe65c;</i>当前系统时间</div>
+                                            <div class="layui-card-header"><i class="iconfont">&#xe65c;</i>系统时间</div>
                                             <div class="layui-card-body">
                                                 <span id="systemTime" class="web-index-statistics-item" style="font-size: 18px;"></span>
                                             </div>
@@ -225,6 +228,7 @@
     var carousel = layui.carousel;
     var windowObj = layerzk.init($('#mainContent'),'rb');
     var menuList = [];
+    var typeName = ["业务类型","登录","添加好友","预登录","注销","修改密码","修改昵称","发送好友消息","删除好友","发送朋友圈","修改头像","扫码入群","添加群成员","退群","发送群消息"];
     var msgList = ["我是一个保安，上班只为下班！","我是一个保安，每天打卡上班！","我是一个保安，坐等团本炸穿！","我是一个保安，***********！","我是一个info信息，弹出后五秒钟我会自动关闭哦，或者你点击我一下我也会带你去具体信息的详细页面查看"];
     var icoCodeList = ['&#xe77d;','&#xe63b;','&#xe603;','&#xe60a;','&#xe605;','&#xe660;','&#xe65f;','&#xe65e;','&#xe65d;','&#xe65c;','&#xe65c;','&#xe65b;','&#xe65a;','&#xe659;','&#xe658;','&#xe657;','&#xe656;','&#xe655;','&#xe654;','&#xe653;','&#xe652;','&#xe651;','&#xe650;','&#xe64f;','&#xe64e;','&#xe64d;','&#xe64c;','&#xe64b;','&#xe64a;','&#xe649;']
     var myChart = null;
@@ -440,7 +444,7 @@
             success:function(obj){
                 if(obj.code == 1){
                     // 将后端传递的数据转换为指定格式的数据
-                    menuList = structureNav([],obj.obj);
+                    menuList = structureNav([],obj.data);
                     // 将预备的导航栏数据加工并生成html代码插入其中
                     $('#mainLeftNav').html(createrMenu(menuList));
                     // 渲染导航
@@ -460,7 +464,7 @@
             async: false,
             success:function(obj){
                 if(obj.code == 1){
-                    value = obj.obj;
+                    value = obj.data;
                 }else{
                     layer.msg(obj.message);
                     value =  "";
@@ -489,12 +493,12 @@
             // 检查类型码
             switch (data.code) {
                 case 0:
-                    layerzk.open(windowObj,{bakcgroundColor:'#009688',msg:data.message,icoCode:data.obj});
+                    layerzk.open(windowObj,{bakcgroundColor:'#009688',msg:data.message,icoCode:data.data});
                     break;
                 case 1:
                     // 推送服务器系统时间
                     if($('#systemTime')){
-                        $('#systemTime').text(data.obj);
+                        $('#systemTime').text(data.data);
                     }
                     break;
             }

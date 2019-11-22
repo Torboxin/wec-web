@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <div class="layui-row layui-col-space5">
+        <form class="layui-form layui-row layui-col-space3" lay-filter="errorAdminScreeCond" style="max-height: 200px;overflow: visible;">
+            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+                <input class="layui-input" type="text" name="errorAdminAccount" placeholder="微信账号匹配" autocomplete="off">
+            </div>
+            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+                <input class="layui-input" type="text" name="errorAdminMsg" placeholder="消息内容匹配" autocomplete="off">
+            </div>
+            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+                <input class="layui-input" type="text" id="errorAdminCreateTime" name="errorAdminCreateTime" placeholder="创建时间" autocomplete="off">
+            </div>
+            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+                <input class="layui-input" type="text" id="errorAdminLastTime" name="errorAdminLastTime" placeholder="最后上报时间" autocomplete="off">
+            </div>
+        </form>
+        <div class="layui-row">
+            <div class="layui-btn-group" style="line-height: 35px;">
+                <button type="button" class="layui-btn layui-btn-normal layui-btn-sm" onclick="loadErrorAdminTable()"><i class="iconfont">&#xe6f7;</i>查询</button>
+            </div>
+        </div>
+        <div class="layui-row">
+            <table lay-filter="errorAdminTable" id="errorAdminTable"></table>
+        </div>
+    </div>
+    <script>
+        $(function(){
+            laydate.render({
+                elem: '#errorAdminCreateTime'
+            });
+            laydate.render({
+                elem: '#errorAdminLastTime'
+            });
+            loadErrorAdminTable();
+            form.render();
+        })
+
+        function loadErrorAdminTable(){
+            var param = form.val('errorAdminScreeCond');
+            table.render({
+                elem: '#errorAdminTable'
+                ,height: 700
+                ,method:'post'
+                ,url: 'http://localhost:8080/wechat-model-controller/error_admin/findAllErrorData'
+                ,where: param
+                ,page: true
+                ,limit:20
+                ,cols: [[
+                    {width:80,type:"checkbox"}
+                    ,{field: 'id', title: 'ID', width:80, sort: true,hide: true}
+                    ,{title: '微信号', width:180, templet:function(o){
+                            return o.wechat_nickname+"["+o.wechat_account+"]";
+                        }}
+                    ,{field: 'error_msg', title: '错误信息', width:200}
+                    ,{field: 'error_num', title: '上报数量', width:100}
+                    ,{field: 'create_time', title: '数据创建时间', width:160}
+                    ,{field: 'last_time', title: '最后上报时间', width:160}
+                ]]
+            });
+        }
+    </script>
+</body>
+</html>

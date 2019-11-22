@@ -1,0 +1,77 @@
+<form class="layui-form" lay-filter="qrCodeInGroupCond">
+    <div class="layui-form-item">
+        <div class="layui-input-block" style="margin-left:0;">
+            <button type="button" class="layui-btn layui-btn-primary layui-btn-sm" id="selectQRCodeImgFile"><i class="iconfont">&#xe72e;</i><span id="selectQRCodeImgFileTitle">选择二维码图片</span></button>
+            <!--<button class="layui-btn layui-btn-sm" lay-submit lay-filter="qrCodeInGroupSubmit">立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary layui-btn-sm">重置</button>-->
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label" style="text-align: left;padding: 9px 0px;">间隔时间：</label>
+            <div class="layui-input-inline" style="width: 100px;">
+                <input type="number" name="intervalMin" placeholder="最小间隔" autocomplete="off" class="layui-input">
+            </div>
+            <div class="layui-form-mid">-</div>
+            <div class="layui-input-inline" style="width: 100px;">
+                <input type="number" name="intervalMax" placeholder="最大间隔" autocomplete="off" class="layui-input">
+            </div>
+            <label class="layui-form-label" style="text-align: left;color: #9E9E9E;">单位：秒</label>
+        </div>
+    </div>
+    <div style="max-height: 300px;overflow: auto;">
+        <table class="layui-table" style="margin: 0;">
+            <thead>
+            <tr>
+                <th>文件名</th>
+                <th>解析值</th>
+                <th>文件大小</th>
+                <th>上传时间</th>
+            </tr>
+            </thead>
+            <tbody id="qrCodeResolverResultTable"></tbody>
+        </table>
+    </div>
+</form>
+<script>
+    var qrCodeImgUpLoad;
+    var codeVal = [];
+    $(function(){
+        qrCodeImgUpLoad = upLoad.render({
+            elem:'#selectQRCodeImgFile',
+            url:'http://localhost:8080/wechat-model-controller/comm/resolverQRCodeImgVal',
+            headers:{"Authorization":isNull(localStorage.wechatToken)},
+            acceptMime:'image/*',
+            exts:'jpg|png',
+            multiple:true,
+            number:30,
+            before:function(obj){
+                layer.load(); //开启loading
+            },
+            done: function(res, index, upload){
+                if(res.code == 0)
+                    if(codeVal.indexOf(res.data.val) != -1){
+                        layerzk.open(windowObj,{bakcgroundColor:'#f44336d4',msg:"文件："+res.data.fileName+"多次上传！",icoCode:'&#xe67e;'},30000);
+                    }else{
+                    codeVal.push(res.data.val);
+                    $('#qrCodeResolverResultTable').html(
+                        $('#qrCodeResolverResultTable').html() +
+                            "    <tr>" +
+                            "      <th>"+res.data.fileName+"</th>" +
+                            "      <th>"+res.data.val+"</th>" +
+                            "      <th>"+res.data.size+" KB</th>" +
+                            "      <th>"+res.data.dateTime+"</th>" +
+                            "    </tr> "
+                        );
+                        $('#selectQRCodeImgFileTitle').text("已选择数量："+codeVal.length);
+                    }
+                else
+                    layerzk.open(windowObj,{bakcgroundColor:'#f44336d4',msg:res.message,icoCode:'&#xe67e;'},5000);
+                layer.closeAll('loading'); //关闭loading
+            },
+            error: function(index, upload){
+                layer.closeAll('loading'); //关闭loading
+            }
+        });
+    })
+</script>

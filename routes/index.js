@@ -17,6 +17,61 @@ router.get('/user_admin', function(req, res, next) {
 	res.render('user_admin', { title: 'Express' });
 });
 
+router.get('/add_group_member', function(req, res, next) {
+    res.type('html');
+    res.render('add_group_member', { title: 'Express' });
+});
+
+router.get('/send_group_message', function(req, res, next) {
+	res.type('html');
+	res.render('send_group_message', { title: 'Express' });
+});
+
+router.get('/group_admin', function(req, res, next) {
+	res.type('html');
+	res.render('group_admin', { title: 'Express' });
+});
+
+router.get('/qrcode_in_group', function(req, res, next) {
+	res.type('html');
+	res.render('qrcode_in_group', { title: 'Express' });
+});
+
+router.get('/send_friend_circle', function(req, res, next) {
+	res.type('html');
+	res.render('send_friend_circle', { title: 'Express' });
+});
+
+router.get('/group_member_admin', function(req, res, next) {
+	res.type('html');
+	res.render('group_member_admin', { title: 'Express' });
+});
+
+router.get('/send_friend_message', function(req, res, next) {
+	res.type('html');
+	res.render('send_friend_message', { title: 'Express' });
+});
+
+router.get('/error_admin', function(req, res, next) {
+	res.type('html');
+	res.render('error_admin', { title: 'Express' });
+});
+
+router.get('/batch_business_admin', function(req, res, next) {
+	res.type('html');
+	res.render('batch_business_admin', { title: 'Express' });
+});
+
+router.get('/add_friend', function(req, res, next) {
+	res.type('html');
+	res.render('add_friend', { title: 'Express' });
+});
+
+router.get('/business_data_admin', function(req, res, next) {
+	res.type('html');
+	res.render('business_data_admin', { title: 'Express' });
+});
+
 router.get('/role_admin', function(req, res, next) {
 	res.type('html');
 	res.render('role_admin', { title: 'Express' });
