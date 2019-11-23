@@ -71,7 +71,7 @@
             success:function(iconList){
                 var html = '';
                 for(i in iconList){
-                    html += '<div class="layui-col-md1"><i class="iconfont" style="cursor:pointer;font-size: 20px;" onclick="thisSelected(this)" data-val="'+iconList[i].ico_code.replace('#','+')+'">'+iconList[i].ico_code+'</i></div>'
+                    html += '<div class="layui-col-md1 layui-col-sm1 layui-col-xs1"><i class="iconfont" style="cursor:pointer;font-size: 20px;" onclick="thisSelected(this)" data-val="'+iconList[i].ico_code.replace('#','+')+'">'+iconList[i].ico_code+'</i></div>'
                 }
                 $('#navIcoCode .layui-field-box').html(html);
                 form.render();

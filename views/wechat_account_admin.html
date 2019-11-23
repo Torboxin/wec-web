@@ -19,9 +19,9 @@
             <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
                 <input class="layui-input"  type="text" id="wechatAccountAdminDieTime" name="dieTime" placeholder="号码死亡时间" autocomplete="off">
             </div>
-            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+            <!--<div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
                 <input class="layui-input"  type="text" name="from" placeholder="数据来源" autocomplete="off">
-            </div>
+            </div>-->
             <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
                 <input class="layui-input"  type="text" name="deviceNum" placeholder="设备编号" autocomplete="off">
             </div>
@@ -30,6 +30,9 @@
             </div>
             <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
                 <select name="proxyRegion" id="proxyRegion"></select>
+            </div>
+            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+                <select id="wechatAccountSelectFrom" name="from"></select>
             </div>
             <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
                 <select name="toUser">
@@ -139,6 +142,19 @@
                     $('#proxyRegion').html(html);
                 }
             });
+            $.ajax({
+                datatype:'json',
+                url:"http://localhost:8080/wechat-model-controller/comm/getAllTbFromData",
+                type:'post',
+                async: false,
+                success:function(obj){
+                    var html = '<option value="">分组来源</option>';
+                    for(i in obj){
+                        html += '<option value="'+obj[i].id+'">'+obj[i].from_name+'</option>'
+                    }
+                    $('#wechatAccountSelectFrom').html(html);
+                }
+            });
             loadWechatAccountAdminTable();
             form.render();
         })
@@ -179,7 +195,9 @@
                     ,{field: 'pid', title: 'PID', width:80,hide: true}
                     ,{field: 'uid', title: 'UID', width:80,hide: true}
                     ,{field: 'wechat_id', title: '微信号', width:120}
-                    ,{field: 'wechat_account', title: '微信账号', width:120}
+                    ,{title: '微信账号', width:120, templet:function(o){
+                            return "<span style='color:"+(o.account_die_time ? "red" : "#4caf50")+"'>" + (o.wechat_account) + "</span>";
+                        }}
                     ,{field: 'wechat_phone', title: '微信手机号', width:120}
                     ,{field: 'wechat_nickname', title: '昵称', width:120}
                     ,{field: 'wechat_headimg', title: '头像', width:120}
@@ -270,12 +288,19 @@
                             }
                             return val;
                         }}
-                    ,{field: 'account_die_time', title: '账号死亡时间', width:180, templet:function (o) {
-                            if(o.account_die_time){
-                                return o.account_die_time;
-                            }else{
-                                return "未死亡";
-                            }
+                    ,{title: '数据创建时间', width:180, templet:function (o) {
+                            return o.create_time ? o.create_time : "无数据";
+                        }}
+                    ,{title: '账号死亡时间', width:180, templet:function (o) {
+                            return o.account_die_time ? o.account_die_time : "未死亡";
+                        }}
+                    ,{title: '存活时长', width:120, templet:function (o) {
+                            return o.survival_time ?
+                                "<span style='color:red;'>" + parseInt(o.survival_time / 24) + " 天 " + o.survival_time % 24 +" 小时</span>"
+                                : "<span style='color:#4caf50;'>至今</span>";
+                        }}
+                    ,{title: '分组来源', width:120, templet:function (o) {
+                            return o.from_name ? o.from_name : "无数据";
                         }}
                     ,{field: 'data_remark', title: '数据备注', width:100}
                     ,{field: 'not_sys_friend_num', title: '非系统好友', width:120}
