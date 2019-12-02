@@ -69,16 +69,23 @@
         var param = data.field;
         var url;
         if(checkStatus.data.length <= 0){
+            if(!data.field.intervalMax || !data.field.intervalMin){
+                layer.tips('间隔时间不可为空！', data.elem, {
+                    tips: [1, '#F44336'],
+                    time: 2000
+                });
+                return false;
+            }
             if(parseInt(data.field.intervalMax) <= parseInt(data.field.intervalMin)){
                 layer.tips('间隔时间最大值不可小于最小值！', data.elem, {
-                    tips: [1, '#3595CC'],
+                    tips: [1, '#F44336'],
                     time: 2000
                 });
                 return false;
             }
             if(data.field.addFriendType == 2 && !data.field.addFriendNumber){
                 layer.tips('添加数量不可为空！', data.elem, {
-                    tips: [1, '#3595CC'],
+                    tips: [1, '#F44336'],
                     time: 2000
                 });
                 return false;
@@ -88,7 +95,7 @@
         }else{
             if(!data.field.addFriendPhone){
                 layer.tips('被添加手机号不可为空！！', data.elem, {
-                    tips: [1, '#3595CC'],
+                    tips: [1, '#F44336'],
                     time: 2000
                 });
                 return false;

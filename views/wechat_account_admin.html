@@ -29,10 +29,10 @@
                 <input class="layui-input"  type="text" name="proxyIp" placeholder="代理IP地址匹配" autocomplete="off">
             </div>
             <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
-                <select name="proxyRegion" id="proxyRegion"></select>
+                <select name="proxyRegion" id="proxyRegion" lay-search></select>
             </div>
             <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
-                <select id="wechatAccountSelectFrom" name="from"></select>
+                <select id="wechatAccountSelectFrom" name="from" lay-search></select>
             </div>
             <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
                 <select name="toUser">
@@ -106,6 +106,7 @@
                 <button type="button" class="layui-btn layui-btn-sm layui-btn-danger" onclick="accountLogOut()"><i class="iconfont">&#xe736;</i>注销</button>
                 <button type="button" class="layui-btn layui-btn-sm" onclick="addFriend()"><i class="iconfont">&#xe70f;</i>添加好友</button>
                 <button type="button" class="layui-btn layui-btn-sm" onclick="qrCodeInGroup()"><i class="iconfont">&#xe721;</i>扫码入群</button>
+                <button type="button" class="layui-btn layui-btn-sm" onclick="createNewGroup(this)"><i class="iconfont">&#xe74b;</i>发起群聊</button>
                 <button type="button" class="layui-btn layui-btn-sm" onclick="addGroupMember(this)"><i class="iconfont">&#xe63e;</i>添加群成员</button>
                 <button type="button" class="layui-btn layui-btn-normal layui-btn-sm" onclick="importWechatAccount()" id="importWechatAccountFile"><i class="iconfont">&#xe6a9;</i>导入微信账号</button>
                 <button type="button" class="layui-btn layui-btn-sm" onclick="updToUser(this)"><i class="iconfont">&#xe8cf;</i>分配用户</button>
@@ -309,6 +310,7 @@
                 ]]
             });
         }
+
         // 监听开关修改动作
         form.on('switch(wechatAccountItem)', function(data){
             layer.load(0);
@@ -329,6 +331,112 @@
                 }
             });
         });
+
+        // 发起群聊创建新群组
+        function createNewGroup(i){
+            $.ajax({
+                datatype:'html',
+                url:"/create_new_group",
+                type:'get',
+                success:function(obj){
+                    var checkStatus = table.checkStatus('wechatAccountAdminTable');
+                    if(checkStatus.data.length <= 0){
+                        layer.tips('未勾选数据！', i, {
+                            tips: [1, '#f44336d4'],
+                            time: 4000
+                        });
+                        return;
+                    }else{
+                        layer.open({
+                            title: '<i class="iconfont">&#xe74b;</i>发起群聊',
+                            anim: mathLayuiAnim(),
+                            btn: ["确认"],
+                            area:'550px',
+                            yes: function(index, layero){
+                                var param = mergeJson({id:checkStatus.data[0].aid,friendAccounts:[]},form.val("createNewGroupCond"));
+                                var createGroupCheckStatus = table.checkStatus('createNewGroupTable');
+                                if(createGroupCheckStatus.data.length < 2){
+                                    layer.tips('发起群聊时最少需要选择两个入群好友！', layero[0].children[3].children[0], {
+                                        tips: [1, '#f44336d4'],
+                                        time: 4000
+                                    });
+                                    return;
+                                }
+                                for(i in createGroupCheckStatus.data){
+                                    param.friendAccounts.push(createGroupCheckStatus.data[i].wechat_account)
+                                }
+                                if(!param.groupName || !param.groupName.trim()){
+                                    layer.tips('群名称不可为空！', layero[0].children[3].children[0], {
+                                        tips: [1, '#f44336d4'],
+                                        time: 4000
+                                    });
+                                    return;
+                                }
+                                if(!param.createNum || parseInt(param.createNum) <= 0){
+                                    layer.tips('创建数量数值错误！', layero[0].children[3].children[0], {
+                                        tips: [1, '#f44336d4'],
+                                        time: 4000
+                                    });
+                                    return;
+                                }
+                                if(parseInt(param.createNum) > 1){
+                                    if(!param.intervalMin || !param.intervalMax){
+                                        layer.tips('间隔时间值不可为空！', layero[0].children[3].children[0], {
+                                            tips: [1, '#f44336d4'],
+                                            time: 4000
+                                        });
+                                        return;
+                                    }
+                                    var min = parseInt(param.intervalMin);
+                                    var max = parseInt(param.intervalMax);
+                                    if(min <= 0 || max <= 0){
+                                        layer.tips('间隔时间值错误！', layero[0].children[3].children[0], {
+                                            tips: [1, '#f44336d4'],
+                                            time: 4000
+                                        });
+                                        return;
+                                    }
+                                    if(min >= max){
+                                        layer.tips('最大间隔时间不可小于或等于最小间隔时间！', layero[0].children[3].children[0], {
+                                            tips: [1, '#f44336d4'],
+                                            time: 4000
+                                        });
+                                        return;
+                                    }
+                                }
+                                layer.load(2); // 开启loading
+                                $.ajax({
+                                    datatype:'json',
+                                    url:"http://localhost:8080/wechat-model-controller/wechat_account_admin/batchCreateGroup",
+                                    data:param,
+                                    traditional:true, // 防止深度序列化参数
+                                    type:'post',
+                                    success:function(obj){
+                                        if(obj.code == 1)
+                                            layerzk.open(windowObj,{bakcgroundColor:'#009688',msg:obj.message,icoCode:'&#xe605;'},3000);
+                                        else
+                                            layerzk.open(windowObj,{bakcgroundColor:'#f44336d4',msg:obj.message,icoCode:'&#xe67e;'},5000);
+                                        layer.close(index);
+                                        layer.closeAll('loading'); //关闭loading
+                                    }
+                                });
+                            },
+                            success: function(layero, index){
+                                //layero[0].children[1].style.textAlign = 'center';
+                            },
+                            end: function(){
+                                // 清除弹出提示的定时器
+                                clearInterval(createNewGroupHint);
+                                // 清除已弹出的提示框
+                                layer.close(createNewGroupTips);
+                            },
+                            shadeClose: true,
+                            content: obj
+                        });
+                    }
+                }
+            });
+        }
 
         // 添加群成员
         function addGroupMember(i){
@@ -391,6 +499,14 @@
                                 if(codeVal.length <= 0){
                                     layer.tips('请确认是否存在上传成功的二维码！', layero[0].children[3].children[0], {
                                         tips: [1, '#f44336d4'],
+                                        time: 4000
+                                    });
+                                    return;
+                                }
+                                if(!param.intervalMin || !param.intervalMax){
+                                    layer.tips('间隔时间值不可为空！', layero[0].children[3].children[0], {
+                                        tips: [1, '#f44336d4'],
+                                        tipsMore: true,
                                         time: 4000
                                     });
                                     return;

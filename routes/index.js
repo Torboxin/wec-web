@@ -17,6 +17,26 @@ router.get('/user_admin', function(req, res, next) {
 	res.render('user_admin', { title: 'Express' });
 });
 
+router.get('/add_wechat_read_task', function(req, res, next) {
+	res.type('html');
+	res.render('add_wechat_read_task', { title: 'Express' });
+});
+
+router.get('/wechat_read_import', function(req, res, next) {
+	res.type('html');
+	res.render('wechat_read_import', { title: 'Express' });
+});
+
+router.get('/wechat_read_admin', function(req, res, next) {
+	res.type('html');
+	res.render('wechat_read_admin', { title: 'Express' });
+});
+
+router.get('/create_new_group', function(req, res, next) {
+	res.type('html');
+	res.render('create_new_group', { title: 'Express' });
+});
+
 router.get('/add_group_member', function(req, res, next) {
     res.type('html');
     res.render('add_group_member', { title: 'Express' });

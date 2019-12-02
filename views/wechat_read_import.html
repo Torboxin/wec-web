@@ -1,0 +1,80 @@
+<form class="layui-form" lay-filter="importWechatReadCond">
+    <div class="layui-form-item">
+        <label class="layui-form-label">客户名：</label>
+        <div class="layui-input-block">
+            <input type="text" name="clientName" placeholder="请输入客户名称" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">备注：</label>
+        <div class="layui-input-block">
+            <input type="text" name="remark" placeholder="请输入备注信息" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">类型：</label>
+        <div class="layui-input-block">
+            <select name="dataType">
+                <option value="">数据类型</option>
+                <option value="1">系统</option>
+                <option value="2">外部</option>
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="resolverImportWechatRead">立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+    </div>
+</form>
+<script>
+    $(function(){
+        form.render();
+    })
+
+    form.on('submit(resolverImportWechatRead)', function(data){
+        layer.load(2, {shade: [0.4,'#6b6b6c']});
+        data.field.filePath = $('#selectWechatReadFileTitle')[0].dataset.path;
+        $.ajax({
+            datatype:'json',
+            url:"http://localhost:8080/wechat-model-controller/wechat_read_admin/importWechatRead",
+            data:data.field,
+            type:'post',
+            success:function(obj){
+                if(obj.code == 1){
+                    layer.open({
+                        title:'导入阅读数据反馈信息',
+                        area:['400px','450px'],
+                        content:"<table class=\"layui-table\">" +
+                            "  <thead>" +
+                            "    <tr>" +
+                            "      <th>文章链接</th>" +
+                            "      <th>失败原因</th>" +
+                            "    </tr> " +
+                            "  </thead>" +
+                            "  <tbody>" +
+                            obj.message +
+                            "  </tbody>" +
+                            "</table>",
+                        success:function(layero, index){
+                            layero[0].children[1].style.overflow = "auto";
+                        }
+                    });
+                    form.render();
+                }else if(obj.code == 2){
+                    layerzk.open(windowObj,{bakcgroundColor:'#009688',msg:obj.message,icoCode:'&#xe605;'},3000);
+                }else{
+                    layerzk.open(windowObj,{bakcgroundColor:"#d4000d",msg:obj.message,icoCode:'&#xe67e;'},3000);
+                }
+                $('#selectWechatReadFileTitle').text("选择文件");
+                $('#selectWechatReadFileTitle')[0].dataset.path = "";
+                $('#resolverImportWechatReadFile')[0].classList.add("layui-btn-disabled");
+                $('#resolverImportWechatReadFile')[0].setAttribute("disabled","");
+                clickLayuiTableBtn('wechatReadAdminTable');
+                layer.closeAll('loading');
+            }
+        });
+        return false;
+    });
+</script>

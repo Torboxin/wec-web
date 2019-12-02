@@ -1,0 +1,93 @@
+<form class="layui-form" lay-filter="addWechatReadTaskCond">
+    <div class="layui-form-item">
+        <label class="layui-form-label">阅读数：</label>
+        <div class="layui-input-block">
+            <input type="number" name="readNum" placeholder="请输入阅读数量" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">间隔时间：</label>
+            <div class="layui-input-inline" style="width: 100px;">
+                <input type="number" name="intervalMin" placeholder="最小间隔" autocomplete="off" class="layui-input">
+            </div>
+            <div class="layui-form-mid">-</div>
+            <div class="layui-input-inline" style="width: 100px;">
+                <input type="number" name="intervalMax" placeholder="最大间隔" autocomplete="off" class="layui-input">
+            </div>
+            <label class="layui-form-label" style="text-align: left;color: #9E9E9E;">单位：秒</label>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">账号分组：</label>
+        <div class="layui-input-block">
+            <select id="accountFromId" name="accountFromId" lay-search></select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="wechatReadTaskSubmit">立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+    </div>
+</form>
+<script>
+    $(function(){
+        $.ajax({
+            datatype:'json',
+            url:"http://localhost:8080/wechat-model-controller/comm/getAllTbFromData",
+            type:'post',
+            async: false,
+            success:function(obj){
+                var html = '<option value="">账号分组</option>';
+                for(i in obj){
+                    html += '<option value="'+obj[i].id+'">'+obj[i].from_name+'</option>'
+                }
+                $('#accountFromId').html(html);
+            }
+        });
+        form.render();
+    })
+
+    form.on('submit(wechatReadTaskSubmit)', function(data){
+        if(!data.field.readNum || parseInt(data.field.readNum) <= 0){
+            layer.tips('阅读数参数值错误！', data.elem, {
+                tips: [1, '#F44336'],
+                time: 2000
+            });
+            return false;
+        }
+        if(!data.field.intervalMax || !data.field.intervalMin){
+            layer.tips('间隔时间不可为空！', data.elem, {
+                tips: [1, '#F44336'],
+                time: 2000
+            });
+            return false;
+        }
+        if(parseInt(data.field.intervalMax) <= parseInt(data.field.intervalMin)){
+            layer.tips('间隔时间最大值不可小于最小值！', data.elem, {
+                tips: [1, '#F44336'],
+                time: 2000
+            });
+            return false;
+        }
+        var param = mergeJson(data.field,form.val("wechatReadAdminScreeCond"));
+        layer.load(2, {shade: [0.4,'#6b6b6c']});
+        $.ajax({
+            datatype:'json',
+            url:"http://localhost:8080/wechat-model-controller/wechat_read_admin/addWechatReadBusinessBySreeCond",
+            type:'post',
+            data:param,
+            traditional:true, // 防止深度序列化参数
+            success:function(obj){
+                if(obj.code == 1){
+                    layerzk.open(windowObj,{bakcgroundColor:'#009688',msg:obj.message,icoCode:'&#xe605;'},3000);
+                }else{
+                    layerzk.open(windowObj,{bakcgroundColor:"#d4000d",msg:obj.message,icoCode:'&#xe67e;'},3000);
+                }
+                layer.closeAll('loading');
+            }
+        });
+        return false;
+    });
+</script>

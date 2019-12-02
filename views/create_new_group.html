@@ -1,0 +1,63 @@
+<form class="layui-form" lay-filter="createNewGroupCond">
+    <div class="layui-form-item">
+        <label class="layui-form-label">群组名：</label>
+        <div class="layui-input-block">
+            <input type="text" name="groupName" required  lay-verify="required" placeholder="请输入群组名称" autocomplete="off" class="layui-input">
+            <i class="iconfont" id="groupNameHintIcon" onclick="createNewGroupInputGroupNameHint(this)" style="position: absolute;top: 0;right: 2px;line-height: 38px;font-size: 20px;cursor: pointer;">&#xe67e;</i>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">创建数量：</label>
+        <div class="layui-input-block">
+            <input type="number" name="createNum" required  lay-verify="required" placeholder="请输入创建群组数量" autocomplete="off" class="layui-input" value="1">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">间隔时间：</label>
+            <div class="layui-input-inline" style="width: 100px;">
+                <input type="number" name="intervalMin" placeholder="最小间隔" autocomplete="off" class="layui-input">
+            </div>
+            <div class="layui-form-mid">-</div>
+            <div class="layui-input-inline" style="width: 100px;">
+                <input type="number" name="intervalMax" placeholder="最大间隔" autocomplete="off" class="layui-input">
+            </div>
+            <label class="layui-form-label" style="text-align: left;color: #9E9E9E;">单位：秒</label>
+        </div>
+    </div>
+    <div style="height: 300px;max-height: 300px;overflow: auto;">
+        <table lay-filter="createNewGroupTable" id="createNewGroupTable"></table>
+    </div>
+</form>
+<script>
+    var createNewGroupHint;
+    var createNewGroupTips;
+    $(function(){
+        // 弹出提示信息
+        createNewGroupHint = setTimeout("createNewGroupInputGroupNameHint($('#groupNameHintIcon'))",2000);
+        var param = {id:table.checkStatus('wechatAccountAdminTable').data[0].aid};
+        table.render({
+            elem: '#createNewGroupTable'
+            ,method:'post'
+            ,url: 'http://localhost:8080/wechat-model-controller/comm/getAssignWechatAccountFriendData'
+            ,where: param
+            ,cols: [[
+                {type:"checkbox",minWidth:40}
+                ,{field: 'fid', title: 'ID', sort: true,hide: true}
+                ,{title: '好友微信', width:140, templet:function(o){
+                        return o.wechat_nickname+"["+o.wechat_account+"]";
+                    }}
+                ,{field: 'add_time', title: '添加时间', width:160}
+                ,{field: 'friend_remark', title: '好友备注', width:100}
+            ]]
+        });
+    })
+
+    // 填写群名称时的提示标语
+    function createNewGroupInputGroupNameHint(i){
+        createNewGroupTips = layer.tips('\'{index}\'为创建群组时的顺序下标数值，可使用在任意位置使用！', i, {
+            tips: [1, '#F44336'],
+            time: 4000
+        });
+    }
+</script>

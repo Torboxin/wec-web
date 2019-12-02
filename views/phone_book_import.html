@@ -63,16 +63,16 @@
                             layero[0].children[1].style.overflow = "auto";
                         }
                     });
-                    $('#selectPhoneBookFileTitle').text("选择文件");
-                    $('#selectPhoneBookFileTitle')[0].dataset.path = "";
-                    $('#resolverImportPhoneBookFile')[0].classList.add("layui-btn-disabled");
-                    $('#resolverImportPhoneBookFile')[0].setAttribute("disabled","");
                     form.render();
                 }else if(obj.code == 2){
                     layerzk.open(windowObj,{bakcgroundColor:'#009688',msg:obj.message,icoCode:'&#xe605;'},3000);
                 }else{
                     layerzk.open(windowObj,{bakcgroundColor:"#d4000d",msg:obj.message,icoCode:'&#xe67e;'},3000);
                 }
+                $('#selectPhoneBookFileTitle').text("选择文件");
+                $('#selectPhoneBookFileTitle')[0].dataset.path = "";
+                $('#resolverImportPhoneBookFile')[0].classList.add("layui-btn-disabled");
+                $('#resolverImportPhoneBookFile')[0].setAttribute("disabled","");
                 clickLayuiTableBtn('phoneBookBatchAdminTable');
                 layer.closeAll('loading');
             }

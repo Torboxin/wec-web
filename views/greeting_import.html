@@ -63,16 +63,16 @@
                             layero[0].children[1].style.overflow = "auto";
                         }
                     });
-                    $('#selectGreetingFileTitle').text("选择文件");
-                    $('#selectGreetingFileTitle')[0].dataset.path = "";
-                    $('#resolverImportGreetingFile')[0].classList.add("layui-btn-disabled");
-                    $('#resolverImportGreetingFile')[0].setAttribute("disabled","");
                     form.render();
                 }else if(obj.code == 2){
                     layerzk.open(windowObj,{bakcgroundColor:'#009688',msg:obj.message,icoCode:'&#xe605;'},3000);
                 }else{
                     layerzk.open(windowObj,{bakcgroundColor:"#d4000d",msg:obj.message,icoCode:'&#xe67e;'},3000);
                 }
+                $('#selectGreetingFileTitle').text("选择文件");
+                $('#selectGreetingFileTitle')[0].dataset.path = "";
+                $('#resolverImportGreetingFile')[0].classList.add("layui-btn-disabled");
+                $('#resolverImportGreetingFile')[0].setAttribute("disabled","");
                 clickLayuiTableBtn('greetingBatchAdminTable');
                 layer.closeAll('loading');
             }
