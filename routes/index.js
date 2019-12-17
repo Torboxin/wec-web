@@ -17,6 +17,16 @@ router.get('/user_admin', function(req, res, next) {
 	res.render('user_admin', { title: 'Express' });
 });
 
+router.get('/add_timing_task', function(req, res, next) {
+	res.type('html');
+	res.render('add_timing_task', { title: 'Express' });
+});
+
+router.get('/timing_task_admin', function(req, res, next) {
+	res.type('html');
+	res.render('timing_task_admin', { title: 'Express' });
+});
+
 router.get('/add_wechat_read_task', function(req, res, next) {
 	res.type('html');
 	res.render('add_wechat_read_task', { title: 'Express' });

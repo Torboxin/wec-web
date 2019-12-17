@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <div class="layui-row layui-col-space5">
+        <form class="layui-form layui-row layui-col-space3" lay-filter="timingBusinessAdminScreeCond" style="max-height: 200px;overflow: visible;">
+            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+                <input class="layui-input" type="text" name="timingBusinessAdminBatchNumber" placeholder="批次号匹配" autocomplete="off">
+            </div>
+            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+                <input class="layui-input" type="text" id="timingBusinessAdminCreateTime" name="timingBusinessAdminCreateTime" placeholder="创建时间" autocomplete="off">
+            </div>
+            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+                <input class="layui-input" type="text" id="timingBusinessAdminDealTime" name="timingBusinessAdminDealTime" placeholder="处理时间" autocomplete="off">
+            </div>
+            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+                <select id="timingBusinessAdminTypeCode" name="timingBusinessAdminTypeCode"></select>
+            </div>
+            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+                <select name="timingBusinessAdminExecuteState">
+                    <option value="">执行状态</option>
+                    <option value="0">未执行</option>
+                    <option value="1">已执行</option>
+                    <option value="2">执行异常</option>
+                </select>
+            </div>
+            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+                <select name="timingBusinessAdminOnOffState">
+                    <option value="">开关状态</option>
+                    <option value="0">关闭</option>
+                    <option value="1">开启</option>
+                </select>
+            </div>
+        </form>
+        <div class="layui-row">
+            <div class="layui-btn-group" style="line-height: 35px;">
+                <button type="button" class="layui-btn layui-btn-normal layui-btn-sm" onclick="loadTimingBusinessAdminTable()"><i class="iconfont">&#xe6f7;</i>查询</button>
+                <button type="button" class="layui-btn layui-btn-sm layui-btn-primary" onclick="addTimingBusiness()"><i class="iconfont">&#xe63e;</i>添加定时任务</button>
+                <button type="button" class="layui-btn layui-btn-sm layui-btn-danger" onclick="delBusinessTimingData(this)"><i class="iconfont">&#xe6fa;</i>删除数据</button>
+            </div>
+        </div>
+        <div class="layui-row">
+            <table lay-filter="timingBusinessAdminTable" id="timingBusinessAdminTable"></table>
+        </div>
+    </div>
+    <script>
+        $(function(){
+            laydate.render({
+                elem: '#timingBusinessAdminCreateTime'
+            });
+            laydate.render({
+                elem: '#timingBusinessAdminDealTime'
+            });
+            var businessTypeHtml = "<option value=''>业务类型</option>";
+            for(var i=1;i<typeName.length;i++){
+                businessTypeHtml += '<option value="'+i+'">'+typeName[i]+'</option>';
+            }
+            $('#timingBusinessAdminTypeCode').html(businessTypeHtml);
+            loadTimingBusinessAdminTable();
+            form.render();
+        })
+
+        function loadTimingBusinessAdminTable(){
+            var param = form.val('timingBusinessAdminScreeCond');
+            table.render({
+                elem: '#timingBusinessAdminTable'
+                ,height: 700
+                ,method:'post'
+                ,url: 'http://localhost:8080/wechat-model-controller/business_timing_admin/findAllTimingBusinessData'
+                ,where: param
+                ,page: true
+                ,limit:20
+                ,cols: [[
+                    {width:80,type:"checkbox"}
+                    ,{field: 'id', title: 'ID', width:80, sort: true,hide: true}
+                    ,{title: '业务类型', width:100, templet:function(o){
+                            return typeName[o.timing_business_type_code];
+                        }}
+                    ,{field: 'username', title: '所属用户', width:100}
+                    ,{field: 'timing_serial_number', title: '批次任务号', width:160}
+                    ,{field: 'timing_business_create_time', title: '创建时间', width:160}
+                    ,{field: 'timing_business_deal_time', title: '处理时间', width:160}
+                    ,{title: '执行状态', width:100,templet:function(o){
+                            var val = "";
+                            switch (o.timing_business_state) {
+                                case 0:
+                                    val = "<span style='color: #6b6b6c;'>未执行</span>";
+                                    break;
+                                case 1:
+                                    val = "<span style='color: #03a9f4;'>已执行</span>";
+                                    break;
+                                default:
+                                    val = "<span style='color: red;'>执行异常</span>";
+                                    break;
+                            }
+                            return val;
+                        }}
+                    ,{field: 'business_batch_remark', title: '备注', width:120}
+                    ,{title: '开关', width:100, templet:function(o){
+                            return o.timing_business_on_off == 1 ? '<input type="checkbox" name="timingBusinessOnOff" lay-filter="timingBusinessOnOff" lay-skin="switch" data-id="'+o.id+'" data-key="isSearch" lay-text="开启|关闭" checked>' : '<input type="checkbox" name="timingBusinessOnOff" lay-filter="timingBusinessOnOff" lay-skin="switch" data-id="'+o.id+'" data-key="isSearch" lay-text="开启|关闭">';
+                        }}
+                    ,{title: '执行时间（周）', width:160, templet:function(o){
+                            return o.timing_business_week_execute_time.replace(1,"周日").replace(2,"周一").replace(3,"周二").replace(4,"周三").replace(5,"周四").replace(6,"周五").replace(7,"周六");
+                        }}
+                ]]
+            });
+        }
+
+        // 添加定时任务
+        function addTimingBusiness(){
+            $.ajax({
+                datatype:'html',
+                url:"/add_timing_task",
+                type:'get',
+                async: false,
+                success:function(obj){
+                    layer.open({
+                        title: '添加定时任务',
+                        anim: mathLayuiAnim(),
+                        skin: 'layerzk-normal',
+                        area:'600px',
+                        btn: false,
+                        shadeClose: true,
+                        content: obj,
+                    });
+                }
+            });
+        }
+
+        // 删除选中定时任务数据
+        function delBusinessTimingData(i){
+            var checkStatus = table.checkStatus('timingBusinessAdminTable');
+            if(checkStatus.data.length <= 0){
+                layer.tips('未勾选数据！', i, {
+                    tips: [1, '#f44336d4'],
+                    time: 4000
+                });
+                return;
+            }else{
+                layer.open({
+                    title: '删除定时业务数据',
+                    anim: mathLayuiAnim(),
+                    skin: 'layerzk-normal',
+                    btn: ["确认"],
+                    shadeClose: true,
+                    content: "是否确认删除选中的定时业务数据信息？",
+                    success: function(layero, index){
+                        layero[0].children[1].style.textAlign = 'center';
+                    },
+                    yes:function(index, layero){
+                        var param = {ids:[]};
+                        for(i in checkStatus.data){
+                            param.ids.push(checkStatus.data[i].id);
+                        }
+                        layer.load(2, {shade: [0.4,'#6b6b6c']});
+                        $.ajax({
+                            datatype:'json',
+                            url:"http://localhost:8080/wechat-model-controller/business_timing_admin/delTimingBusinessData",
+                            data:param,
+                            traditional:true, // 防止深度序列化参数
+                            type:'post',
+                            success:function(obj){
+                                if(obj.code == 1)
+                                    layerzk.open(windowObj,{bakcgroundColor:'#009688',msg:obj.message,icoCode:'&#xe605;'}, 3000);
+                                else
+                                    layerzk.open(windowObj,{bakcgroundColor:'#f44336d4',msg:obj.message,icoCode:'&#xe67e;'},5000);
+                                clickLayuiTableBtn('timingBusinessAdminTable');
+                                layer.close(index);
+                                layer.closeAll('loading');
+                            },
+                            error:function(xhr,state,errorThrown){
+                                layer.closeAll('loading');
+                            }
+                        });
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html>

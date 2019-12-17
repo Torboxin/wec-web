@@ -32,6 +32,12 @@ form.on('submit(save)', function(data) {
     return false;
 });
 
+$(function(){
+    if(localStorage.getItem("wechatToken")){
+        window.location = "/main";
+    }
+})
+
 function changevcode(){
     //console.log("刷新验证码");
     var randomnum = Math.random();

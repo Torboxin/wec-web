@@ -206,6 +206,45 @@
                             return o.wechat_set_headimg == 1 ? "<span style='color: #4caf50;'>已修改</span>" : "<span style='color: red;'>未修改</span>";
                         }}
                     ,{field: 'username', title: '所属用户', width:90}
+                    ,{field: 'not_sys_friend_num', title: '非系统好友', width:120}
+                    ,{field: 'sys_friend_num', title: '系统好友', width:100}
+                    ,{field: 'device_num', title: '设备编号', width:100}
+                    ,{field: 'login_state', title: '登录状态', width:100, templet:function (o) {
+                            var val = "";
+                            switch (o.login_state) {
+                                case 1:
+                                    val = "<span style='color: #03a9f4;'>登录中</span>";
+                                    break;
+                                case 2:
+                                    val = "<span style='color: #4caf50;'>已登录</span>";
+                                    break;
+                                default:
+                                    val = "<span style='color: red;'>未登录</span>";
+                                    break;
+                            }
+                            return val;
+                        }}
+                    ,{field: 'account_state_id', title: '账号状态', width:100 ,templet:function (o) {
+                            var val = "";
+                            switch (o.account_state_id) {
+                                case 1:
+                                    val = "<span style='color: #03a9f4;'>登录成功</span>";
+                                    break;
+                                case 2:
+                                    val = "<span style='color: red;'>登录失败</span>";
+                                    break;
+                                case 3:
+                                    val = "<span style='color: #ff9800;'>登录超时</span>";
+                                    break;
+                                default:
+                                    val = "无";
+                                    break;
+                            }
+                            return val;
+                        }}
+                    ,{title: '分组来源', width:120, templet:function (o) {
+                            return o.from_name ? o.from_name : "无数据";
+                        }}
                     ,{field: 'is_search', title: '被搜索', width:100, templet:function (o) {
                             return o.is_search==1?'<input type="checkbox" name="wechatAccountItem" lay-filter="wechatAccountItem" lay-skin="switch" data-id="'+o.aid+'" data-key="isSearch" lay-text="可以|不可以" checked>':'<input type="checkbox" name="wechatAccountItem" lay-filter="wechatAccountItem" lay-skin="switch" data-id="'+o.aid+'" data-key="isSearch" lay-text="可以|不可以">';
                         }}
@@ -234,21 +273,6 @@
                             return o.wechat_set_pwd == 1 ? "<span style='color: #4caf50;'>已修改</span>" : "<span style='color: red;'>未修改</span>";
                         }}
                     ,{field: 'login_time', title: '登录时间', width:180}
-                    ,{field: 'login_state', title: '登录状态', width:100, templet:function (o) {
-                            var val = "";
-                            switch (o.login_state) {
-                                case 1:
-                                    val = "<span style='color: #03a9f4;'>登录中</span>";
-                                    break;
-                                case 2:
-                                    val = "<span style='color: #4caf50;'>已登录</span>";
-                                    break;
-                                default:
-                                    val = "<span style='color: red;'>未登录</span>";
-                                    break;
-                            }
-                            return val;
-                        }}
                     ,{field: 'data_type_code', title: '数据类型', width:100, templet:function (o) {
                             var val = "";
                             switch (o.data_type_code) {
@@ -271,24 +295,6 @@
                             return o.proxy_ip ? o.proxy_ip+":"+o.proxy_port+"-"+o.proxy_username+"-"+o.proxy_pwd+"-"+o.proxy_province_id+"-"+o.proxy_city : "无数据";
                         }}
                     ,{field: 'proxy_lose_efficacy_time', title: '代理过期时间', width:180}
-                    ,{field: 'account_state_id', title: '账号状态', width:100 ,templet:function (o) {
-                            var val = "";
-                            switch (o.account_state_id) {
-                                case 1:
-                                    val = "<span style='color: #03a9f4;'>登录成功</span>";
-                                    break;
-                                case 2:
-                                    val = "<span style='color: red;'>登录失败</span>";
-                                    break;
-                                case 3:
-                                    val = "<span style='color: #ff9800;'>登录超时</span>";
-                                    break;
-                                default:
-                                    val = "无";
-                                    break;
-                            }
-                            return val;
-                        }}
                     ,{title: '数据创建时间', width:180, templet:function (o) {
                             return o.create_time ? o.create_time : "无数据";
                         }}
@@ -300,13 +306,7 @@
                                 "<span style='color:red;'>" + parseInt(o.survival_time / 24) + " 天 " + o.survival_time % 24 +" 小时</span>"
                                 : "<span style='color:#4caf50;'>至今</span>";
                         }}
-                    ,{title: '分组来源', width:120, templet:function (o) {
-                            return o.from_name ? o.from_name : "无数据";
-                        }}
                     ,{field: 'data_remark', title: '数据备注', width:100}
-                    ,{field: 'not_sys_friend_num', title: '非系统好友', width:120}
-                    ,{field: 'sys_friend_num', title: '系统好友', width:100}
-                    ,{field: 'device_num', title: '设备编号', width:100}
                 ]]
             });
         }
@@ -346,6 +346,11 @@
                             time: 4000
                         });
                         return;
+                    }else if(checkStatus.data.length > 1){
+                        layer.tips('只能选择一项数据！', i, {
+                            tips: [1, '#f44336d4'],
+                            time: 4000
+                        });
                     }else{
                         layer.open({
                             title: '<i class="iconfont">&#xe74b;</i>发起群聊',

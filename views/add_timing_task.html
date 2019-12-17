@@ -1,0 +1,179 @@
+<h3 id="nonsupportBusinessType" style="color: #6b6b6c;text-align: center;display: none;">该类型暂不支持定时任务！</h3>
+<form class="layui-form" lay-filter="addTimingTaskCond">
+    <div class="layui-form-item">
+        <label class="layui-form-label">业务类型：</label>
+        <div class="layui-input-block">
+            <select id="addTimingBusinessType" name="addTimingBusinessType" lay-filter="addTimingBusinessType" lay-search></select>
+        </div>
+    </div>
+    <div id="addTimingBusinessFromDataContent" style="display: block;">
+        <div class="layui-form-item">
+            <label class="layui-form-label">账号分组：</label>
+            <div class="layui-input-block">
+                <div id="addTimingTaskAccountFromId"></div>
+            </div>
+        </div>
+        <div id="timingBusinessAddFriend" style="display: none">
+            <div class="layui-form-item">
+                <label class="layui-form-label">业务参数：</label>
+                <div class="layui-input-block">
+                    <div id="timingBusinessAddFriendParam"></div>
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">执行时间(周)：</label>
+            <div class="layui-input-block">
+                <div id="executeTimeWeek"></div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">执行时间(日)：</label>
+            <div class="layui-input-block">
+                <input type="text" class="layui-input" id="executeTimeDay" name="executeTimeDay" placeholder="任务处理时间">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="addTimingTaskSubmit">立即提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary" onclick="clearAddTimingTaskCond()">重置</button>
+            </div>
+        </div>
+    </div>
+</form>
+<script>
+
+    // TODO 未完成的定时任务模块
+    var addTimingTaskAccountFromId;
+    var executeTimeWeek;
+    var timingBusinessAddFriendParam;
+    var yesBusinessTypeArr = [1,2,3,4,5];
+
+    $(function(){
+        laydate.render({
+            elem: '#executeTimeDay',
+            type: 'time'
+        });
+        var businessTypeHtml = "<option value=''>业务类型</option>";
+        for(var i=1;i<typeName.length;i++){
+            businessTypeHtml += '<option value="'+i+'">'+typeName[i]+'</option>';
+        }
+        $('#addTimingBusinessType').html(businessTypeHtml);
+        executeTimeWeek = xmSelect.render({
+            el: '#executeTimeWeek',
+            language: 'zn',
+            filterable: true,
+            name: 'executeTimeWeek',
+            toolbar: {
+                show: true,
+                list: [ 'ALL', 'CLEAR', 'REVERSE' ]
+            },
+            data: [
+                {name: '周一', value: 2},
+                {name: '周二', value: 3},
+                {name: '周三', value: 4},
+                {name: '周四', value: 5},
+                {name: '周五', value: 6},
+                {name: '周六', value: 7},
+                {name: '周日', value: 1}
+            ]
+        });
+        $.ajax({
+            datatype:'json',
+            url:"http://localhost:8080/wechat-model-controller/comm/getAllTbFromData",
+            type:'post',
+            async: false,
+            success:function(obj){
+                var data = [];
+                for(i in obj){
+                    data.push({name:obj[i].from_name,value:obj[i].id})
+                }
+                addTimingTaskAccountFromId = xmSelect.render({
+                    el: '#addTimingTaskAccountFromId',
+                    language: 'zn',
+                    filterable: true,
+                    name: 'addTimingTaskAccountFromId',
+                    toolbar: {
+                        show: true,
+                        list: [ 'ALL', 'CLEAR', 'REVERSE' ]
+                    },
+                    data:data
+                });
+            }
+        });
+        form.render();
+    })
+
+    function isBusinessType(state){
+        if(state == 1){
+            $('#nonsupportBusinessType').css({
+                display:'none'
+            })
+            $('#addTimingBusinessFromDataContent').css({
+                display:'block'
+            })
+        }else{
+            $('#nonsupportBusinessType').css({
+                display:'block'
+            })
+            $('#addTimingBusinessFromDataContent').css({
+                display:'none'
+            })
+        }
+    }
+
+    form.on('select(addTimingBusinessType)', function(data){
+        var dataVal = parseInt(data.value);
+        if(yesBusinessTypeArr.indexOf(dataVal) != -1){
+            isBusinessType(1);
+        }else{
+            isBusinessType(0);
+        }
+        switch (dataVal) {
+            case 1:
+                $('#timingBusinessAddFriend').css('display','block');
+                break;
+            case 2:
+                break;
+            case 3:
+                break;
+            case 4:
+                break;
+            case 5:
+                break;
+            default:
+                break;
+        }
+        timingBusinessAddFriendParam = xmSelect.render({
+            el: '#timingBusinessAddFriendParam',
+            language: 'zn',
+            filterable: true,
+            name: 'addFriendParam',
+            toolbar: {
+                show: true,
+                list: [ 'ALL', 'CLEAR', 'REVERSE' ]
+            },
+            data: [
+                {name: '周一', value: 2},
+                {name: '周二', value: 3},
+                {name: '周三', value: 4},
+                {name: '周四', value: 5},
+                {name: '周五', value: 6},
+                {name: '周六', value: 7},
+                {name: '周日', value: 1}
+            ]
+        });
+    });
+
+    // 监听表单提交
+    form.on('submit(addTimingTaskSubmit)', function(data){
+        console.log(data);
+        return false;
+    });
+
+    // 清空表单数据
+    function clearAddTimingTaskCond(){
+        addTimingTaskAccountFromId.setValue([]);
+        executeTimeWeek.setValue([]);
+    }
+</script>
