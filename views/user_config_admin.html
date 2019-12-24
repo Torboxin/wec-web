@@ -1,0 +1,110 @@
+<style>
+    .user-config-form .layui-card{
+        background-color: unset;
+    }
+    .user-config-form .layui-card-header{
+        color: #fff;
+        border-bottom: unset;
+    }
+    .user-config-form .layui-input{
+        padding-left: unset;
+        text-align: center;
+    }
+</style>
+<form class="layui-form user-config-form">
+    <div class="layui-card">
+        <div class="layui-card-header">添加好友间隔</div>
+        <div class="layui-card-body">
+            <input id="addSystemFriendInterval" type="text" name="addSystemFriendInterval" placeholder="请输入间隔时间段" autocomplete="off" class="layui-input" onblur="updUserConfigItem(this)" onfocus="recordThisUserConfigItemValue(this)">
+        </div>
+    </div>
+    <div class="layui-card">
+        <div class="layui-card-header">发送消息间隔</div>
+        <div class="layui-card-body">
+            <input id="sendMessageInterval" type="text" name="sendMessageInterval" placeholder="请输入间隔时间段" autocomplete="off" class="layui-input" onblur="updUserConfigItem(this)" onfocus="recordThisUserConfigItemValue(this)">
+        </div>
+    </div>
+    <div class="layui-card">
+        <div class="layui-card-header">发送朋友圈间隔</div>
+        <div class="layui-card-body">
+            <input id="sendFriendCircleInterval" type="text" name="sendFriendCircleInterval" placeholder="请输入间隔时间段" autocomplete="off" class="layui-input" onblur="updUserConfigItem(this)" onfocus="recordThisUserConfigItemValue(this)">
+        </div>
+    </div>
+    <div class="layui-card">
+        <div class="layui-card-header">切换选项卡自动刷新</div>
+        <div class="layui-card-body">
+            <input type="checkbox" name="changeTabRefresh" lay-skin="switch" lay-text="开启|关闭" lay-filter="changeTabRefresh" checked>
+        </div>
+    </div>
+</form>
+<script>
+    var oldAddSystemFriendInterval = null;
+    var oldSendMessageInterval = null;
+    var oldSendFriendCircleInterval = null;
+
+   function getUserConfigData(){
+       $.ajax({
+           datatype:'json',
+           url:"http://localhost:8080/wechat-model-controller/comm/getUserConfigData",
+           type:'post',
+           success:function(obj){
+               $('#addSystemFriendInterval').val(obj.add_system_friend_interval);
+               $('#sendMessageInterval').val(obj.send_message_interval);
+               $('#sendFriendCircleInterval').val(obj.send_friend_circle_interval);
+               $(".user-config-form")[0].dataset.id = obj.id;
+               $(".user-config-form")[0].dataset.uid = obj.user_id;
+           }
+       });
+   }
+
+    form.on('switch(changeTabRefresh)', function(data){
+        data.elem.checked ? menuTabCutReLoad = 1 : menuTabCutReLoad = null;
+    });
+
+    $(function(){
+        getUserConfigData();
+        menuTabCutReLoad ? null : $('input[name="changeTabRefresh"]')[0].removeAttribute("checked");
+        form.render();
+    })
+
+    function updUserConfigItem(i){
+
+        if(!isIntervalTime(i.value)) {
+            layer.tips('时间格式错误！', i, {
+                tips: [1, '#f44336d4'],
+                time: 3000
+            });
+            i.id == "addSystemFriendInterval" ? i.value = oldAddSystemFriendInterval : null;
+            i.id == "sendMessageInterval" ? i.value = oldSendMessageInterval : null;
+            i.id == "sendFriendCircleInterval" ? i.value = oldSendFriendCircleInterval : null;
+            return;
+        }
+        var param = {
+            [i.id]:i.value,
+            userId:$('.user-config-form')[0].dataset.uid
+        };
+        $.ajax({
+            datatype:'json',
+            url:"http://localhost:8080/wechat-model-controller/comm/updUserConfigItemData",
+            data: param,
+            type:'post',
+            success:function(obj){
+                if(obj.code == 1){
+                    layerzk.open(windowObj,{bakcgroundColor:'#009688',msg:obj.message,icoCode:'&#xe605;'},3000);
+                    recordThisUserConfigItemValue(i);
+                }else{
+                    i.id == "addSystemFriendInterval" ? i.value = oldAddSystemFriendInterval : null;
+                    i.id == "sendMessageInterval" ? i.value = oldSendMessageInterval : null;
+                    i.id == "sendFriendCircleInterval" ? i.value = oldSendFriendCircleInterval : null;
+                    layerzk.open(windowObj,{bakcgroundColor:'#f44336d4',msg:obj.message,icoCode:'&#xe67e;'},5000);
+                }
+            }
+        });
+    }
+
+    function recordThisUserConfigItemValue(i){
+        i.id == "addSystemFriendInterval" ? oldAddSystemFriendInterval = i.value : null;
+        i.id == "sendMessageInterval" ? oldSendMessageInterval = i.value : null;
+        i.id == "sendFriendCircleInterval" ? oldSendFriendCircleInterval = i.value : null;
+    }
+</script>

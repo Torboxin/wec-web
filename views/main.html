@@ -77,6 +77,10 @@
         body .layui-layer-dialog .layui-layer-content{
             overflow: visible;
         }
+        .head-nav li{
+            margin: 0 5px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body class="layui-layout-body">
@@ -84,16 +88,18 @@
     <div class="layui-header header-nav">
         <div class="layui-logo layui-hide-sm layui-hide-xs layui-show-md-block">管理中心</div>
         <!-- 头部区域（可配合layui已有的水平导航） -->
-        <ul class="layui-nav layui-layout-left layui-hide-sm layui-hide-xs layui-show-md-block">
+        <ul class="layui-nav layui-layout-left layui-hide-sm layui-hide-xs layui-show-md-block head-nav">
             <li class="layui-nav-item">
                 <i id="menuHideCss" class="layui-icon" style="font-size: 20px;cursor: pointer;" v-on:click="menuHide">&#xe668;</i>
                 <i id="menuShowCss" class="layui-icon" style="font-size: 20px;cursor: pointer;display: none;" v-on:click="menuShow">&#xe66b;</i>
             </li>
+            <li class="layui-nav-item" onclick="showUserConfig()">用户配置</li>
         </ul>
-        <ul class="layui-nav layui-layout-left layui-show-sm-block layui-hide-md" style="left: unset;">
+        <ul class="layui-nav layui-layout-left layui-show-sm-block layui-hide-md head-nav" style="left: unset;">
             <li class="layui-nav-item">
-                <i i class="iconfont" style="font-size: 20px;cursor: pointer;" onclick="showNav()">&#xe63b;</i>
+                <i i class="iconfont" style="font-size: 20px;" onclick="showNav()">&#xe63b;</i>
             </li>
+            <li class="layui-nav-item" onclick="showUserConfig()">用户配置</li>
         </ul>
         <ul class="layui-nav layui-layout-right">
             <li class="layui-nav-item"><a href="/" onclick="userLoginOut()">退出</a></li>
@@ -247,6 +253,10 @@
     $(function () {
         if(!localStorage.wechatToken)
             window.location = "/";
+        // 设置from验证规则
+        form.verify({
+            intervalTime:["^\\d{2,3}[-]\\d{2,4}$", '时间间隔格式错误！']
+        })
         // 初始化websocket
         initWebSocket();
         // 初始化导航
@@ -425,6 +435,20 @@
         };
         myChart.setOption(option);
     })
+    // 判断时间段格式是否正确
+    function isIntervalTime(val){
+        if(val){
+            if(val.search("^\\d{2,3}[-]\\d{2,4}$") != -1){
+                var valArr = val.split("-");
+                if(valArr.length == 2){
+                    if(parseInt(valArr[0]) < parseInt(valArr[1])){
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
     // 模拟点击layui table下方确定按钮进行异步请求
     function clickLayuiTableBtn(id){
         $('div[lay-id="' + id + '"] .layui-laypage-btn').click()
@@ -581,6 +605,35 @@
             }
         });
     }
+
+    // 用户配置弹出层
+    function showUserConfig(){
+        $.ajax({
+            datatype:'html',
+            url:"/user_config_admin",
+            type: 'get',
+            success:function(obj){
+                layer.open({
+                    type: 1,
+                    anim: mathLayuiAnim(),
+                    area: ['200px',window.innerHeight+'px'],
+                    offset: 'r',
+                    shade: [0.5,'#000'],
+                    resize: false,
+                    shadeClose: true,
+                    closeBtn: false,
+                    title: false, //不显示标题
+                    isOutAnim: true,
+                    content: obj,
+                    success:function(layero, index){
+                        layero[0].style.backgroundColor = "#393D49";
+                        layero[0].style.textAlign = "center";
+                    }
+                });
+            }
+        });
+    }
+
     // 给某个消息窗口增加数据
     function info(){
         layerzk.open(windowObj,{bakcgroundColor:rgba16(),msg:msgList[parseInt(Math.random()*msgList.length)],icoCode:icoCodeList[parseInt(Math.random()*icoCodeList.length)]},3000);

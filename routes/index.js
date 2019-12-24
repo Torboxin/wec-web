@@ -17,6 +17,11 @@ router.get('/user_admin', function(req, res, next) {
 	res.render('user_admin', { title: 'Express' });
 });
 
+router.get('/user_config_admin', function(req, res, next) {
+	res.type('html');
+	res.render('user_config_admin', { title: 'Express' });
+});
+
 router.get('/add_timing_task', function(req, res, next) {
 	res.type('html');
 	res.render('add_timing_task', { title: 'Express' });

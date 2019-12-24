@@ -1,5 +1,11 @@
 <form class="layui-form" lay-filter="createNewGroupCond">
     <div class="layui-form-item">
+        <label class="layui-form-label">配置：</label>
+        <div class="layui-input-block">
+            <input type="checkbox" name="autoAdd" title="自动拉人" checked>
+        </div>
+    </div>
+    <div class="layui-form-item">
         <label class="layui-form-label">群组名：</label>
         <div class="layui-input-block">
             <input type="text" name="groupName" required  lay-verify="required" placeholder="请输入群组名称" autocomplete="off" class="layui-input">
@@ -51,6 +57,7 @@
                 ,{field: 'friend_remark', title: '好友备注', width:100}
             ]]
         });
+        form.render();
     })
 
     // 填写群名称时的提示标语

@@ -2,8 +2,8 @@
     <div class="layui-form-item">
         <label class="layui-form-label">添加类别：</label>
         <div class="layui-input-block">
-            <input type="radio" name="addFriendType" lay-filter="addFriendType" value="1" title="添加指定手机号" checked>
-            <input type="radio" name="addFriendType" lay-filter="addFriendType" value="2" title="添加指定电话本">
+            <input type="radio" id="addFriendType1" name="addFriendType" lay-filter="addFriendType" value="1" title="添加指定手机号">
+            <input type="radio" id="addFriendType2" name="addFriendType" lay-filter="addFriendType" value="2" title="添加指定电话本">
         </div>
     </div>
     <div id="addFriendPhoneDiv">
@@ -55,14 +55,17 @@
     </div>
 </form>
 <script>
-    form.on('radio(addFriendType)', function(data){
-        if(data.value == 2){
+    function radioSelect(value){
+        if(value == 2){
             $('#addFriendPhoneBookDiv').css({display:"block"});
             $('#addFriendPhoneDiv').css({display:"none"});
         }else{
             $('#addFriendPhoneBookDiv').css({display:"none"});
             $('#addFriendPhoneDiv').css({display:"block"});
         }
+    }
+    form.on('radio(addFriendType)', function(data){
+        radioSelect(data.value);
     });
     form.on('submit(addFriendSubmit)', function(data){
         var checkStatus = table.checkStatus('wechatAccountAdminTable');
@@ -146,6 +149,20 @@
         return false;
     });
     $(function(){
+        //
+        var checkStatus = table.checkStatus('wechatAccountAdminTable');
+        var addFriendType2 = $('#addFriendType2')[0];
+        var addFriendType1 = $('#addFriendType1')[0];
+        if(checkStatus.data.length <= 0){
+            addFriendType1.setAttribute("disabled","");
+            addFriendType2.setAttribute("checked","");
+            radioSelect(2);
+        }else{
+            addFriendType2.setAttribute("disabled","");
+            addFriendType1.setAttribute("checked","");
+            radioSelect(1);
+        }
+        form.render();
         $.ajax({
             datatype:'json',
             url:"http://localhost:8080/wechat-model-controller/comm/getAllIsOpenPhoneBookBatchData",

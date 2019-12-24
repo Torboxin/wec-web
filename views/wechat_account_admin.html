@@ -175,6 +175,9 @@
                         btn: false,
                         shadeClose: true,
                         content: obj,
+                        success: function(layero, index){
+                            layero[0].children[1].style.overflow = "visible";
+                        }
                     });
                 }
             });
@@ -409,6 +412,15 @@
                                         return;
                                     }
                                 }
+                                if(param.autoAdd){
+                                    if(param.autoAdd === "on"){
+                                        param.autoAdd = 1;
+                                    }else{
+                                        param.autoAdd = 0;
+                                    }
+                                }else{
+                                    param.autoAdd = 0;
+                                }
                                 layer.load(2); // 开启loading
                                 $.ajax({
                                     datatype:'json',
@@ -471,7 +483,10 @@
                             offset:'150px',
                             resize:false,
                             shadeClose: true,
-                            content: obj
+                            content: obj,
+                            success: function(layero, index){
+                                layero[0].children[1].style.overflow = "visible";
+                            }
                         });
                     }
                 });
@@ -696,6 +711,9 @@
                         btn: false,
                         shadeClose: true,
                         content: obj,
+                        success: function(layero, index){
+                            layero[0].children[1].style.overflow = "visible";
+                        }
                     });
                 }
             });
@@ -937,6 +955,7 @@
                         shadeClose: true,
                         content: obj,
                         success:function(layero, index){
+                            layero[0].children[1].style.overflow = "visible";
                             // 监听分配用户提交
                             form.on('submit(updAccountToUser)', function(data){
                                 layer.load(2, {shade: [0.4,'#6b6b6c']});
@@ -981,6 +1000,7 @@
                         shadeClose: true,
                         content: obj,
                         success:function(layero, index){
+                            layero[0].children[1].style.overflow = "visible";
                             // 监听分配设备提交
                             form.on('submit(updAccountToDevice)', function(data){
                                 layer.load(2, {shade: [0.4,'#6b6b6c']});

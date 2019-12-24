@@ -10,7 +10,7 @@
         <div class="layui-form-item">
             <label class="layui-form-label">账号分组：</label>
             <div class="layui-input-block">
-                <div id="addTimingTaskAccountFromId"></div>
+                <select id="addTimingTaskAccountFromId" name="addTimingTaskAccountFromId" lay-filter="addTimingTaskAccountFromId" lay-search></select>
             </div>
         </div>
         <div id="timingBusinessAddFriend" style="display: none">
@@ -47,7 +47,7 @@
     var addTimingTaskAccountFromId;
     var executeTimeWeek;
     var timingBusinessAddFriendParam;
-    var yesBusinessTypeArr = [1,2,3,4,5];
+    var yesBusinessTypeArr = [2,7,8,9,14];
 
     $(function(){
         laydate.render({
@@ -56,13 +56,14 @@
         });
         var businessTypeHtml = "<option value=''>业务类型</option>";
         for(var i=1;i<typeName.length;i++){
-            businessTypeHtml += '<option value="'+i+'">'+typeName[i]+'</option>';
+            if(yesBusinessTypeArr.indexOf(i) != -1){
+                businessTypeHtml += '<option value="'+i+'">'+typeName[i]+'</option>';
+            }
         }
         $('#addTimingBusinessType').html(businessTypeHtml);
         executeTimeWeek = xmSelect.render({
             el: '#executeTimeWeek',
             language: 'zn',
-            filterable: true,
             name: 'executeTimeWeek',
             toolbar: {
                 show: true,
@@ -84,21 +85,24 @@
             type:'post',
             async: false,
             success:function(obj){
-                var data = [];
+                var html = "<option value=''>无指定分组</option>";
+                //var data = [];
                 for(i in obj){
-                    data.push({name:obj[i].from_name,value:obj[i].id})
+                    //data.push({name:obj[i].from_name,value:obj[i].id})
+                    html += "<option value='"+obj[i].id+"'>"+obj[i].from_name+"</option>";
                 }
-                addTimingTaskAccountFromId = xmSelect.render({
-                    el: '#addTimingTaskAccountFromId',
-                    language: 'zn',
-                    filterable: true,
-                    name: 'addTimingTaskAccountFromId',
-                    toolbar: {
-                        show: true,
-                        list: [ 'ALL', 'CLEAR', 'REVERSE' ]
-                    },
-                    data:data
-                });
+                // addTimingTaskAccountFromId = xmSelect.render({
+                //     el: '#addTimingTaskAccountFromId',
+                //     language: 'zn',
+                //     filterable: true,
+                //     name: 'addTimingTaskAccountFromId',
+                //     toolbar: {
+                //         show: true,
+                //         list: [ 'ALL', 'CLEAR', 'REVERSE' ]
+                //     },
+                //     data:data
+                // });
+                $('#addTimingTaskAccountFromId').html(html);
             }
         });
         form.render();

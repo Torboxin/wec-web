@@ -103,7 +103,7 @@
                             return o.timing_business_on_off == 1 ? '<input type="checkbox" name="timingBusinessOnOff" lay-filter="timingBusinessOnOff" lay-skin="switch" data-id="'+o.id+'" data-key="isSearch" lay-text="开启|关闭" checked>' : '<input type="checkbox" name="timingBusinessOnOff" lay-filter="timingBusinessOnOff" lay-skin="switch" data-id="'+o.id+'" data-key="isSearch" lay-text="开启|关闭">';
                         }}
                     ,{title: '执行时间（周）', width:160, templet:function(o){
-                            return o.timing_business_week_execute_time.replace(1,"周日").replace(2,"周一").replace(3,"周二").replace(4,"周三").replace(5,"周四").replace(6,"周五").replace(7,"周六");
+                            return o.timing_business_week_execute_time.replace(0,"周日").replace(1,"周一").replace(2,"周二").replace(3,"周三").replace(4,"周四").replace(5,"周五").replace(6,"周六");
                         }}
                 ]]
             });

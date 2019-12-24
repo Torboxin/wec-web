@@ -58,8 +58,12 @@
                 ,{field: 'id', title: 'id', width:80,hide: true}
                 ,{field: 'group_name', title: '群组名称', width:100}
                 ,{field: 'group_key', title: '群组编号', width:140}
+                ,{title: '创建人', width:140, templet:function(o){
+                        return o.wechat_nickname && o.wechat_account ? o.wechat_nickname + "[" + o.wechat_account + "]" : "无数据";
+                    }}
                 ,{field: 'create_time', title: '创建时间', width:160}
                 ,{field: 'update_time', title: '修改时间', width:160}
+                ,{field: 'first_add_time', title: '拉人时间', width:160}
                 ,{field: 'add_group_type_code', title: '入群方式', width:100, templet:function(o){
                         return o.add_group_type_code == 1 ? "扫码入群" : "自建群";
                     }}
@@ -67,9 +71,29 @@
                         return o.QRCode_url ? o.QRCode_url : "无";
                     }}
                 ,{field: 'init_num', title: '初始人数', width:100}
-                ,{field: 'add_num', title: '添加人数', width:100}
+                ,{field: 'add_num', title: '添加成功人数', width:120}
+                ,{field: 'add_fail_num', title: '添加失败人数', width:120}
                 ,{field: 'end_num', title: '最终人数', width:100}
-                ,{field: 'username', title: '所属用户', width:120}
+                ,{field: 'username', title: '所属用户', width:100}
+                ,{field: 'c_name', title: '所属客户', width:100}
+                ,{field: 'state', title: '群组状态', width:100, templet:function(o){
+                        var msg = "";
+                        switch (o.state) {
+                            case 1:
+                                msg = "<span style='color: #4caf50;'>正常</span>";
+                                break;
+                            case 2:
+                                msg = "<span style='color: #03a9f4;'>已交付</span>";
+                                break;
+                            default:
+                                msg = "<span style='color: red;'>异常</span>"
+                                break;
+                        }
+                        return msg;
+                    }}
+                ,{field: 'auto_add', title: '自动拉人', width:100, templet:function(o){
+                        return o.auto_add == 1 ? '<input type="checkbox" name="groupAdminAutoAdd" lay-filter="groupAdminAutoAdd" lay-skin="switch" data-id="'+o.id+'" lay-text="开启|关闭" checked>' : '<input type="checkbox" name="groupAdminAutoAdd" lay-filter="groupAdminAutoAdd" lay-skin="switch" data-id="'+o.id+'" lay-text="开启|关闭">';
+                    }}
             ]]
         });
     }
