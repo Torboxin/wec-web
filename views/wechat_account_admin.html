@@ -301,14 +301,17 @@
                     ,{title: '数据创建时间', width:180, templet:function (o) {
                             return o.create_time ? o.create_time : "无数据";
                         }}
-                    ,{title: '账号死亡时间', width:180, templet:function (o) {
-                            return o.account_die_time ? o.account_die_time : "未死亡";
+                    ,{title: '账号异常时间', width:180, templet:function (o) {
+                            return o.account_die_time ? o.account_die_time : "无";
                         }}
                     ,{title: '存活时长', width:120, templet:function (o) {
                             return o.survival_time ?
                                 "<span style='color:red;'>" + parseInt(o.survival_time / 24) + " 天 " + o.survival_time % 24 +" 小时</span>"
                                 : "<span style='color:#4caf50;'>至今</span>";
                         }}
+                    ,{field: 'executable_add_friend_time', title: '添加系统好友执行时间', width:180}
+                    ,{field: 'executable_send_friend_circle_time', title: '发送朋友圈执行时间', width:180}
+                    ,{field: 'executable_dialogue_time', title: '发送消息执行时间', width:180}
                     ,{field: 'data_remark', title: '数据备注', width:100}
                 ]]
             });
