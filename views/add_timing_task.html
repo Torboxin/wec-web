@@ -42,12 +42,10 @@
     </div>
 </form>
 <script>
-
-    // TODO 未完成的定时任务模块
     var addTimingTaskAccountFromId;
     var executeTimeWeek;
     //var timingBusinessAddFriendParam;
-    var yesBusinessTypeArr = [2,7,8,9];
+    var yesBusinessTypeArr = [2,7,9];
 
     $(function(){
         laydate.render({
@@ -70,13 +68,13 @@
                 list: [ 'ALL', 'CLEAR', 'REVERSE' ]
             },
             data: [
-                {name: '周一', value: 1},
-                {name: '周二', value: 2},
-                {name: '周三', value: 3},
-                {name: '周四', value: 4},
-                {name: '周五', value: 5},
-                {name: '周六', value: 6},
-                {name: '周日', value: 0}
+                {name: '周一', value: 2},
+                {name: '周二', value: 3},
+                {name: '周三', value: 4},
+                {name: '周四', value: 5},
+                {name: '周五', value: 6},
+                {name: '周六', value: 7},
+                {name: '周日', value: 1}
             ]
         });
         $.ajax({
