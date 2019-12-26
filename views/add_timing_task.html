@@ -13,14 +13,14 @@
                 <select id="addTimingTaskAccountFromId" name="addTimingTaskAccountFromId" lay-filter="addTimingTaskAccountFromId" lay-search></select>
             </div>
         </div>
-        <div id="timingBusinessAddFriend" style="display: none">
+<!--        <div id="timingBusinessAddFriend" style="display: none">
             <div class="layui-form-item">
                 <label class="layui-form-label">业务参数：</label>
                 <div class="layui-input-block">
                     <div id="timingBusinessAddFriendParam"></div>
                 </div>
             </div>
-        </div>
+        </div>-->
         <div class="layui-form-item">
             <label class="layui-form-label">执行时间(周)：</label>
             <div class="layui-input-block">
@@ -46,15 +46,15 @@
     // TODO 未完成的定时任务模块
     var addTimingTaskAccountFromId;
     var executeTimeWeek;
-    var timingBusinessAddFriendParam;
-    var yesBusinessTypeArr = [2,7,8,9,14];
+    //var timingBusinessAddFriendParam;
+    var yesBusinessTypeArr = [2,7,8,9];
 
     $(function(){
         laydate.render({
             elem: '#executeTimeDay',
             type: 'time'
         });
-        var businessTypeHtml = "<option value=''>业务类型</option>";
+        var businessTypeHtml = "";
         for(var i=1;i<typeName.length;i++){
             if(yesBusinessTypeArr.indexOf(i) != -1){
                 businessTypeHtml += '<option value="'+i+'">'+typeName[i]+'</option>';
@@ -70,13 +70,13 @@
                 list: [ 'ALL', 'CLEAR', 'REVERSE' ]
             },
             data: [
-                {name: '周一', value: 2},
-                {name: '周二', value: 3},
-                {name: '周三', value: 4},
-                {name: '周四', value: 5},
-                {name: '周五', value: 6},
-                {name: '周六', value: 7},
-                {name: '周日', value: 1}
+                {name: '周一', value: 1},
+                {name: '周二', value: 2},
+                {name: '周三', value: 3},
+                {name: '周四', value: 4},
+                {name: '周五', value: 5},
+                {name: '周六', value: 6},
+                {name: '周日', value: 0}
             ]
         });
         $.ajax({
@@ -133,45 +133,87 @@
         }else{
             isBusinessType(0);
         }
-        switch (dataVal) {
-            case 1:
-                $('#timingBusinessAddFriend').css('display','block');
-                break;
-            case 2:
-                break;
-            case 3:
-                break;
-            case 4:
-                break;
-            case 5:
-                break;
-            default:
-                break;
-        }
-        timingBusinessAddFriendParam = xmSelect.render({
-            el: '#timingBusinessAddFriendParam',
-            language: 'zn',
-            filterable: true,
-            name: 'addFriendParam',
-            toolbar: {
-                show: true,
-                list: [ 'ALL', 'CLEAR', 'REVERSE' ]
-            },
-            data: [
-                {name: '周一', value: 2},
-                {name: '周二', value: 3},
-                {name: '周三', value: 4},
-                {name: '周四', value: 5},
-                {name: '周五', value: 6},
-                {name: '周六', value: 7},
-                {name: '周日', value: 1}
-            ]
-        });
+        // switch (dataVal) {
+        //     case 1:
+        //         $('#timingBusinessAddFriend').css('display','block');
+        //         break;
+        //     case 2:
+        //         break;
+        //     case 3:
+        //         break;
+        //     case 4:
+        //         break;
+        //     case 5:
+        //         break;
+        //     default:
+        //         break;
+        // }
+        // timingBusinessAddFriendParam = xmSelect.render({
+        //     el: '#timingBusinessAddFriendParam',
+        //     language: 'zn',
+        //     filterable: true,
+        //     name: 'addFriendParam',
+        //     toolbar: {
+        //         show: true,
+        //         list: [ 'ALL', 'CLEAR', 'REVERSE' ]
+        //     },
+        //     data: [
+        //         {name: '周一', value: 2},
+        //         {name: '周二', value: 3},
+        //         {name: '周三', value: 4},
+        //         {name: '周四', value: 5},
+        //         {name: '周五', value: 6},
+        //         {name: '周六', value: 7},
+        //         {name: '周日', value: 1}
+        //     ]
+        // });
     });
 
     // 监听表单提交
     form.on('submit(addTimingTaskSubmit)', function(data){
-        console.log(data);
+        if(yesBusinessTypeArr.indexOf(parseInt(data.field.addTimingBusinessType)) == -1){
+            layer.tips('无效业务类型！', data.elem, {
+                tips: [1, '#f44336d4'],
+                time: 3000
+            });
+            return false;
+        }
+        if(!data.field.addTimingTaskAccountFromId){
+            layer.tips('未选择账号分组！', data.elem, {
+                tips: [1, '#f44336d4'],
+                time: 3000
+            });
+            return false;
+        }
+        if(!data.field.executeTimeWeek){
+            layer.tips('未选择执行时间（周）！', data.elem, {
+                tips: [1, '#f44336d4'],
+                time: 3000
+            });
+            return false;
+        }
+        if(!data.field.executeTimeDay){
+            layer.tips('未选择执行时间（天）！', data.elem, {
+                tips: [1, '#f44336d4'],
+                time: 3000
+            });
+            return false;
+        }
+        layer.load(2); // 开启loading
+        $.ajax({
+            datatype:'json',
+            url:"http://localhost:8080/wechat-model-controller/business_timing_admin/addTimingBusinessData",
+            data:data.field,
+            traditional:true, // 防止深度序列化参数
+            type:'post',
+            success:function(obj){
+                if(obj.code == 1)
+                    layerzk.open(windowObj,{bakcgroundColor:'#009688',msg:obj.message,icoCode:'&#xe605;'},3000);
+                else
+                    layerzk.open(windowObj,{bakcgroundColor:'#f44336d4',msg:obj.message,icoCode:'&#xe67e;'},5000);
+                layer.closeAll('loading'); //关闭loading
+            }
+        });
         return false;
     });
 

@@ -249,6 +249,8 @@
     var tree = layui.tree;
     var laydate = layui.laydate;
     var upLoad = layui.upload;
+    // 控制是否弹出用户配置界面的提示信息
+    var userConfigHint = 0;
 
     $(function () {
         if(!localStorage.wechatToken)
@@ -628,6 +630,13 @@
                     success:function(layero, index){
                         layero[0].style.backgroundColor = "#393D49";
                         layero[0].style.textAlign = "center";
+                        if(userConfigHint == 0){
+                            layer.tips('间隔时间单位：分钟<br>格式为：最小间隔-最大间隔！', layero[0], {
+                                tips: [4, 'rgb(113,209,26)'],
+                                time: 5000
+                            });
+                            userConfigHint = 1;
+                        }
                     }
                 });
             }
