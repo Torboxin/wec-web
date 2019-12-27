@@ -27,6 +27,9 @@
         <div class="layui-row">
             <div class="layui-btn-group" style="line-height: 35px;">
                 <button type="button" class="layui-btn layui-btn-normal layui-btn-sm" onclick="loadGroupAdminTable()"><i class="iconfont">&#xe6f7;</i>查询</button>
+                <button type="button" class="layui-btn layui-btn-sm" onclick="deliveryGroups(this)"><i class="iconfont">&#xe752;</i>交付</button>
+                <button type="button" class="layui-btn layui-btn-sm" onclick="exportGroupsData(this, 1)"><i class="iconfont">&#xe6a8;</i>导出群组信息</button>
+                <button type="button" class="layui-btn layui-btn-sm" onclick="exportGroupsData(this, 2)"><i class="iconfont">&#xe6a8;</i>导出群成员信息</button>
             </div>
         </div>
         <div class="layui-row">
@@ -95,6 +98,117 @@
                         return o.auto_add == 1 ? '<input type="checkbox" name="groupAdminAutoAdd" lay-filter="groupAdminAutoAdd" lay-skin="switch" data-id="'+o.id+'" lay-text="开启|关闭" checked>' : '<input type="checkbox" name="groupAdminAutoAdd" lay-filter="groupAdminAutoAdd" lay-skin="switch" data-id="'+o.id+'" lay-text="开启|关闭">';
                     }}
             ]]
+        });
+    }
+
+    // 导出群组数据
+    function exportGroupsData(i, typeCode){
+        var checkStatus = table.checkStatus('groupAdminTable');
+        if(checkStatus.data.length == 0){
+            layer.tips('未勾选数据！', i, {
+                tips: [1, '#f44336d4'],
+                time: 4000
+            });
+            return;
+        }
+        layer.open({
+            title: '导出群组信息',
+            anim: mathLayuiAnim(),
+            skin: 'layerzk-normal',
+            btn: ["确认"],
+            shadeClose: true,
+            content: '是否确认将当前选中群组数据导出？',
+            success:function(layero, index){
+                layero[0].children[1].style.textAlign = 'center';
+            },
+            yes:function(index, layero){
+                var param = {groupIds:[],typeCode:typeCode};
+                for(j in checkStatus.data){
+                    param.groupIds.push(checkStatus.data[j].id);
+                }
+                layer.load(2); // 开启loading
+                $.ajax({
+                    datatype:'json',
+                    url:"http://localhost:8080/wechat-model-controller/wechat_group_admin/exportGroupsData",
+                    data:param,
+                    traditional:true, // 防止深度序列化参数
+                    type:'post',
+                    success:function(obj){
+                        if(obj.code == 1)
+                            // layerzk.open(windowObj,{bakcgroundColor:'#009688',msg:obj.message,icoCode:'&#xe605;'},3000);
+                            layer.open({
+                                title: 'Excel下载',
+                                content: '<a href="http://localhost:3000/static/'+obj.message+'" class="layui-btn layui-btn-fluid"><i class="iconfont">&#xe6a8;</i>下载</a>'
+                            });
+                        else
+                            layerzk.open(windowObj,{bakcgroundColor:'#f44336d4',msg:obj.message,icoCode:'&#xe67e;'},5000);
+                        layer.close(index);
+                        layer.closeAll('loading'); //关闭loading
+                    }
+                });
+            }
+        });
+    }
+
+    // 交付群组
+    function deliveryGroups(i){
+        var checkStatus = table.checkStatus('groupAdminTable');
+        if(checkStatus.data.length == 0){
+            layer.tips('未勾选数据！', i, {
+                tips: [1, '#f44336d4'],
+                time: 4000
+            });
+            return;
+        }
+        layer.open({
+            title: '交付群组',
+            anim: mathLayuiAnim(),
+            skin: 'layerzk-normal',
+            btn: ["确认"],
+            shadeClose: true,
+            content: '<input class="layui-input"type="text" name="groupDeliveryClientName" placeholder="请输入客户名称" autocomplete="off">是否确认将当前选中群组数据交付？',
+            success:function(layero, index){
+                layero[0].children[1].style.textAlign = 'center';
+            },
+            yes:function(index, layero){
+                if(!$('input[name="groupDeliveryClientName"]').val()){
+                    layer.tips('客户名不可为空！', $('input[name="groupDeliveryClientName"]'), {
+                        tips: [1, '#f44336d4'],
+                        time: 3000
+                    });
+                    return;
+                }
+                var param = {groupIds:[],clientName:$('input[name="groupDeliveryClientName"]').val()};
+                for(j in checkStatus.data){
+                    param.groupIds.push(checkStatus.data[j].id);
+                }
+                layer.load(2); // 开启loading
+                $.ajax({
+                    datatype:'json',
+                    url:"http://localhost:8080/wechat-model-controller/wechat_group_admin/deliveryGroups",
+                    data:param,
+                    traditional:true, // 防止深度序列化参数
+                    type:'post',
+                    success:function(obj){
+                        if(obj.code == 1) {
+                            layerzk.open(windowObj, {
+                                bakcgroundColor: '#009688',
+                                msg: obj.message,
+                                icoCode: '&#xe605;'
+                            }, 3000);
+                            clickLayuiTableBtn('groupAdminTable');
+                        }else {
+                            layerzk.open(windowObj, {
+                                bakcgroundColor: '#f44336d4',
+                                msg: obj.message,
+                                icoCode: '&#xe67e;'
+                            }, 5000);
+                        }
+                        layer.close(index);
+                        layer.closeAll('loading'); //关闭loading
+                    }
+                });
+            }
         });
     }
 </script>
