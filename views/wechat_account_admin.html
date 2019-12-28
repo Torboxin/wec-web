@@ -119,6 +119,7 @@
                 <button type="button" class="layui-btn layui-btn-primary layui-btn-sm" onclick="updAccountSync(this)"><i class="iconfont">&#xe647;</i>同步账号</button>
                 <button type="button" class="layui-btn layui-btn-primary layui-btn-sm" onclick="proxyRepair(this)"><i class="iconfont">&#xe842;</i>代理修复</button>
                 <button type="button" class="layui-btn layui-btn-primary layui-btn-sm" onclick="sendFriendCircle()"><i class="iconfont">&#xe619;</i>发送朋友圈</button>
+                <button type="button" class="layui-btn layui-btn-primary layui-btn-sm" onclick="allcationCreateGroupAccount()"><i class="iconfont">&#xe757;</i>一键分配建群号</button>
             </div>
         </div>
         <div class="layui-row">
@@ -1411,6 +1412,17 @@
             }
         }
 
+        // 一键分配建群号
+        function allcationCreateGroupAccount(){
+            /**
+             * 1.查询已分配但不满足关联数量的建群号若存在跳转2不存在跳转3
+             * 2.补充关联账号数量并与关联此账号的微信号添加相同建群号好友跳转3
+             * 3.查询所有未分配的数据跳转4
+             * 4.按照当前比例进行账号分配跳转5
+             * 5.将分配号的建群号和与建群号所关联的账号设为同一分组中跳转6
+             * 6.分配完成后返回分配结果信息
+             */
+        }
     </script>
 </body>
 </html>
