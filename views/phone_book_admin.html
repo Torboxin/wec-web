@@ -22,6 +22,7 @@
     <div class="layui-row">
         <div class="layui-btn-group" style="line-height: 35px;">
             <button type="button" class="layui-btn layui-btn-normal layui-btn-sm" onclick="loadPhoneBookBatchAdminTable()"><i class="iconfont">&#xe6f7;</i>查询</button>
+            <a href="http://localhost:3000/static/txt_template/importPhoneBookTemplate.txt" class="layui-btn layui-btn-primary layui-btn-sm" target="_blank" download="导入电话本数据模板.txt"><i class="iconfont">&#xe889;</i>导入模板</a>
             <button type="button" class="layui-btn layui-btn-primary layui-btn-sm" id="selectPhoneBookFile"><i class="iconfont">&#xe6dd;</i><span id="selectPhoneBookFileTitle">选择文件</span></button>
             <button type="button" class="layui-btn layui-btn-normal layui-btn-sm layui-btn-disabled" onclick="importPhoneBook()" disabled id="resolverImportPhoneBookFile"><i class="iconfont">&#xe6dd;</i>解析导入文件</button>
             <button type="button" class="layui-btn layui-btn-danger layui-btn-sm" onclick="delPhoneBook(this)"><i class="iconfont">&#xe642;</i>删除</button>

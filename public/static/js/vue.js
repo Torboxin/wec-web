@@ -2336,8 +2336,8 @@
 
   /*  */
 
-  // The template compiler attempts to minimize the need for normalization by
-  // statically analyzing the template at compile time.
+  // The txt_template compiler attempts to minimize the need for normalization by
+  // statically analyzing the txt_template at compile time.
   //
   // For plain HTML markup, normalization can be completely skipped because the
   // generated render function is guaranteed to return Array<VNode>. There are
@@ -2358,7 +2358,7 @@
   }
 
   // 2. When the children contains constructs that always generated nested Arrays,
-  // e.g. <template>, <slot>, v-for, or when the children is provided by user
+  // e.g. <txt_template>, <slot>, v-for, or when the children is provided by user
   // with hand-written render functions / JSX. In such cases a full normalization
   // is needed to cater to all possible types of children values.
   function normalizeChildren (children) {
@@ -3010,7 +3010,7 @@
       }
     }));
 
-    // support for compiled functional template
+    // support for compiled functional txt_template
     if (isCompiled) {
       // exposing $options for renderStatic()
       this.$options = options;
@@ -3281,7 +3281,7 @@
       _parentVnode: vnode,
       parent: parent
     };
-    // check inline-template render functions
+    // check inline-txt_template render functions
     var inlineTemplate = vnode.data.inlineTemplate;
     if (isDef(inlineTemplate)) {
       options.render = inlineTemplate.render;
@@ -4022,14 +4022,14 @@
         if ((vm.$options.template && vm.$options.template.charAt(0) !== '#') ||
           vm.$options.el || el) {
           warn(
-            'You are using the runtime-only build of Vue where the template ' +
+            'You are using the runtime-only build of Vue where the txt_template ' +
             'compiler is not available. Either pre-compile the templates into ' +
             'render functions, or use the compiler-included build.',
             vm
           );
         } else {
           warn(
-            'Failed to mount component: template or render function not defined.',
+            'Failed to mount component: txt_template or render function not defined.',
             vm
           );
         }
@@ -4098,7 +4098,7 @@
     // we need to do this before overwriting $options._renderChildren.
 
     // check if there are dynamic scopedSlots (hand-written or compiled but with
-    // dynamic slot names). Static scoped slots compiled from template has the
+    // dynamic slot names). Static scoped slots compiled from txt_template has the
     // "$stable" marker.
     var newScopedSlots = parentVnode.data.scopedSlots;
     var oldScopedSlots = vm.$scopedSlots;
@@ -5442,7 +5442,7 @@
   /*  */
 
   // these are reserved for web because they are directly compiled away
-  // during template compilation
+  // during txt_template compilation
   var isReservedAttr = makeMap('style,class');
 
   // attributes that should be using props for binding
@@ -5591,7 +5591,7 @@
     'button,datalist,fieldset,form,input,label,legend,meter,optgroup,option,' +
     'output,progress,select,textarea,' +
     'details,dialog,menu,menuitem,summary,' +
-    'content,element,shadow,template,blockquote,iframe,tfoot'
+    'content,element,shadow,txt_template,blockquote,iframe,tfoot'
   );
 
   // this map is intentionally selective, only covering SVG elements that may
@@ -9396,7 +9396,7 @@
       if (html === last) {
         options.chars && options.chars(html);
         if (!stack.length && options.warn) {
-          options.warn(("Mal-formatted tag at end of template: \"" + html + "\""), { start: index + html.length });
+          options.warn(("Mal-formatted tag at end of txt_template: \"" + html + "\""), { start: index + html.length });
         }
         break
       }
@@ -9636,7 +9636,7 @@
           });
         } else {
           warnOnce(
-            "Component template should contain exactly one root element. " +
+            "Component txt_template should contain exactly one root element. " +
             "If you are using v-if on multiple elements, " +
             "use v-else-if to chain them instead.",
             { start: element.start }
@@ -9821,7 +9821,7 @@
           {
             if (text === template) {
               warnOnce(
-                'Component template requires a root element, rather than just text.',
+                'Component txt_template requires a root element, rather than just text.',
                 { start: start }
               );
             } else if ((text = text.trim())) {
@@ -9965,7 +9965,7 @@
       {
         if (el.tag === 'template') {
           warn$2(
-            "<template> cannot be keyed. Place the key on real elements instead.",
+            "<txt_template> cannot be keyed. Place the key on real elements instead.",
             getRawBindingAttr(el, 'key')
           );
         }
@@ -10098,7 +10098,7 @@
   }
 
   // handle content being passed to a component as slot,
-  // e.g. <template slot="xxx">, <div slot-scope="xxx">
+  // e.g. <txt_template slot="xxx">, <div slot-scope="xxx">
   function processSlotContent (el) {
     var slotScope;
     if (el.tag === 'template') {
@@ -10108,7 +10108,7 @@
         warn$2(
           "the \"scope\" attribute for scoped slots have been deprecated and " +
           "replaced by \"slot-scope\" since 2.5. The new \"slot-scope\" attribute " +
-          "can also be used on plain elements in addition to <template> to " +
+          "can also be used on plain elements in addition to <txt_template> to " +
           "denote scoped slots.",
           el.rawAttrsMap['scope'],
           true
@@ -10120,7 +10120,7 @@
       if (el.attrsMap['v-for']) {
         warn$2(
           "Ambiguous combined usage of slot-scope and v-for on <" + (el.tag) + "> " +
-          "(v-for takes higher priority). Use a wrapper <template> for the " +
+          "(v-for takes higher priority). Use a wrapper <txt_template> for the " +
           "scoped slot to make it clearer.",
           el.rawAttrsMap['slot-scope'],
           true
@@ -10144,7 +10144,7 @@
     // 2.6 v-slot syntax
     {
       if (el.tag === 'template') {
-        // v-slot on <template>
+        // v-slot on <txt_template>
         var slotBinding = getAndRemoveAttrByRegex(el, slotRE);
         if (slotBinding) {
           {
@@ -10156,7 +10156,7 @@
             }
             if (el.parent && !maybeComponent(el.parent)) {
               warn$2(
-                "<template v-slot> can only appear at the root level inside " +
+                "<txt_template v-slot> can only appear at the root level inside " +
                 "the receiving the component",
                 el
               );
@@ -10176,7 +10176,7 @@
           {
             if (!maybeComponent(el)) {
               warn$2(
-                "v-slot can only be used on components or <template>.",
+                "v-slot can only be used on components or <txt_template>.",
                 slotBinding$1
               );
             }
@@ -10189,7 +10189,7 @@
             if (el.scopedSlots) {
               warn$2(
                 "To avoid scope ambiguity, the default slot should also use " +
-                "<template> syntax when there are other named slots.",
+                "<txt_template> syntax when there are other named slots.",
                 slotBinding$1
               );
             }
@@ -10257,7 +10257,7 @@
     if ((binding = getBindingAttr(el, 'is'))) {
       el.component = binding;
     }
-    if (getAndRemoveAttr(el, 'inline-template') != null) {
+    if (getAndRemoveAttr(el, 'inline-txt_template') != null) {
       el.inlineTemplate = true;
     }
   }
@@ -10428,7 +10428,7 @@
     return map
   }
 
-  // for script (e.g. type="x/template") or style, do not decode content
+  // for script (e.g. type="x/txt_template") or style, do not decode content
   function isTextTag (el) {
     return el.tag === 'script' || el.tag === 'style'
   }
@@ -10599,7 +10599,7 @@
   var genStaticKeysCached = cached(genStaticKeys$1);
 
   /**
-   * Goal of the optimizer: walk the generated template AST tree
+   * Goal of the optimizer: walk the generated txt_template AST tree
    * and detect sub-trees that are purely static, i.e. parts of
    * the DOM that never needs to change.
    *
@@ -10635,7 +10635,7 @@
       if (
         !isPlatformReservedTag(node.tag) &&
         node.tag !== 'slot' &&
-        node.attrsMap['inline-template'] == null
+        node.attrsMap['inline-txt_template'] == null
       ) {
         return
       }
@@ -11149,7 +11149,7 @@
     if (el.model) {
       data += "model:{value:" + (el.model.value) + ",callback:" + (el.model.callback) + ",expression:" + (el.model.expression) + "},";
     }
-    // inline-template
+    // inline-txt_template
     if (el.inlineTemplate) {
       var inlineTemplate = genInlineTemplate(el, state);
       if (inlineTemplate) {
@@ -11203,7 +11203,7 @@
     var ast = el.children[0];
     if (el.children.length !== 1 || ast.type !== 1) {
       state.warn(
-        'Inline-template components must have exactly one child element.',
+        'Inline-txt_template components must have exactly one child element.',
         { start: el.start }
       );
     }
@@ -11473,7 +11473,7 @@
   // strip strings in expressions
   var stripStringRE = /'(?:[^'\\]|\\.)*'|"(?:[^"\\]|\\.)*"|`(?:[^`\\]|\\.)*\$\{|\}(?:[^`\\]|\\.)*`|`(?:[^`\\]|\\.)*`/g;
 
-  // detect problematic expressions in a template
+  // detect problematic expressions in a txt_template
   function detectErrors (ast, warn) {
     if (ast) {
       checkNode(ast, warn);
@@ -11654,7 +11654,7 @@
             warn$$1(
               'It seems you are using the standalone build of Vue.static in an ' +
               'environment with Content Security Policy that prohibits unsafe-eval. ' +
-              'The template compiler cannot work in this environment. Consider ' +
+              'The txt_template compiler cannot work in this environment. Consider ' +
               'relaxing the policy to allow unsafe-eval or pre-compiling your ' +
               'templates into render functions.'
             );
@@ -11679,14 +11679,14 @@
           if (options.outputSourceRange) {
             compiled.errors.forEach(function (e) {
               warn$$1(
-                "Error compiling template:\n\n" + (e.msg) + "\n\n" +
+                "Error compiling txt_template:\n\n" + (e.msg) + "\n\n" +
                 generateCodeFrame(template, e.start, e.end),
                 vm
               );
             });
           } else {
             warn$$1(
-              "Error compiling template:\n\n" + template + "\n\n" +
+              "Error compiling txt_template:\n\n" + template + "\n\n" +
               compiled.errors.map(function (e) { return ("- " + e); }).join('\n') + '\n',
               vm
             );
@@ -11869,7 +11869,7 @@
     }
 
     var options = this.$options;
-    // resolve template/el and convert to render function
+    // resolve txt_template/el and convert to render function
     if (!options.render) {
       var template = options.template;
       if (template) {
@@ -11888,7 +11888,7 @@
           template = template.innerHTML;
         } else {
           {
-            warn('invalid template option:' + template, this);
+            warn('invalid txt_template option:' + template, this);
           }
           return this
         }
