@@ -223,6 +223,10 @@
     $.ajaxSetup({
         headers:{"Authorization":isNull(localStorage.wechatToken)},
         crossDomain: true,
+        error:function(jqXHR, textStatus, errorThrown){
+            // 请求出现任何异常错误必须清除弹窗
+            layer.closeAll();
+        },
         statusCode: {
             404: function(){
                 clearInit();

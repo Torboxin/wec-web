@@ -34,7 +34,7 @@
             <a href="http://localhost:3000/static/txt_template/importReadArticleTemplate.txt" class="layui-btn layui-btn-primary layui-btn-sm" target="_blank" download="导入微信阅读文章数据模板.txt"><i class="iconfont">&#xe889;</i>导入模板</a>
             <button type="button" class="layui-btn layui-btn-primary layui-btn-sm" id="selectWechatReadFile"><i class="iconfont">&#xe6dd;</i><span id="selectWechatReadFileTitle">选择文件</span></button>
             <button type="button" class="layui-btn layui-btn-normal layui-btn-sm layui-btn-disabled" onclick="importWechatRead()" disabled id="resolverImportWechatReadFile"><i class="iconfont">&#xe6dd;</i>解析导入文件</button>
-            <button type="button" class="layui-btn layui-btn-sm" onclick="addWechatReadTask()"><i class="iconfont"></i>添加阅读任务</button>
+            <!--<button type="button" class="layui-btn layui-btn-sm" onclick="addWechatReadTask()"><i class="iconfont"></i>添加阅读任务</button>-->
             <button type="button" class="layui-btn layui-btn-danger layui-btn-sm" onclick="delWechatRead(this)"><i class="iconfont">&#xe642;</i>删除</button>
         </div>
     </div>
@@ -90,13 +90,71 @@
                     ,{field: 'read_url', title: '阅读文章链接', width:160}
                     ,{field: 'create_time', title: '创建时间', width:160}
                     ,{field: 'client_name', title: '客户名称', width:120}
+                    ,{field: 'read_num', title: '阅读数量', width:100, edit:'text'}
+                    ,{field: 'target_num', title: '目标数量', width:100, edit:'text'}
+                    ,{field: 'read_data_state', title: '数据开关', width:100, templet:function (o) {
+                            return o.read_data_state == 1 ? '<input type="checkbox" name="wechatReadDataState" lay-filter="wechatReadDataState" lay-skin="switch" data-id="'+o.id+'" lay-text="开启|关闭" checked>':'<input type="checkbox" name="wechatReadDataState" lay-filter="wechatReadDataState" lay-skin="switch" data-id="'+o.id+'" lay-text="开启|关闭">';
+                        }}
+                    ,{field: 'read_data_is_get_time', title: '数据可取时间', width:160}
                     ,{field: 'data_type', title: '数据类型', width:100, templet:function(o){
                             return o.data_type == 1 ? "系统" : "外部";
                         }}
                     ,{field: 'remark', title: '备注', width:100}
                 ]]
             });
+
+            table.on('edit(wechatReadAdminTable)', function(obj){
+                if(!obj.value){
+                    layer.msg("输入值错误！");
+                    return;
+                }
+                var param = {
+                    value:obj.value,
+                    name:obj.field,
+                    id:obj.tr[0].children[1].firstChild.innerText
+                };
+                layer.load(2); // 开启loading
+                $.ajax({
+                    datatype:'json',
+                    url:"http://localhost:8080/wechat-model-controller/wechat_read_admin/updReadData",
+                    data:param,
+                    traditional:true, // 防止深度序列化参数
+                    type:'post',
+                    success:function(obj){
+                        if(obj.code == 1)
+                            layerzk.open(windowObj,{bakcgroundColor:'#009688',msg:obj.message,icoCode:'&#xe605;'},3000);
+                        else
+                            layerzk.open(windowObj,{bakcgroundColor:'#f44336d4',msg:obj.message,icoCode:'&#xe67e;'},5000);
+                        clickLayuiTableBtn('wechatReadAdminTable');
+                        layer.closeAll('loading'); //关闭loading
+                    }
+                });
+            });
         }
+
+        // 监听阅读数据开关
+        form.on('switch(wechatReadDataState)', function(data){
+            var param = {
+                id:[data.elem.dataset.id],
+                state:data.elem.checked ? 1 : 0
+            }
+            layer.load(2); // 开启loading
+            $.ajax({
+                datatype:'json',
+                url:"http://localhost:8080/wechat-model-controller/wechat_read_admin/updReadDataOnOffState",
+                data:param,
+                traditional:true, // 防止深度序列化参数
+                type:'post',
+                success:function(obj){
+                    if(obj.code == 1)
+                        layerzk.open(windowObj,{bakcgroundColor:'#009688',msg:obj.message,icoCode:'&#xe605;'},3000);
+                    else
+                        layerzk.open(windowObj,{bakcgroundColor:'#f44336d4',msg:obj.message,icoCode:'&#xe67e;'},5000);
+                    clickLayuiTableBtn('wechatReadAdminTable');
+                    layer.closeAll('loading'); //关闭loading
+                }
+            });
+        });
 
         function importWechatRead(){
             $.ajax({
