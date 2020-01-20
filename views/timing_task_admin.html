@@ -100,7 +100,7 @@
                         }}
                     ,{field: 'business_batch_remark', title: '备注', width:120}
                     ,{title: '开关', width:100, templet:function(o){
-                            return o.timing_business_on_off == 1 ? '<input type="checkbox" name="timingBusinessOnOff" lay-filter="timingBusinessOnOff" lay-skin="switch" data-id="'+o.id+'" data-key="isSearch" lay-text="开启|关闭" checked>' : '<input type="checkbox" name="timingBusinessOnOff" lay-filter="timingBusinessOnOff" lay-skin="switch" data-id="'+o.id+'" data-key="isSearch" lay-text="开启|关闭">';
+                            return o.timing_business_on_off == 1 ? '<input type="checkbox" name="timingBusinessOnOff" lay-filter="timingBusinessOnOff" lay-skin="switch" data-id="'+o.id+'" data-key="isTimingTaskOnOff" lay-text="开启|关闭" checked>' : '<input type="checkbox" name="timingBusinessOnOff" lay-filter="timingBusinessOnOff" lay-skin="switch" data-id="'+o.id+'" data-key="isTimingTaskOnOff" lay-text="开启|关闭">';
                         }}
                     ,{title: '执行时间（周）', width:160, templet:function(o){
                             return o.timing_business_week_execute_time.replace(1,"周日").replace(2,"周一").replace(3,"周二").replace(4,"周三").replace(5,"周四").replace(6,"周五").replace(7,"周六");
@@ -108,6 +108,30 @@
                 ]]
             });
         }
+
+        // 监听任务开关 开启/关闭
+        form.on('switch(timingBusinessOnOff)', function(data){
+            layer.load(2);
+            $.ajax({
+                datatype:'json',
+                url:"http://localhost:8080/wechat-model-controller/business_timing_admin/openOrCloseTimingTask",
+                data:{
+                    id:data.elem.dataset.id,
+                    val:data.elem.checked ? 1 : 0
+                },
+                traditional:true, // 防止深度序列化参数
+                type:'post',
+                success:function(obj){
+                    layer.msg(obj.message);
+                    // if(obj.code == 1)
+                    //     layerzk.open(windowObj,{bakcgroundColor:'#009688',msg:obj.message,icoCode:'&#xe605;'}, 3000);
+                    // else
+                    //     layerzk.open(windowObj,{bakcgroundColor:'#f44336d4',msg:obj.message,icoCode:'&#xe67e;'},5000);
+                    // clickLayuiTableBtn('timingBusinessAdminTable');
+                    layer.closeAll('loading');
+                }
+            });
+        });
 
         // 添加定时任务
         function addTimingBusiness(){
