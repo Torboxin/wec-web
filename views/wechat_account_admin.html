@@ -7,48 +7,48 @@
 <body>
     <div class="layui-row layui-col-space5">
         <form class="layui-form layui-row layui-col-space3" lay-filter="wechatAccountAdminScreeCond" style="max-height: 200px;overflow: visible;">
-            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+            <div class="layui-col-lg1 layui-col-md2 layui-col-sm6 layui-col-xs12">
                 <input class="layui-input" type="text" name="wechatid" placeholder="微信号匹配" autocomplete="off">
             </div>
-            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+            <div class="layui-col-lg1 layui-col-md2 layui-col-sm6 layui-col-xs12">
                 <input class="layui-input"type="text" name="account" placeholder="微信账号匹配" autocomplete="off">
             </div>
-            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+            <div class="layui-col-lg1 layui-col-md2 layui-col-sm6 layui-col-xs12">
                 <input class="layui-input" type="text" name="phone" placeholder="手机号匹配" autocomplete="off">
             </div>
-            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+            <div class="layui-col-lg1 layui-col-md2 layui-col-sm6 layui-col-xs12">
                 <input class="layui-input"  type="text" id="wechatAccountAdminDieTime" name="dieTime" placeholder="号码死亡时间" autocomplete="off">
             </div>
             <!--<div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
                 <input class="layui-input"  type="text" name="from" placeholder="数据来源" autocomplete="off">
             </div>-->
-            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+            <div class="layui-col-lg1 layui-col-md2 layui-col-sm6 layui-col-xs12">
                 <input class="layui-input"  type="text" name="deviceNum" placeholder="设备编号" autocomplete="off">
             </div>
-            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+            <div class="layui-col-lg1 layui-col-md2 layui-col-sm6 layui-col-xs12">
                 <input class="layui-input"  type="text" name="proxyIp" placeholder="代理IP地址匹配" autocomplete="off">
             </div>
-            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+            <div class="layui-col-lg1 layui-col-md2 layui-col-sm6 layui-col-xs12">
                 <select name="proxyRegion" id="proxyRegion" lay-search></select>
             </div>
-            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+            <div class="layui-col-lg1 layui-col-md2 layui-col-sm6 layui-col-xs12">
                 <select id="wechatAccountSelectFrom" name="from" lay-search></select>
             </div>
-            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+            <div class="layui-col-lg1 layui-col-md2 layui-col-sm6 layui-col-xs12">
                 <select name="toUser">
                     <option value="">是否分配用户</option>
                     <option value="1">已分配</option>
                     <option value="0">未分配</option>
                 </select>
             </div>
-            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+            <div class="layui-col-lg1 layui-col-md2 layui-col-sm6 layui-col-xs12">
                 <select name="isProxy">
                     <option value="">是否分配代理</option>
                     <option value="1">已分配</option>
                     <option value="0">未分配</option>
                 </select>
             </div>
-            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+            <div class="layui-col-lg1 layui-col-md2 layui-col-sm6 layui-col-xs12">
                 <select name="accountState">
                     <option value="">号码状态</option>
                     <option value="1">登录成功</option>
@@ -56,42 +56,42 @@
                     <option value="3">登录超时</option>
                 </select>
             </div>
-            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+            <div class="layui-col-lg1 layui-col-md2 layui-col-sm6 layui-col-xs12">
                 <select name="isLogin">
                     <option value="">是否开启登录</option>
                     <option value="1">已开启</option>
                     <option value="0">未开启</option>
                 </select>
             </div>
-            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+            <div class="layui-col-lg1 layui-col-md2 layui-col-sm6 layui-col-xs12">
                 <select name="proxyState">
                     <option value="">代理有效状态</option>
                     <option value="0">生效中</option>
                     <option value="1">已失效</option>
                 </select>
             </div>
-            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+            <div class="layui-col-lg1 layui-col-md2 layui-col-sm6 layui-col-xs12">
                 <select name="loginState">
                     <option value="">登录状态</option>
                     <option value="2">已登录</option>
                     <option value="0">未登录</option>
                 </select>
             </div>
-            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+            <div class="layui-col-lg1 layui-col-md2 layui-col-sm6 layui-col-xs12">
                 <select name="updPwdState">
                     <option value="">改密状态</option>
                     <option value="1">已修改</option>
                     <option value="0">未修改</option>
                 </select>
             </div>
-            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+            <div class="layui-col-lg1 layui-col-md2 layui-col-sm6 layui-col-xs12">
                 <select name="updHeadImgState">
                     <option value="">头像状态</option>
                     <option value="1">已修改</option>
                     <option value="0">未修改</option>
                 </select>
             </div>
-            <div class="layui-col-md1 layui-col-sm6 layui-col-xs12">
+            <div class="layui-col-lg1 layui-col-md2 layui-col-sm6 layui-col-xs12">
                 <select name="isExistsFriend">
                     <option value="">有无好友</option>
                     <option value="1">有</option>

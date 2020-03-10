@@ -117,7 +117,7 @@
             skin: 'layerzk-normal',
             btn: ["确认"],
             shadeClose: true,
-            content: '是否确认将当前选中群组数据导出？',
+            content: typeCode == 1 ? '是否确认将当前选中群组数据导出？' : '是否确认将当前选中群组数据的成员信息导出？',
             success:function(layero, index){
                 layero[0].children[1].style.textAlign = 'center';
             },
