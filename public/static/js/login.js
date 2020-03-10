@@ -1,10 +1,12 @@
 var form = layui.form;
+var codeKey = null;
 layui.use('form', function() {
     form.render("checkbox");
 });
 
 form.on('submit(save)', function(data) {
     var ds = data.field;
+    ds.codeKey = codeKey;
     $.ajax({
         datatype:'html',
         url:"http://localhost:8080/wechat-model-controller/login/userLogin",
@@ -35,12 +37,24 @@ form.on('submit(save)', function(data) {
 $(function(){
     if(localStorage.getItem("wechatToken")){
         window.location = "/main";
+        return;
     }
+    changevcode();
 })
 
 function changevcode(){
     //console.log("刷新验证码");
     var randomnum = Math.random();
     var img = document.getElementById("imgid");
-    img.src = "http://localhost:8080/wechat-model-controller/login/verifycode?d="+randomnum;
+    $.ajax({
+        datatype:'json',
+        url:"http://localhost:8080/wechat-model-controller/login/findCodeKey",
+        type:'post',
+        async: false,
+        success:function(ret){
+            console.log(ret);
+            codeKey = ret.codeKey;
+        }
+    });
+    img.src = "http://localhost:8080/wechat-model-controller/login/verifycode?d="+randomnum+"&codeKey="+codeKey;
 }
