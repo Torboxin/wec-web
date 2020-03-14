@@ -65,6 +65,25 @@
             });
         }
 
+        // 监听表格内文本编辑框修改
+        table.on('edit(userAdminTable)', function(obj){
+            var param = {
+                'itemName':obj.field,
+                'itemValue':obj.value,
+                'id':obj.data.id
+            };
+            $.ajax({
+                datatype:'json',
+                url:"http://localhost:8080/wechat-model-controller/user_admin/updUserConfigItem",
+                data:param,
+                type:'post',
+                success:function(obj){
+                    layer.msg(obj.message);
+                    clickLayuiTableBtn('userAdminTable');
+                }
+            });
+        });
+
         // 监听表格内用户角色下拉选修改
         form.on('select(updUserRole)', function(data){
             var param = "userId="+data.elem.dataset.id+"&roleId="+data.value;

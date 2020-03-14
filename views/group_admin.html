@@ -101,6 +101,26 @@
         });
     }
 
+    // 监听自动拉人开关修改
+    form.on('switch(groupAdminAutoAdd)', function(data){
+        layer.load(0);
+        var param = {
+            value:data.elem.checked ? 1 : 0,
+            id:data.othis[0].parentNode.children[0].dataset.id
+        };
+        $.ajax({
+            datatype:'json',
+            url:"http://localhost:8080/wechat-model-controller/wechat_group_admin/autoAddOnOff",
+            data:param,
+            type:'post',
+            success:function(obj){
+                if(obj.code == 1)
+                    layerzk.open(windowObj,{bakcgroundColor:"#009688",msg:obj.message,icoCode:'&#xe605;'}, 3000);
+                layer.closeAll('loading');
+            }
+        });
+    });
+
     // 导出群组数据
     function exportGroupsData(i, typeCode){
         var checkStatus = table.checkStatus('groupAdminTable');
