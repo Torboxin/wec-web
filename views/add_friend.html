@@ -170,7 +170,7 @@
             success:function(phoneBookBatchList){
                 var options = '';
                 for(i in phoneBookBatchList){
-                    options += '<option value="'+phoneBookBatchList[i].id+'">'+phoneBookBatchList[i].batch_serial_number+' ['+phoneBookBatchList[i].batch_remark+']</option>'
+                    options += '<option value="'+phoneBookBatchList[i].id+'">'+phoneBookBatchList[i].batch_serial_number+' ['+phoneBookBatchList[i].batch_remark+'] ' + phoneBookBatchList[i].batch_is_get_num + '</option>'
                 }
                 $('select[name="phoneBookBatchSelect"]').html(options);
                 form.render();

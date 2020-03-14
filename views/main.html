@@ -124,7 +124,7 @@
                         <div class="layui-tab-item layui-show">
                             <div id="htmlContent" class="animated fadeInUp">
                                 <div class="layui-row layui-col-space10 web-index">
-                                    <div class="layui-col-md2 layui-col-sm6 layui-col-xs12">
+                                    <div class="layui-col-md4 layui-col-sm6 layui-col-lg2 layui-col-xs12">
                                         <div class="layui-card">
                                             <div class="layui-card-header"><i class="iconfont">&#xe650;</i>微信存活率</div>
                                             <div class="layui-card-body">
@@ -132,7 +132,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="layui-col-md2 layui-col-sm6 layui-col-xs12">
+                                    <div class="layui-col-md4 layui-col-sm6 layui-col-lg2 layui-col-xs12">
                                         <div class="layui-card">
                                             <div class="layui-card-header"><i class="iconfont">&#xe64d;</i>业务成功率</div>
                                             <div class="layui-card-body">
@@ -140,7 +140,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="layui-col-md2 layui-col-sm6 layui-col-xs12">
+                                    <div class="layui-col-md4 layui-col-sm6 layui-col-lg2 layui-col-xs12">
                                         <div class="layui-card">
                                             <div class="layui-card-header"><i class="iconfont">&#xe64a;</i>加人成功率</div>
                                             <div class="layui-card-body">
@@ -148,7 +148,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="layui-col-md2 layui-col-sm6 layui-col-xs12">
+                                    <div class="layui-col-md4 layui-col-sm6 layui-col-lg2 layui-col-xs12">
                                         <div class="layui-card">
                                             <div class="layui-card-header"><i class="iconfont">&#xe649;</i>新增微信数</div>
                                             <div class="layui-card-body">
@@ -156,7 +156,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="layui-col-md2 layui-col-sm6 layui-col-xs12">
+                                    <div class="layui-col-md4 layui-col-sm6 layui-col-lg2 layui-col-xs12">
                                         <div class="layui-card">
                                             <div class="layui-card-header"><i class="iconfont">&#xe654;</i>设备信息总数</div>
                                             <div class="layui-card-body">
@@ -164,7 +164,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="layui-col-md2 layui-col-sm6 layui-col-xs12">
+                                    <div class="layui-col-md4 layui-col-sm6 layui-col-lg2 layui-col-xs12">
                                         <div class="layui-card">
                                             <div class="layui-card-header"><i class="iconfont">&#xe65c;</i>系统时间</div>
                                             <div class="layui-card-body">
@@ -530,7 +530,7 @@
     // 开启websocket连接
     function initWebSocket(){
         var webSocketUrl = getConfigItemValue("ws_server");
-        var url = webSocketUrl+"?Authorization="+localStorage.wechatToken;
+        var url = webSocketUrl+"?Authorization="+localStorage.wechatToken.replace(/[+]/g, "%2B");
         socket = new WebSocket(url);
         // 监听连接
         socket.onopen = function (e) {
@@ -590,30 +590,50 @@
     }
     // 加载首页统计项
     function loadIndexStatisticsItems(){
-        const opt = {
-            suffix: ' %',
-            decimalPlaces: 2,
-            duration: 2
-        };
-        const opt2 = {
-            suffix: ' 条',
-            duration: 2
-        }
-        var optArr = $('.layui-card .item-opt');
-        var optTwoArr = $('.layui-card .item-opt-two');
-        for(i in optArr){
-            new CountUp(optArr[i], Math.random()*100, opt).start();
-            optArr[i].onclick = function () {
-                new CountUp(this.id, Math.random()*100, opt).start();
+        $.ajax({
+            datatype:'json',
+            url:"http://localhost:8080/wechat-model-controller/comm/getHomeDataItem",
+            type: 'get',
+            success:function(obj){
+                const opt = {
+                    suffix: ' %',
+                    decimalPlaces: 2,
+                    duration: 2
+                };
+                const opt2 = {
+                    suffix: ' 条',
+                    duration: 2
+                }
+                var optArr = $('.layui-card .item-opt');
+                var optTwoArr = $('.layui-card .item-opt-two');
+                for(i in optArr){
+                    var value = null;
+                    if(optArr[i].id === "weChatSuccess"){
+                        value = obj.json.sur / (obj.json.die + obj.json.sur) * 100;
+                    }else if(optArr[i].id === "businessSuccess"){
+                        value = obj.json.businessSur / (obj.json.businessDie + obj.json.businessSur) * 100;
+                    }
+                    new CountUp(optArr[i], value, opt).start();
+                    // optArr[i].onclick = function () {
+                    //     new CountUp(this.id, value, opt).start();
+                    // }
+                }
+                for(i in optTwoArr){
+                    var value = null;
+                    if(optTwoArr[i].id === "newWeChatAccountCount"){
+                        value = obj.json.newAddNum;
+                    }else if(optTwoArr[i].id === "hanrdBaseCount"){
+                        value = obj.json.hanrdBaseNum;
+                    }
+                    new CountUp(optTwoArr[i], value, opt2).start();
+                    // optTwoArr[i].onclick = function () {
+                    //     new CountUp(this.id, value, opt2).start();
+                    // }
+                }
             }
-        }
-        for(i in optTwoArr){
-            new CountUp(optTwoArr[i], parseInt(Math.random()*3000)+3000, opt2).start();
-            optTwoArr[i].onclick = function () {
-                new CountUp(this.id, parseInt(Math.random()*3000)+3000, opt2).start();
-            }
-        }
+        });
     }
+
     // 分辨率较小时的导航栏显示
     function showNav(){
         $('#mainLeftMenu')[0].classList.remove('layui-hide-sm','layui-hide-xs');

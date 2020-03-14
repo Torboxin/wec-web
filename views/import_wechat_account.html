@@ -89,24 +89,28 @@
             type:'post',
             success:function(obj){
                 if(obj.code == 1){
-                    layer.open({
-                        title:'导入微信号反馈信息',
-                        area:['400px','450px'],
-                        content:"<table class=\"layui-table\">" +
-                            "  <thead>" +
-                            "    <tr>" +
-                            "      <th>微信号</th>" +
-                            "      <th>失败原因</th>" +
-                            "    </tr> " +
-                            "  </thead>" +
-                            "  <tbody>" +
-                            obj.message +
-                            "  </tbody>" +
-                            "</table>",
-                        success:function(layero, index){
-                            layero[0].children[1].style.overflow = "auto";
-                        }
-                    });
+                    if(obj.message) {
+                        layer.open({
+                            title: '导入微信号反馈信息',
+                            area: ['400px', '450px'],
+                            content: "<table class=\"layui-table\">" +
+                                "  <thead>" +
+                                "    <tr>" +
+                                "      <th>微信号</th>" +
+                                "      <th>失败原因</th>" +
+                                "    </tr> " +
+                                "  </thead>" +
+                                "  <tbody>" +
+                                obj.message +
+                                "  </tbody>" +
+                                "</table>",
+                            success: function (layero, index) {
+                                layero[0].children[1].style.overflow = "auto";
+                            }
+                        });
+                    }else{
+                        layerzk.open(windowObj,{bakcgroundColor:'#009688',msg:'导入已完成！',icoCode:'&#xe605;'},3000);
+                    }
                 }else{
                     layerzk.open(windowObj,{bakcgroundColor:"#d4000d",msg:obj.message,icoCode:'&#xe67e;'},3000);
                 }
