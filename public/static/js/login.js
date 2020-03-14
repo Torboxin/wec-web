@@ -52,7 +52,6 @@ function changevcode(){
         type:'post',
         async: false,
         success:function(ret){
-            console.log(ret);
             codeKey = ret.codeKey;
         }
     });
