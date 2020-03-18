@@ -55,6 +55,7 @@
                             ,{field: 'add_system_friend_interval', title: '添加好友间隔', width:120, edit:'text'}
                             ,{field: 'send_message_interval', title: '发送消息间隔', width:120, edit:'text'}
                             ,{field: 'send_friend_circle_interval', title: '发送朋友圈间隔', width:120, edit:'text'}
+                            ,{field: 'create_group_number', title: '建群组最大人数', width:120, edit:'text'}
                             ,{field: 'disabled', title: '禁用', width:120, templet:function (o) {
                                     return o.disabled==1?'<input type="checkbox" name="userAdminDisabledOnOff" lay-filter="userAdminDisabledOnOff" lay-skin="switch" data-id="'+o.id+'" lay-text="已禁用|未禁用" checked>':'<input type="checkbox" name="userAdminDisabledOnOff" lay-filter="userAdminDisabledOnOff" lay-skin="switch" data-id="'+o.id+'" lay-text="已禁用|未禁用">';
                                 }}

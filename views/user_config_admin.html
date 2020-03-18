@@ -31,6 +31,12 @@
         </div>
     </div>
     <div class="layui-card">
+        <div class="layui-card-header">建群组人员最大数</div>
+        <div class="layui-card-body">
+            <input id="createGroupNumber" type="number" name="createGroupNumber" placeholder="请输入建群组人员最大数量" autocomplete="off" class="layui-input" onblur="updUserConfigItem(this)" onfocus="recordThisUserConfigItemValue(this)">
+        </div>
+    </div>
+    <div class="layui-card">
         <div class="layui-card-header">切换选项卡自动刷新</div>
         <div class="layui-card-body">
             <input type="checkbox" name="changeTabRefresh" lay-skin="switch" lay-text="开启|关闭" lay-filter="changeTabRefresh" checked>
@@ -41,6 +47,7 @@
     var oldAddSystemFriendInterval = null;
     var oldSendMessageInterval = null;
     var oldSendFriendCircleInterval = null;
+    var oldCreateGroupNumber = null;
 
    function getUserConfigData(){
        $.ajax({
@@ -51,6 +58,7 @@
                $('#addSystemFriendInterval').val(obj.add_system_friend_interval);
                $('#sendMessageInterval').val(obj.send_message_interval);
                $('#sendFriendCircleInterval').val(obj.send_friend_circle_interval);
+               $('#createGroupNumber').val(obj.create_group_number);
                $(".user-config-form")[0].dataset.id = obj.id;
                $(".user-config-form")[0].dataset.uid = obj.user_id;
            }
@@ -68,15 +76,17 @@
     })
 
     function updUserConfigItem(i){
-        if(!isIntervalTime(i.value)) {
-            layer.tips('时间格式错误！', i, {
-                tips: [1, '#f44336d4'],
-                time: 3000
-            });
-            i.id == "addSystemFriendInterval" ? i.value = oldAddSystemFriendInterval : null;
-            i.id == "sendMessageInterval" ? i.value = oldSendMessageInterval : null;
-            i.id == "sendFriendCircleInterval" ? i.value = oldSendFriendCircleInterval : null;
-            return;
+        if(i.id != 'createGroupNumber'){
+            if(!isIntervalTime(i.value)) {
+                layer.tips('时间格式错误！', i, {
+                    tips: [1, '#f44336d4'],
+                    time: 3000
+                });
+                i.id == "addSystemFriendInterval" ? i.value = oldAddSystemFriendInterval : null;
+                i.id == "sendMessageInterval" ? i.value = oldSendMessageInterval : null;
+                i.id == "sendFriendCircleInterval" ? i.value = oldSendFriendCircleInterval : null;
+                return;
+            }
         }
         var param = {
             [i.id]:i.value,
@@ -95,6 +105,7 @@
                     i.id == "addSystemFriendInterval" ? i.value = oldAddSystemFriendInterval : null;
                     i.id == "sendMessageInterval" ? i.value = oldSendMessageInterval : null;
                     i.id == "sendFriendCircleInterval" ? i.value = oldSendFriendCircleInterval : null;
+                    i.id == "createGroupNumber" ? i.value = oldCreateGroupNumber : null;
                     layerzk.open(windowObj,{bakcgroundColor:'#f44336d4',msg:obj.message,icoCode:'&#xe67e;'},5000);
                 }
             }
@@ -105,5 +116,6 @@
         i.id == "addSystemFriendInterval" ? oldAddSystemFriendInterval = i.value : null;
         i.id == "sendMessageInterval" ? oldSendMessageInterval = i.value : null;
         i.id == "sendFriendCircleInterval" ? oldSendFriendCircleInterval = i.value : null;
+        i.id == "createGroupNumber" ? oldCreateGroupNumber = i.value : null;
     }
 </script>
