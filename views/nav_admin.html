@@ -38,7 +38,7 @@
                             {width:80,type:"checkbox"}
                             ,{field: 'id', title: 'ID', width:80, sort: true,hide: true}
                             ,{field: 'nav_name', title: '名称', width:140}
-                            ,{field: 'nav_url', title: '链接', width:200}
+                            ,{field: 'nav_url', title: '链接', width:200, edit:'text'}
                             ,{field: 'nav_father_name', title: '上级菜单', width:140}
                             ,{field: 'nav_type_code', title: '类型', width:60, templet:function (o) {
                                     return navStateList[o.nav_type_code];
@@ -46,9 +46,38 @@
                             ,{field: 'nav_ico_code', title: '图标', width:60, templet:function (o) {
                                     return '<i class="iconfont" style="font-size: 22px;">'+o.nav_ico_code+'</i>';
                                 }}
-                            ,{field: 'nav_order_code', title: '排序', width:90}
-                            ,{field: 'nav_permission', title: '权限', width:200}
+                            ,{field: 'nav_order_code', title: '排序', width:90, edit:'text'}
+                            ,{field: 'nav_permission', title: '权限', width:200, edit:'text'}
                         ]]
+                    });
+
+                    table.on('edit(navigationAdminTable)', function(obj){
+                        if(!obj.value){
+                            layer.msg("输入值错误！");
+                            return;
+                        }
+                        var param = {
+                            value:obj.value,
+                            name:obj.field,
+                            id:obj.tr[0].children[1].firstChild.innerText
+                        };
+                        layer.load(2); // 开启loading
+                        $.ajax({
+                            datatype:'json',
+                            url:"http://localhost:8080/wechat-model-controller/nav_admin/updNavData",
+                            data:param,
+                            traditional:true, // 防止深度序列化参数
+                            type:'post',
+                            success:function(obj){
+                                if(obj.code == 1)
+                                    layerzk.open(windowObj,{bakcgroundColor:'#009688',msg:obj.message,icoCode:'&#xe605;'},3000);
+                                else
+                                    layerzk.open(windowObj,{bakcgroundColor:'#f44336d4',msg:obj.message,icoCode:'&#xe67e;'},5000);
+                                clickLayuiTableBtn('navigationAdminTable');
+                                loadNavTree();
+                                layer.closeAll('loading'); //关闭loading
+                            }
+                        });
                     });
                 }
             });
