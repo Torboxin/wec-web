@@ -38,6 +38,10 @@
     </div>
     <script type="text/html" id="phoneBookBatchAdminTableEventButton">
         <a class="layui-btn layui-btn-xs" lay-event="batchInfo"><i class="iconfont">&#xe6c3;</i>批次详情</a>
+        <a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="updDataState"><i class="iconfont">&#xe766;</i>切换数据状态</a>
+    </script>
+    <script type="text/html" id="phoneBookAdminTableEventButton">
+        <a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="updDataState"><i class="iconfont">&#xe766;</i>切换数据状态</a>
     </script>
     <script>
         var phoneBookUpLoad = null;
@@ -93,7 +97,7 @@
                     ,{field: 'batch_create_time', title: '创建时间', width:160, sort: true}
                     ,{field: 'batch_use_time', title: '最后调用时间', width:160, sort: true}
                     ,{field: 'batch_remark', title: '备注', width:80}
-                    ,{toolbar: '#phoneBookBatchAdminTableEventButton', width:110}
+                    ,{toolbar: '#phoneBookBatchAdminTableEventButton', width:220}
                 ]]
             });
 
@@ -104,6 +108,18 @@
 
                 if(layEvent === 'batchInfo'){
                     loadPhoneBookAdminTable(tr[0].children[1].children[0].innerText);
+                }else if(layEvent === 'updDataState'){
+                    var param = {id:tr[0].children[1].firstChild.innerText};
+                    $.ajax({
+                        datatype:'json',
+                        url:"http://localhost:8080/wechat-model-controller/phone_book_admin/updPhoneBookBatchDataDisabledState",
+                        data: param,
+                        type:'post',
+                        success:function(obj){
+                            layer.msg(obj.message);
+                            clickLayuiTableBtn('phoneBookBatchAdminTable');
+                        }
+                    });
                 }
             })
         }
@@ -127,8 +143,29 @@
                     ,{field: 'batch_serial_number', title: '导入批次', width:140, sort:true}
                     ,{field: 'create_time', title: '导入时间', width:160, sort:true}
                     ,{field: 'remark', title: '备注', width:80}
+                    ,{toolbar: '#phoneBookAdminTableEventButton', width:130}
                 ]]
             });
+
+            table.on('tool(phoneBookAdminTable)', function (obj) {
+                var data = obj.data;
+                var layEvent = obj.event;
+                var tr = obj.tr;
+
+                if(layEvent === 'updDataState'){
+                    var param = {id:tr[0].children[0].firstChild.innerText};
+                    $.ajax({
+                        datatype:'json',
+                        url:"http://localhost:8080/wechat-model-controller/phone_book_admin/updPhoneBookDataDisabledState",
+                        data: param,
+                        type:'post',
+                        success:function(obj){
+                            layer.msg(obj.message);
+                            clickLayuiTableBtn('phoneBookAdminTable');
+                        }
+                    });
+                }
+            })
         }
 
         function importPhoneBook(){
