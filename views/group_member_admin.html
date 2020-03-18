@@ -79,7 +79,7 @@
                 ,{field: 'wechat_nickname', title: '微信昵称', width:100}
                 ,{field: 'add_group_time', title: '入群时间', width:160}
                 ,{field: 'is_quit', title: '是否退群', width:100, templet:function(o){
-                        return o.is_quit == 0 ? "未退群" : "已退群";
+                        return o.is_quit == 0 ? "<span style='color: #4caf50;'>未退群</span>" : "<span style='color: red;'>已退群</span>";
                     }}
                 ,{field: 'quit_time', title: '退群时间', width:160, templet:function(o){
                         return o.quit_time ? o.quit_time : "无数据";
