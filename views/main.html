@@ -58,12 +58,12 @@
 
         @font-face {
             font-family: 'iconfont';  /* project id 1376042 */
-            src: url('//at.alicdn.com/t/font_1376042_olm7wd5hm7.eot');
-            src: url('//at.alicdn.com/t/font_1376042_olm7wd5hm7.eot?#iefix') format('embedded-opentype'),
-            url('//at.alicdn.com/t/font_1376042_olm7wd5hm7.woff2') format('woff2'),
-            url('//at.alicdn.com/t/font_1376042_olm7wd5hm7.woff') format('woff'),
-            url('//at.alicdn.com/t/font_1376042_olm7wd5hm7.ttf') format('truetype'),
-            url('//at.alicdn.com/t/font_1376042_olm7wd5hm7.svg#iconfont') format('svg');
+            src: url('//at.alicdn.com/t/font_1376042_1ewf5s6lz05.eot');
+            src: url('//at.alicdn.com/t/font_1376042_1ewf5s6lz05.eot?#iefix') format('embedded-opentype'),
+            url('//at.alicdn.com/t/font_1376042_1ewf5s6lz05.woff2') format('woff2'),
+            url('//at.alicdn.com/t/font_1376042_1ewf5s6lz05.woff') format('woff'),
+            url('//at.alicdn.com/t/font_1376042_1ewf5s6lz05.ttf') format('truetype'),
+            url('//at.alicdn.com/t/font_1376042_1ewf5s6lz05.svg#iconfont') format('svg');
         }
 
         .iconfont{
@@ -197,7 +197,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <button type="button" class="layui-btn layui-btn-primary" onclick="info()">一个标准的按钮</button>
+                                <!--<button type="button" class="layui-btn layui-btn-primary" onclick="info()">一个标准的按钮</button>-->
                             </div>
                         </div>
                     </div>
@@ -267,7 +267,7 @@
             intervalTime:["^\\d{2,3}[-]\\d{2,4}$", '时间间隔格式错误！']
         })
         // 初始化websocket
-        initWebSocket();
+        // initWebSocket();
         // 初始化导航
         initNav();
         $.ajax({
@@ -691,9 +691,9 @@
     }
 
     // 给某个消息窗口增加数据
-    function info(){
-        layerzk.open(windowObj,{bakcgroundColor:rgba16(),msg:msgList[parseInt(Math.random()*msgList.length)],icoCode:icoCodeList[parseInt(Math.random()*icoCodeList.length)]},3000);
-    }
+    // function info(){
+    //     layerzk.open(windowObj,{bakcgroundColor:rgba16(),msg:msgList[parseInt(Math.random()*msgList.length)],icoCode:icoCodeList[parseInt(Math.random()*icoCodeList.length)]},3000);
+    // }
     // 随机layui动画
     function mathLayuiAnim(){
         return parseInt(Math.random()*7);
@@ -879,11 +879,8 @@
         index++;
         var tIndex = index;
         for(i in menuList) {
-
             if(menuList[i].typeCode == 1){
-                if(menuList[i].dl.length <= 0){
-                    return "";
-                }else{
+                if(menuList[i].dl.length > 0){
                     var t = menuList[i];
                     var html = createrMultiLevelMenu(t.dl,index);
                     if(html){
