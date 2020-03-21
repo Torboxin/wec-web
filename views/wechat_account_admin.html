@@ -5,7 +5,7 @@
     <title>Title</title>
 </head>
 <body>
-    <div class="layui-row layui-col-space5">
+    <div id="wechatAccountAdminDiv" class="layui-row layui-col-space5">
         <form class="layui-form layui-row layui-col-space3" lay-filter="wechatAccountAdminScreeCond" style="max-height: 200px;overflow: visible;">
             <div class="layui-col-lg1 layui-col-md2 layui-col-sm6 layui-col-xs12">
                 <input class="layui-input" type="text" name="wechatid" placeholder="微信号匹配" autocomplete="off">
@@ -126,15 +126,15 @@
                 <button type="button" class="layui-btn layui-btn-sm" onclick="createNewGroup(this)"><i class="iconfont">&#xe74b;</i>发起群聊</button>
                 <button type="button" class="layui-btn layui-btn-sm" onclick="addGroupMember(this)"><i class="iconfont">&#xe63e;</i>添加群成员</button>
                 <button type="button" class="layui-btn layui-btn-normal layui-btn-sm" onclick="importWechatAccount()" id="importWechatAccountFile"><i class="iconfont">&#xe6a9;</i>导入微信账号</button>
-                <button type="button" class="layui-btn layui-btn-sm" onclick="updToUser(this)"><i class="iconfont">&#xe8cf;</i>分配用户</button>
-                <button type="button" class="layui-btn layui-btn-sm" onclick="updToDevice(this)"><i class="iconfont">&#xe8cf;</i>分配设备</button>
+                <button v-if="permissionAdmin > 0" type="button" class="layui-btn layui-btn-sm wechat-admin" onclick="updToUser(this)"><i class="iconfont">&#xe8cf;</i>分配用户</button>
+                <button v-if="permissionAdmin > 0" type="button" class="layui-btn layui-btn-sm wechat-admin" onclick="updToDevice(this)"><i class="iconfont">&#xe8cf;</i>分配设备</button>
                 <button type="button" class="layui-btn layui-btn-sm" onclick="updAccountPwd()"><i class="iconfont">&#xe8cf;</i>修改密码</button>
                 <button type="button" class="layui-btn layui-btn-sm" onclick="updAccountNickname()"><i class="iconfont">&#xe8cf;</i>修改昵称</button>
                 <button type="button" class="layui-btn layui-btn-sm" onclick="updAccountHeadImg()"><i class="iconfont">&#xe714;</i>修改头像</button>
-                <button type="button" class="layui-btn layui-btn-primary layui-btn-sm" onclick="openLogin(this)"><i class="iconfont">&#xeb17;</i>开启登录</button>
-                <button type="button" class="layui-btn layui-btn-warm layui-btn-sm" onclick="closeLogin(this)"><i class="iconfont">&#xe6fa;</i>关闭登录</button>
-                <button type="button" class="layui-btn layui-btn-primary layui-btn-sm" onclick="updAccountSync(this)"><i class="iconfont">&#xe647;</i>同步账号</button>
-                <button type="button" class="layui-btn layui-btn-primary layui-btn-sm" onclick="proxyRepair(this)"><i class="iconfont">&#xe842;</i>代理修复</button>
+                <button type="button" class="layui-btn layui-btn-primary layui-btn-sm wechat-admin" onclick="openLogin(this)"><i class="iconfont">&#xeb17;</i>开启登录</button>
+                <button type="button" class="layui-btn layui-btn-warm layui-btn-sm wechat-admin" onclick="closeLogin(this)"><i class="iconfont">&#xe6fa;</i>关闭登录</button>
+                <button type="button" class="layui-btn layui-btn-primary layui-btn-sm wechat-admin" onclick="updAccountSync(this)"><i class="iconfont">&#xe647;</i>同步账号</button>
+                <button type="button" class="layui-btn layui-btn-primary layui-btn-sm wechat-admin" onclick="proxyRepair(this)"><i class="iconfont">&#xe842;</i>代理修复</button>
                 <button type="button" class="layui-btn layui-btn-primary layui-btn-sm" onclick="sendFriendCircle()"><i class="iconfont">&#xe619;</i>发送朋友圈</button>
                 <button type="button" class="layui-btn layui-btn-primary layui-btn-sm" onclick="fillMemberNotEnoughCreateGroup()"><i class="iconfont">&#xe842;</i>一键修复建群组</button>
                 <button type="button" class="layui-btn layui-btn-primary layui-btn-sm" onclick="allcationCreateGroup()"><i class="iconfont">&#xe757;</i>一键分配建群组</button>
@@ -145,6 +145,12 @@
         </div>
     </div>
     <script>
+        new Vue({
+            el: '#wechatAccountAdminDiv',
+            data:{
+                permissionAdmin:adminPermission()
+            }
+        })
         $(function () {
             laydate.render({
                 elem: '#wechatAccountAdminDieTime'
@@ -216,6 +222,7 @@
         }
 
         function loadWechatAccountAdminTable(){
+            // var clos = getAccountAdminTableCols();
             var param = form.val("wechatAccountAdminScreeCond");
             table.render({
                 elem: '#wechatAccountAdminTable'
@@ -230,15 +237,18 @@
                     ,{field: 'aid', title: 'AID', width:80,hide: true}
                     ,{field: 'pid', title: 'PID', width:80,hide: true}
                     ,{field: 'uid', title: 'UID', width:80,hide: true}
-                    ,{field: 'wechat_id', title: '微信号', width:120}
+                    ,{field: 'wechat_id', title: '微信号', width:120, hide: true}
                     ,{title: '微信账号', width:120, templet:function(o){
                             return "<span style='color:"+(o.account_die_time ? "red" : "#4caf50")+"'>" + (o.wechat_account) + "</span>";
                         }}
-                    ,{field: 'wechat_phone', title: '微信手机号', width:120}
+                    ,{field: 'wechat_phone', title: '微信手机号', width:120, hide: true}
                     ,{field: 'wechat_nickname', title: '昵称', width:120}
-                    ,{field: 'wechat_headimg', title: '头像', width:120}
+                    ,{field: 'wechat_headimg', title: '头像', width:120, hide: true}
                     ,{field: 'wechat_set_headimg', title: '修改头像', width:90, templet:function (o) {
                             return o.wechat_set_headimg == 1 ? "<span style='color: #4caf50;'>已修改</span>" : "<span style='color: red;'>未修改</span>";
+                        }}
+                    ,{field: 'wechat_set_pwd', title: '改密状态', width:90, templet:function (o) {
+                            return o.wechat_set_pwd == 1 ? "<span style='color: #4caf50;'>已修改</span>" : "<span style='color: red;'>未修改</span>";
                         }}
                     ,{field: 'username', title: '所属用户', width:90}
                     ,{field: 'not_sys_friend_num', title: '非系统好友', width:120}
@@ -277,41 +287,38 @@
                             }
                             return val;
                         }}
-                    ,{title: '分组来源', width:120, templet:function (o) {
+                    ,{field: 'is_login', title: '登录权限', width:90, templet:function (o) {
+                            return o.is_login == 1 ? "<span style='color: #4caf50;'>开启</span>" : "<span style='color: red;'>关闭</span>";
+                        }}
+                    ,{title: '分组来源', width:100, templet:function (o) {
                             return o.from_name ? o.from_name : "无数据";
                         }}
-                    ,{title: '建群组', width:120, templet:function (o) {
+                    ,{title: '建群组', width:80, templet:function (o) {
                             return o.c_g_name ? o.c_g_name : "无数据";
                         }}
-                    ,{title: '建群号', width:100, templet:function(o){
+                    ,{title: '建群号', width:80, templet:function(o){
                             return o.is_create_group_number == 1 ? "<span style='color: #4caf50;'>是</span>" : "<span style='color: red;'>否</span>";
+                        }}
+                    ,{field: 'add_frined', title: '加好友', width:100, templet:function (o) {
+                            return o.add_frined==1?'<input type="checkbox" name="wechatAccountItem" lay-filter="wechatAccountItem" lay-skin="switch" data-id="'+o.aid+'" data-key="addFrined" lay-text="开启|关闭" checked>':'<input type="checkbox" name="wechatAccountItem" lay-filter="wechatAccountItem" lay-skin="switch" data-id="'+o.aid+'" data-key="addFrined" lay-text="开启|关闭">';
+                        }}
+                    ,{field: 'is_send_friend_circle', title: '发朋友圈', width:100, templet:function (o) {
+                            return o.is_send_friend_circle==1?'<input type="checkbox" name="wechatAccountItem" lay-filter="wechatAccountItem" lay-skin="switch" data-id="'+o.aid+'" data-key="isSendFriendCircle" lay-text="开启|关闭" checked>':'<input type="checkbox" name="wechatAccountItem" lay-filter="wechatAccountItem" lay-skin="switch" data-id="'+o.aid+'" data-key="isSendFriendCircle" lay-text="开启|关闭">';
+                        }}
+                    ,{field: 'is_dialogue', title: '对话', width:100, templet:function (o) {
+                            return o.is_dialogue==1?'<input type="checkbox" name="wechatAccountItem" lay-filter="wechatAccountItem" lay-skin="switch" data-id="'+o.aid+'" data-key="isDialogue" lay-text="开启|关闭" checked>':'<input type="checkbox" name="wechatAccountItem" lay-filter="wechatAccountItem" lay-skin="switch" data-id="'+o.aid+'" data-key="isDialogue" lay-text="开启|关闭">';
                         }}
                     ,{field: 'is_search', title: '被搜索', width:100, templet:function (o) {
                             return o.is_search==1?'<input type="checkbox" name="wechatAccountItem" lay-filter="wechatAccountItem" lay-skin="switch" data-id="'+o.aid+'" data-key="isSearch" lay-text="可以|不可以" checked>':'<input type="checkbox" name="wechatAccountItem" lay-filter="wechatAccountItem" lay-skin="switch" data-id="'+o.aid+'" data-key="isSearch" lay-text="可以|不可以">';
                         }}
-                    ,{field: 'add_frined', title: '加好友', width:100, templet:function (o) {
-                            return o.add_frined==1?'<input type="checkbox" name="wechatAccountItem" lay-filter="wechatAccountItem" lay-skin="switch" data-id="'+o.aid+'" data-key="addFrined" lay-text="可以|不可以" checked>':'<input type="checkbox" name="wechatAccountItem" lay-filter="wechatAccountItem" lay-skin="switch" data-id="'+o.aid+'" data-key="addFrined" lay-text="可以|不可以">';
-                        }}
                     ,{field: 'is_group', title: '被拉群', width:100, templet:function (o) {
                             return o.is_group==1?'<input type="checkbox" name="wechatAccountItem" lay-filter="wechatAccountItem" lay-skin="switch" data-id="'+o.aid+'" data-key="isGroup" lay-text="可以|不可以" checked>':'<input type="checkbox" name="wechatAccountItem" lay-filter="wechatAccountItem" lay-skin="switch" data-id="'+o.aid+'" data-key="isGroup" lay-text="可以|不可以">';
-                        }}
-                    ,{field: 'is_send_friend_circle', title: '发朋友圈', width:100, templet:function (o) {
-                            return o.is_send_friend_circle==1?'<input type="checkbox" name="wechatAccountItem" lay-filter="wechatAccountItem" lay-skin="switch" data-id="'+o.aid+'" data-key="isSendFriendCircle" lay-text="可以|不可以" checked>':'<input type="checkbox" name="wechatAccountItem" lay-filter="wechatAccountItem" lay-skin="switch" data-id="'+o.aid+'" data-key="isSendFriendCircle" lay-text="可以|不可以">';
-                        }}
-                    ,{field: 'is_dialogue', title: '对话', width:100, templet:function (o) {
-                            return o.is_dialogue==1?'<input type="checkbox" name="wechatAccountItem" lay-filter="wechatAccountItem" lay-skin="switch" data-id="'+o.aid+'" data-key="isDialogue" lay-text="可以|不可以" checked>':'<input type="checkbox" name="wechatAccountItem" lay-filter="wechatAccountItem" lay-skin="switch" data-id="'+o.aid+'" data-key="isDialogue" lay-text="可以|不可以">';
                         }}
                     ,{field: 'proxy_sync', title: '代理同步', width:110, templet:function (o) {
                             return o.proxy_sync==1?'<input type="checkbox" name="wechatAccountItem" lay-filter="wechatAccountItem" lay-skin="switch" data-id="'+o.aid+'" data-key="proxySync" lay-text="已同步|未同步" checked>':'<input type="checkbox" name="wechatAccountItem" lay-filter="wechatAccountItem" lay-skin="switch" data-id="'+o.aid+'" data-key="proxySync" lay-text="已同步|未同步">';
                         }}
-                    ,{field: 'synchronize_state', title: '同步状态', width:110, templet:function (o) {
+                    ,{field: 'synchronize_state', title: '账号同步', width:110, templet:function (o) {
                             return o.synchronize_state==1?'<input type="checkbox" name="wechatAccountItem" lay-filter="wechatAccountItem" lay-skin="switch" data-id="'+o.aid+'" data-key="synchronizeState" lay-text="已同步|未同步" checked>':'<input type="checkbox" name="wechatAccountItem" lay-filter="wechatAccountItem" lay-skin="switch" data-id="'+o.aid+'" data-key="synchronizeState" lay-text="已同步|未同步">';
-                        }}
-                    ,{field: 'is_login', title: '登录权限', width:90, templet:function (o) {
-                            return o.is_login == 1 ? "<span style='color: #4caf50;'>开启</span>" : "<span style='color: red;'>关闭</span>";
-                        }}
-                    ,{field: 'wechat_set_pwd', title: '改密状态', width:90, templet:function (o) {
-                            return o.wechat_set_pwd == 1 ? "<span style='color: #4caf50;'>已修改</span>" : "<span style='color: red;'>未修改</span>";
                         }}
                     ,{field: 'login_time', title: '登录时间', width:180}
                     ,{field: 'data_type_code', title: '数据类型', width:100, templet:function (o) {
