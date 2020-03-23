@@ -24,7 +24,7 @@ form.on('submit(save)', function(data) {
         success:function(ret){
             layer.msg(ret.message);
             if (ret.code == 1) {
-                localStorage.setItem("wechatToken",ret.json.token);
+                sessionStorage.setItem("wechatToken",ret.json.token);
                 window.location = "/main";
             }else{
                 changevcode();
@@ -35,7 +35,7 @@ form.on('submit(save)', function(data) {
 });
 
 $(function(){
-    if(localStorage.getItem("wechatToken")){
+    if(sessionStorage.getItem("wechatToken")){
         window.location = "/main";
         return;
     }

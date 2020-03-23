@@ -220,7 +220,7 @@
     });
     // 设置ajax全局参数
     $.ajaxSetup({
-        headers:{"Authorization":isNull(localStorage.wechatToken)},
+        headers:{"Authorization":isNull(sessionStorage.wechatToken)},
         crossDomain: true,
         error:function(jqXHR, textStatus, errorThrown){
             // 请求出现任何异常错误必须清除弹窗
@@ -243,7 +243,7 @@
     var socket = null;
     var html404 = null;
     var menuTabCutReLoad = null;
-    var table = layui.table.set({headers:{"Authorization":isNull(localStorage.wechatToken)}});
+    var table = layui.table.set({headers:{"Authorization":isNull(sessionStorage.wechatToken)}});
     var form = layui.form;
     var transfer = layui.transfer;
     var element = layui.element;
@@ -258,7 +258,7 @@
         setInterval(function(){
             $('#systemTime').text(getNowFormatDate());
         },1000)
-        if(!localStorage.wechatToken)
+        if(!sessionStorage.wechatToken)
             window.location = "/";
         // 设置from验证规则
         form.verify({
@@ -528,7 +528,7 @@
     // 开启websocket连接
     function initWebSocket(){
         var webSocketUrl = getConfigItemValue("ws_server");
-        var url = webSocketUrl+"?Authorization="+localStorage.wechatToken.replace(/[+]/g, "%2B");
+        var url = webSocketUrl+"?Authorization="+sessionStorage.wechatToken.replace(/[+]/g, "%2B");
         socket = new WebSocket(url);
         // 监听连接
         socket.onopen = function (e) {
@@ -562,7 +562,7 @@
     }
     // 清理并初始化
     function clearInit(){
-        localStorage.clear();
+        sessionStorage.clear();
         window.location = "/";
     }
     // 登出当前登录账号

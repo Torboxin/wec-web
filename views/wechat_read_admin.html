@@ -49,7 +49,7 @@
             wechatReadUpLoad = upLoad.render({
                 elem:'#selectWechatReadFile',
                 url:'http://localhost:8080/wechat-model-controller/comm/upLoadFile',
-                headers:{"Authorization":isNull(localStorage.wechatToken)},
+                headers:{"Authorization":isNull(sessionStorage.wechatToken)},
                 acceptMime:'text/plain',
                 exts:'txt',
                 before:function(obj){
