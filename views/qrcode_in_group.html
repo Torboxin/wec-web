@@ -40,6 +40,7 @@
         qrCodeImgUpLoad = upLoad.render({
             elem:'#selectQRCodeImgFile',
             url:'http://localhost:8080/wechat-model-controller/comm/resolverQRCodeImgVal',
+            headers:{"Authorization":isNull(sessionStorage.wechatToken)},
             acceptMime:'image/*',
             exts:'jpg|png',
             multiple:true,

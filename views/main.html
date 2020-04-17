@@ -55,15 +55,18 @@
         .layui-nav{
             cursor: pointer;
         }
+        .item-cpi{
+            float: right;
+        }
 
         @font-face {
             font-family: 'iconfont';  /* project id 1376042 */
-            src: url('//at.alicdn.com/t/font_1376042_1ewf5s6lz05.eot');
-            src: url('//at.alicdn.com/t/font_1376042_1ewf5s6lz05.eot?#iefix') format('embedded-opentype'),
-            url('//at.alicdn.com/t/font_1376042_1ewf5s6lz05.woff2') format('woff2'),
-            url('//at.alicdn.com/t/font_1376042_1ewf5s6lz05.woff') format('woff'),
-            url('//at.alicdn.com/t/font_1376042_1ewf5s6lz05.ttf') format('truetype'),
-            url('//at.alicdn.com/t/font_1376042_1ewf5s6lz05.svg#iconfont') format('svg');
+            src: url('//at.alicdn.com/t/font_1376042_y8s6m6eaa9.eot');
+            src: url('//at.alicdn.com/t/font_1376042_y8s6m6eaa9.eot?#iefix') format('embedded-opentype'),
+            url('//at.alicdn.com/t/font_1376042_y8s6m6eaa9.woff2') format('woff2'),
+            url('//at.alicdn.com/t/font_1376042_y8s6m6eaa9.woff') format('woff'),
+            url('//at.alicdn.com/t/font_1376042_y8s6m6eaa9.ttf') format('truetype'),
+            url('//at.alicdn.com/t/font_1376042_y8s6m6eaa9.svg#iconfont') format('svg');
         }
 
         .iconfont{
@@ -129,6 +132,8 @@
                                             <div class="layui-card-header"><i class="iconfont">&#xe650;</i>微信存活率</div>
                                             <div class="layui-card-body">
                                                 <span id="weChatSuccess" class="web-index-statistics-item item-opt"></span>
+                                                <span class="layui-badge item-cpi"></span>
+                                                <span style="clear: right;display: block;"></span>
                                             </div>
                                         </div>
                                     </div>
@@ -137,30 +142,38 @@
                                             <div class="layui-card-header"><i class="iconfont">&#xe64d;</i>业务成功率</div>
                                             <div class="layui-card-body">
                                                 <span id="businessSuccess" class="web-index-statistics-item item-opt"></span>
+                                                <span class="layui-badge item-cpi"></span>
+                                                <span style="clear: right;display: block;"></span>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="layui-col-md4 layui-col-sm6 layui-col-lg2 layui-col-xs12">
                                         <div class="layui-card">
-                                            <div class="layui-card-header"><i class="iconfont">&#xe64a;</i>加人成功率</div>
+                                            <div class="layui-card-header"><i class="iconfont">&#xe768;</i>添加通过率</div>
                                             <div class="layui-card-body">
                                                 <span id="addFriendSuccess" class="web-index-statistics-item item-opt"></span>
+                                                <span class="layui-badge item-cpi"></span>
+                                                <span style="clear: right;display: block;"></span>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="layui-col-md4 layui-col-sm6 layui-col-lg2 layui-col-xs12">
                                         <div class="layui-card">
-                                            <div class="layui-card-header"><i class="iconfont">&#xe649;</i>新增微信数</div>
+                                            <div class="layui-card-header"><i class="iconfont">&#xe768;</i>新增微信数</div>
                                             <div class="layui-card-body">
                                                 <span id="newWeChatAccountCount" class="web-index-statistics-item item-opt-two"></span>
+                                                <span class="layui-badge item-cpi"></span>
+                                                <span style="clear: right;display: block;"></span>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="layui-col-md4 layui-col-sm6 layui-col-lg2 layui-col-xs12">
                                         <div class="layui-card">
-                                            <div class="layui-card-header"><i class="iconfont">&#xe654;</i>设备信息总数</div>
+                                            <div class="layui-card-header"><i class="iconfont">&#xe64b;</i>电话本内有效数据</div>
                                             <div class="layui-card-body">
-                                                <span id="hanrdBaseCount" class="web-index-statistics-item item-opt-two"></span>
+                                                <span id="validPhoneDataCount" class="web-index-statistics-item item-opt-two"></span>
+                                                <span class="layui-badge item-cpi"></span>
+                                                <span style="clear: right;display: block;"></span>
                                             </div>
                                         </div>
                                     </div>
@@ -169,30 +182,17 @@
                                             <div class="layui-card-header"><i class="iconfont">&#xe65c;</i>系统时间</div>
                                             <div class="layui-card-body">
                                                 <span id="systemTime" class="web-index-statistics-item" style="font-size: 18px;"></span>
+                                                <span class="layui-badge layui-bg-gray item-cpi">-----</span>
+                                                <span style="clear: right;display: block;"></span>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="layui-row">
-                                    <div class="layui-carousel" id="test1" lay-filter="test1">
+                                    <div class="layui-carousel" id="rollChart" lay-filter="rollChart">
                                         <div carousel-item>
                                             <div>
-                                                <div id="accountProbability" style="width: 100%;height: 100%;" ></div>
-                                            </div>
-                                            <div>
-                                                <div id="sk2"></div>
-                                            </div>
-                                            <div>
-                                                <div id="sk3"></div>
-                                            </div>
-                                            <div>
-                                                <div id="sk4"></div>
-                                            </div>
-                                            <div>
-                                                <div id="sk5"></div>
-                                            </div>
-                                            <div>
-                                                <div id="sk6"></div>
+                                                <div id="businessItemNum" style="width: 100%;height: 100%;" ></div>
                                             </div>
                                         </div>
                                     </div>
@@ -334,7 +334,7 @@
         });
         //建造实例
         carousel.render({
-            elem: '#test1'
+            elem: '#rollChart'
             ,height: '600px'
             ,width: '100%' //设置容器宽度
             ,arrow: 'hover' //始终显示箭头
@@ -346,101 +346,6 @@
 
         });
         loadIndexStatisticsItems();
-        myChart = echarts.init(document.getElementById('accountProbability'),{width:'auto',height:'auto'});
-        var option = {
-            tooltip : {
-                trigger: 'axis',
-                axisPointer : {            // 坐标轴指示器，坐标轴触发有效
-                    type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
-                }
-            },
-            legend: {
-                data:['']
-            },
-            grid: {
-                left: '3%',
-                right: '4%',
-                bottom: '3%',
-                containLabel: true
-            },
-            xAxis : [
-                {
-                    type : 'category',
-                    data : ['周一','周二','周三','周四','周五','周六','周日']
-                }
-            ],
-            yAxis : [
-                {
-                    type : 'value'
-                }
-            ],
-            series : [
-                {
-                    name:'直接访问',
-                    type:'bar',
-                    data:[320, 332, 301, 334, 390, 330, 320]
-                },
-                {
-                    name:'邮件营销',
-                    type:'bar',
-                    stack: '广告',
-                    data:[120, 132, 101, 134, 90, 230, 210]
-                },
-                {
-                    name:'联盟广告',
-                    type:'bar',
-                    stack: '广告',
-                    data:[220, 182, 191, 234, 290, 330, 310]
-                },
-                {
-                    name:'视频广告',
-                    type:'bar',
-                    stack: '广告',
-                    data:[150, 232, 201, 154, 190, 330, 410]
-                },
-                {
-                    name:'搜索引擎',
-                    type:'bar',
-                    data:[862, 1018, 964, 1026, 1679, 1600, 1570],
-                    markLine : {
-                        lineStyle: {
-                            normal: {
-                                type: 'dashed'
-                            }
-                        },
-                        data : [
-                            [{type : 'min'}, {type : 'max'}]
-                        ]
-                    }
-                },
-                {
-                    name:'百度',
-                    type:'bar',
-                    barWidth : 5,
-                    stack: '搜索引擎',
-                    data:[620, 732, 701, 734, 1090, 1130, 1120]
-                },
-                {
-                    name:'谷歌',
-                    type:'bar',
-                    stack: '搜索引擎',
-                    data:[120, 132, 101, 134, 290, 230, 220]
-                },
-                {
-                    name:'必应',
-                    type:'bar',
-                    stack: '搜索引擎',
-                    data:[60, 72, 71, 74, 190, 130, 110]
-                },
-                {
-                    name:'其他',
-                    type:'bar',
-                    stack: '搜索引擎',
-                    data:[62, 82, 91, 84, 109, 110, 120]
-                }
-            ]
-        };
-        myChart.setOption(option);
     })
 
     // 获取当前系统时间
@@ -593,6 +498,55 @@
             url:"http://localhost:8080/wechat-model-controller/comm/getHomeDataItem",
             type: 'get',
             success:function(obj){
+                $.ajax({
+                    datatype:'json',
+                    url:"http://localhost:8080/wechat-model-controller/comm/getHomeChartData",
+                    type: 'get',
+                    success:function(obj){
+                        var sum = 0;
+                        var weChatAccountsStatusChartData = [];
+                        var businessType = [];
+                        for(i in obj.data){
+                            weChatAccountsStatusChartData.push({value:obj.data[i].count,name:typeName[obj.data[i].business_type_code]});
+                            businessType.push(typeName[obj.data[i].business_type_code])
+                            sum += obj.data[i].count;
+                        }
+                        myChart = echarts.init(document.getElementById('businessItemNum'),{width:'auto',height:'auto'});
+                        var option = {
+                            title: {
+                                text: '各项业务所执行次数',
+                                subtext: '仅代表当天数据(总数:'+sum+')',
+                                left: 'center'
+                            },
+                            tooltip: {
+                                trigger: 'item',
+                                formatter: '{a} <br/>{b} : {c} ({d}%)'
+                            },
+                            legend: {
+                                orient: 'vertical',
+                                left: 'left',
+                                data: businessType
+                            },
+                            series: [
+                                {
+                                    name: '业务类型',
+                                    type: 'pie',
+                                    radius: '55%',
+                                    center: ['50%', '60%'],
+                                    data: weChatAccountsStatusChartData,
+                                    emphasis: {
+                                        itemStyle: {
+                                            shadowBlur: 10,
+                                            shadowOffsetX: 0,
+                                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                                        }
+                                    }
+                                }
+                            ]
+                        };
+                        myChart.setOption(option);
+                    }
+                });
                 const opt = {
                     suffix: ' %',
                     decimalPlaces: 2,
@@ -606,27 +560,81 @@
                 var optTwoArr = $('.layui-card .item-opt-two');
                 for(i in optArr){
                     var value = null;
+                    var contrast = null;
                     if(optArr[i].id === "weChatSuccess"){
                         value = obj.json.sur / (obj.json.die + obj.json.sur) * 100;
+                        value = value ? value : 0;
+                        contrast = value - (obj.json.oldHomeData.sur / (obj.json.oldHomeData.die + obj.json.oldHomeData.sur) * 100);
                     }else if(optArr[i].id === "businessSuccess"){
                         value = obj.json.businessSur / (obj.json.businessDie + obj.json.businessSur) * 100;
+                        value = value ? value : 0;
+                        contrast = value - (obj.json.oldHomeData.businessSur / (obj.json.oldHomeData.businessDie + obj.json.oldHomeData.businessSur) * 100);
+                    }else if(optArr[i].id === "addFriendSuccess"){
+                        if(obj.json.addFriendCount){
+                            value = obj.json.newFriendNum / obj.json.addFriendCount * 100;
+                        }else{
+                            value = 0;
+                        }
+                        value = value ? value : 0;
+                        contrast = value - (obj.json.oldHomeData.newFriendNum / obj.json.oldHomeData.addFriendCount * 100);
                     }
-                    new CountUp(optArr[i], value, opt).start();
-                    // optArr[i].onclick = function () {
-                    //     new CountUp(this.id, value, opt).start();
-                    // }
+                    if(value != null){
+                        new CountUp(optArr[i], value, opt).start()
+                        var addClass = null;
+                        var text = null;
+                        if(contrast == 0){
+                            addClass = "layui-bg-gray";
+                            text = "较昨日 ---";
+                        }else if(!contrast){
+                            addClass = "item-cpi";
+                            text = "较昨日 +" + value.toFixed(2) + "%";
+                        }else if(contrast > 0){
+                            addClass = "item-cpi";
+                            text = "较昨日 +" + contrast.toFixed(2) + "%";
+                        }else{
+                            addClass = "layui-bg-green";
+                            text = "较昨日 " + contrast.toFixed(2) + "%";
+                        }
+                        optArr[i].parentNode.children[1].classList.add(addClass)
+                        optArr[i].parentNode.children[1].innerText = text;
+                        // optArr[i].onclick = function () {
+                        //     new CountUp(this.id, value, opt).start();
+                        // }
+                    }
                 }
                 for(i in optTwoArr){
                     var value = null;
+                    var contrast = null;
                     if(optTwoArr[i].id === "newWeChatAccountCount"){
                         value = obj.json.newAddNum;
-                    }else if(optTwoArr[i].id === "hanrdBaseCount"){
-                        value = obj.json.hanrdBaseNum;
+                        contrast = value - obj.json.oldHomeData.newAddNum;
+                    }else if(optTwoArr[i].id === "validPhoneDataCount"){
+                        value = obj.json.validPhoneDataCount;
+                        contrast = value - obj.json.oldHomeData.validPhoneDataCount;
                     }
-                    new CountUp(optTwoArr[i], value, opt2).start();
-                    // optTwoArr[i].onclick = function () {
-                    //     new CountUp(this.id, value, opt2).start();
-                    // }
+                    if(value != null){
+                        new CountUp(optTwoArr[i], value, opt2).start();
+                        var addClass = null;
+                        var text = null;
+                        if(contrast ==  0){
+                            addClass = "layui-bg-gray";
+                            text = "较昨日 ---";
+                        }else if(!contrast){
+                            addClass = "item-cpi";
+                            text = "较昨日 +" + value;
+                        }else if(contrast > 0){
+                            addClass = "item-cpi";
+                            text = "较昨日 +" + contrast;
+                        }else{
+                            addClass = "layui-bg-green";
+                            text = "较昨日 " + contrast;
+                        }
+                        optTwoArr[i].parentNode.children[1].classList.add(addClass)
+                        optTwoArr[i].parentNode.children[1].innerText = text;
+                        // optTwoArr[i].onclick = function () {
+                        //     new CountUp(this.id, value, opt2).start();
+                        // }
+                    }
                 }
             }
         });
