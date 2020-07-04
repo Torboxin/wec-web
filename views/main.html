@@ -559,25 +559,34 @@
                 var optArr = $('.layui-card .item-opt');
                 var optTwoArr = $('.layui-card .item-opt-two');
                 for(i in optArr){
-                    var value = null;
-                    var contrast = null;
-                    if(optArr[i].id === "weChatSuccess"){
-                        value = obj.json.sur / (obj.json.die + obj.json.sur) * 100;
-                        value = value ? value : 0;
-                        contrast = value - (obj.json.oldHomeData.sur / (obj.json.oldHomeData.die + obj.json.oldHomeData.sur) * 100);
-                    }else if(optArr[i].id === "businessSuccess"){
-                        value = obj.json.businessSur / (obj.json.businessDie + obj.json.businessSur) * 100;
-                        value = value ? value : 0;
-                        contrast = value - (obj.json.oldHomeData.businessSur / (obj.json.oldHomeData.businessDie + obj.json.oldHomeData.businessSur) * 100);
-                    }else if(optArr[i].id === "addFriendSuccess"){
-                        if(obj.json.addFriendCount){
-                            value = obj.json.newFriendNum / obj.json.addFriendCount * 100;
-                        }else{
-                            value = 0;
-                        }
-                        value = value ? value : 0;
-                        contrast = value - (obj.json.oldHomeData.newFriendNum / obj.json.oldHomeData.addFriendCount * 100);
+                    if(i === "length"){
+                        break;
                     }
+                    var value = null,oldValue = null;
+                    var contrast = null;
+                    var divisor = null,dividend = null,oldDivisor = null,oldDividend = null;
+                    var inalNum = 100;
+                    if(optArr[i].id === "weChatSuccess"){
+                        divisor = obj.json.sur;
+                        dividend = obj.json.die + obj.json.sur;
+                        oldDivisor = obj.json.oldHomeData.sur;
+                        oldDividend = obj.json.oldHomeData.die + obj.json.oldHomeData.sur;
+                    }else if(optArr[i].id === "businessSuccess"){
+                        divisor = obj.json.businessSur;
+                        dividend = obj.json.businessDie + obj.json.businessSur;
+                        oldDivisor = obj.json.oldHomeData.businessSur;
+                        oldDividend = obj.json.oldHomeData.businessDie + obj.json.oldHomeData.businessSur;
+                    }else if(optArr[i].id === "addFriendSuccess"){
+                        divisor = obj.json.newFriendNum;
+                        dividend = obj.json.addFriendCount;
+                        oldDivisor = obj.json.oldHomeData.newFriendNum;
+                        oldDividend = obj.json.oldHomeData.addFriendCount;
+                    }
+                    value = divisor / dividend * inalNum;
+                    value = value ? value : 0;
+                    oldValue = oldDivisor / oldDividend * inalNum;
+                    oldValue = oldValue ? oldValue : 0;
+                    contrast = value - oldValue;
                     if(value != null){
                         new CountUp(optArr[i], value, opt).start()
                         var addClass = null;
@@ -607,10 +616,10 @@
                     var contrast = null;
                     if(optTwoArr[i].id === "newWeChatAccountCount"){
                         value = obj.json.newAddNum;
-                        contrast = value - obj.json.oldHomeData.newAddNum;
+                        contrast = value - (obj.json.oldHomeData.newAddNum ? obj.json.oldHomeData.newAddNum : 0);
                     }else if(optTwoArr[i].id === "validPhoneDataCount"){
                         value = obj.json.validPhoneDataCount;
-                        contrast = value - obj.json.oldHomeData.validPhoneDataCount;
+                        contrast = value - (obj.json.oldHomeData.validPhoneDataCount ? obj.json.oldHomeData.validPhoneDataCount : 0);
                     }
                     if(value != null){
                         new CountUp(optTwoArr[i], value, opt2).start();
